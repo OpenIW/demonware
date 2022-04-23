@@ -9,7 +9,7 @@ LARGE_INTEGER bdPlatformTiming::getHiResTimeStamp()
     return time;
 }
 
-float bdPlatformTiming::getElapsedTime(unsigned int time1, unsigned int time2)
+float bdPlatformTiming::getElapsedTime(bdUInt64 time1, bdUInt64 time2)
 {
     LARGE_INTEGER frequency;
 

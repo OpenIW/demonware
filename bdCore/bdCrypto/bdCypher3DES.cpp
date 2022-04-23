@@ -7,7 +7,7 @@ bdCypher3Des::bdCypher3Des() : bdCypher(8u)
 
     if (register_cipher(&des3_desc) == -1)
     {
-        //bdLogError("Error registering 3DES cipher: [%s]", error_to_string(1));
+        bdLogError("bdCypher3Des", "Error registering 3DES cipher: [%s]", error_to_string(1));
     }
 }
 
@@ -39,20 +39,20 @@ bdBool bdCypher3Des::init(const bdUByte8* key, bdUInt keySize)
 
     if (keySize != 24)
     {
-        //bdLogError("Cannot init 3DES cypher with key of size [%u], Key must 24 bytes", keySize);
+        bdLogError("bdCypher3Des", "Cannot init 3DES cypher with key of size [%u], Key must 24 bytes", keySize);
         return false;
     }
     index = find_cipher_id(des3_desc.ID);
     if (index == -1)
     {
-        //bdLogError("Error retrieving 3DES cipher");
+        bdLogError("bdCypher3Des", "Error retrieving 3DES cipher");
         return false;
     }
     bdMemset(iv, 0, 8);
     error = cbc_start(index, iv, key, 24, 0, &m_cbc);
     if (error)
     {
-        //bdLogError("Error starting cipher: [%s]", error_to_string(error));
+        bdLogError("bdCypher3Des", "Error starting cipher: [%s]", error_to_string(error));
         return false;
     }
     return true;

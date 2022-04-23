@@ -2,6 +2,7 @@
 #pragma once
 
 #ifdef _WINDOWS
+#pragma warning(disable: 4273) // Silence
 #define _WINSOCKAPI_    // stops windows.h including winsock.h
 #include <Windows.h>
 #include <WinSock2.h>

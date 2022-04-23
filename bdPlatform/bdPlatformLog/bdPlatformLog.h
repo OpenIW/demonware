@@ -25,3 +25,4 @@ public:
 
 #define bdLogError(channel, Msg, ...) bdLogMessage(BD_LOG_ERROR, "err/", channel, __FILE__, __FUNCTION__, __LINE__, Msg, ##__VA_ARGS__)
 #define bdLogWarn(channel, Msg, ...) bdLogMessage(BD_LOG_WARNING, "warn/", channel, __FILE__, __FUNCTION__, __LINE__, Msg, ##__VA_ARGS__)
+#define bdLogInfo(channel, Msg, ...) bdLogMessage(BD_LOG_INFO, "info/", channel, __FILE__, __FUNCTION__, __LINE__, Msg, ##__VA_ARGS__)

@@ -1,58 +1,60 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::Node::Node()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::Node::Node()
 {
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::Node::Node(keyType* key, dataType* value, const Node* next)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType* key, dataType* value, Node* const next) : m_data(value), m_key(*key)
 {
+    m_next = next;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::Node::~Node()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::Node::~Node()
 {
+    delete this;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::bdHashMap()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::bdHashMap()
 {
     m_numIterators = 0;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::bdHashMap(const bdUInt initialCapacity, const bdFloat32 loadFactor)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::bdHashMap(const bdUInt initialCapacity, const bdFloat32 loadFactor)
 {
     m_numIterators = 0;
     createMap(initialCapacity, loadFactor);
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdHashMap<hashClass, dataType, keyType>::~bdHashMap()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdHashMap<keyType, dataType, hashClass>::~bdHashMap()
 {
     clear();
-    bdDeallocate<bdHashMap<hashClass, dataType, keyType>::Node*>(m_map);
+    bdDeallocate<bdHashMap<keyType, dataType, hashClass>::Node*>(m_map);
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline void bdHashMap<hashClass, dataType, keyType>::releaseIterator(Iterator iterator)
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::releaseIterator(Iterator iterator)
 {
     if (iterator)
     {
-        //bdAssertMsg(m_numIterators != 0, "bdHashMap::releaseIteratorIterator count reached 0, can't release iterator");
+        bdAssert(m_numIterators != 0, "bdHashMap::releaseIteratorIterator count reached 0, can't release iterator");
         --m_numIterators;
     }
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline dataType* bdHashMap<hashClass, dataType, keyType>::getValue(Iterator* iterator)
+template<typename keyType, typename dataType, typename hashClass>
+inline dataType* bdHashMap<keyType, dataType, hashClass>::getValue(Iterator iterator)
 {
-    return reinterpret_cast<Node*>(*iterator)->m_data;
+    return &reinterpret_cast<Node*>(iterator)->m_data;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline void bdHashMap<hashClass, dataType, keyType>::next(Iterator* iterator)
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator* iterator)
 {
     bdUInt hash;
     Node* n;
@@ -79,15 +81,15 @@ inline void bdHashMap<hashClass, dataType, keyType>::next(Iterator* iterator)
     }
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdBool bdHashMap<hashClass, dataType, keyType>::remove(keyType* key)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(keyType* key)
 {
     Node* prevNode;
     Node* n;
     bdUInt hash;
     bdUInt i;
 
-    //bdAssertMsg(m_numIterators == 0, "bdHashMap::remove, another iterator is being held while removing from hashmap");
+    bdAssert(m_numIterators == 0, "bdHashMap::remove, another iterator is being held while removing from hashmap");
     hash = m_hashClass.getHash(key);
     i = getHashIndex(hash);
     n = m_map[i];
@@ -113,21 +115,58 @@ inline bdBool bdHashMap<hashClass, dataType, keyType>::remove(keyType* key)
     {
         m_map[i] = n->m_next;
     }
-    n->~Node();
-    delete n;
     --m_size;
 
     return true;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline void bdHashMap<hashClass, dataType, keyType>::clear()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key, dataType* value)
+{
+    Node* n;
+    Node* prevNode;
+    bdUInt i;
+    bdUInt hash;
+
+    hash = m_hashClass.getHash(key);
+    i = getHashIndex(hash);
+    n = m_map[i];
+    prevNode = NULL;
+    bdAssert(m_numIterators == 0, "bdHashMap::remove, another iterator is being held while removing from hashmap");
+    while (1)
+    {
+        if (!n)
+        {
+            return false;
+        }
+        if (*key == n->m_key)
+        {
+            break;
+        }
+        prevNode = n;
+        n = n->m_next;
+    }
+    if (prevNode)
+    {
+        prevNode->m_next = n->m_next;
+    }
+    else
+    {
+        m_map[i] = n->m_next;
+    }
+    value = &n->m_data;
+    --m_size;
+    return true;
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::clear()
 {
     Node* n;
     Node* last;
     bdUInt i;
 
-    //bdAssertMsg(m_numIterators == 0, "bdHashMap::clear, another iterator is being held while clearing the hashmap");
+    bdAssert(m_numIterators == 0, "bdHashMap::clear, another iterator is being held while clearing the hashmap");
 
     for (i = 0; i < m_capacity; ++i)
     {
@@ -144,8 +183,8 @@ inline void bdHashMap<hashClass, dataType, keyType>::clear()
     m_size = 0;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline void bdHashMap<hashClass, dataType, keyType>::resize(const bdUInt newSize)
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::resize(const bdUInt newSize)
 {
     bdUInt i;
     bdUInt targetCapacity;
@@ -182,8 +221,8 @@ inline void bdHashMap<hashClass, dataType, keyType>::resize(const bdUInt newSize
     bdDeallocate<Node*>(oldmap);
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdBool bdHashMap<hashClass, dataType, keyType>::get(const keyType* key, const dataType* value)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType* key, const dataType* value)
 {
     Iterator iterator = getIterator(key);
     if (!iterator)
@@ -195,20 +234,20 @@ inline bdBool bdHashMap<hashClass, dataType, keyType>::get(const keyType* key, c
     return true;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdBool bdHashMap<hashClass, dataType, keyType>::put(const keyType* key, const dataType* value)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType* key, const dataType* value)
 {
     Node* n;
     bdUInt i;
     bdUInt hash;
 
-    //bdAssertMsg(m_numIterators == 0, "bdHashMap::put, another iterator is being held while inserting to hashmap");
+    bdAssert(m_numIterators == 0, "bdHashMap::put, another iterator is being held while inserting to hashmap");
 
     hash = m_hashClass.getHash(key);
     i = getHashIndex(hash);
-    for (n = this->m_map[i]; n; n = n->next)
+    for (n = m_map[i]; n; n = n->m_next)
     {
-        if (key == &n->m_key)
+        if (*key == n->m_key)
         {
             return false;
         }
@@ -219,40 +258,41 @@ inline bdBool bdHashMap<hashClass, dataType, keyType>::put(const keyType* key, c
         i = getHashIndex(hash);
     }
     ++m_size;
-    m_map[i] = new Node(key, value, m_map[i]);
+    m_map[i] = new Node(const_cast<keyType*>(key), const_cast<dataType*>(value), m_map[i]);
     return true;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline void bdHashMap<hashClass, dataType, keyType>::createMap(const bdUInt initialCapacity, const bdFloat32 loadFactor)
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::createMap(const bdUInt initialCapacity, const bdFloat32 loadFactor)
 {
     if (loadFactor <= 0.0 || loadFactor > 1.0)
     {
-        bdLogMessage(
-            BD_LOG_WARNING,
-            "warn/",
-            "hashmap",
-            __FILE__,
-            __FUNCTION__,
-            __LINE__,
-            "Illegal loadFactor. Using default value.");
+        bdLogWarn("hashmap", "Illegal loadFactor. Using default value.");
     }
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdUInt bdHashMap<hashClass, dataType, keyType>::getHashIndex(const bdUInt hash)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdUInt bdHashMap<keyType, dataType, hashClass>::getHashIndex(const bdUInt hash)
 {
     return hash & m_capacity - 1;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdInt bdHashMap<hashClass, dataType, keyType>::getSize()
+template<typename keyType, typename dataType, typename hashClass>
+inline bdInt bdHashMap<keyType, dataType, hashClass>::getSize()
 {
     return this->m_size;
 }
 
-template<typename hashClass, typename dataType, typename keyType>
-inline bdUInt bdHashMap<hashClass, dataType, keyType>::getNextCapacity(const bdUInt targetCapacity)
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::containsKey(const keyType* key)
+{
+    Iterator iterator = getIterator(key);
+    releaseIterator(iterator);
+    return iterator != NULL;
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline bdUInt bdHashMap<keyType, dataType, hashClass>::getNextCapacity(const bdUInt targetCapacity)
 {
     return bdBitOperations::nextPowerOf2(targetCapacity);
 }

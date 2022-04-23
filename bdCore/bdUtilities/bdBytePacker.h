@@ -15,3 +15,40 @@ public:
     template <typename varType>
     static bdBool appendBasicType(const void* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var);
 };
+
+// Keep this just in case.
+#define SkipBytes(status, data, size, offset, newOffset, bytes)                                                \
+if (status)                                                                                                    \
+{                                                                                                              \
+    status = bdBytePacker::skipBytes(reinterpret_cast<const bdUByte8*>(data), size, offset, newOffset, bytes); \
+}
+
+#define RewindBytes(status, data, size, offset, newOffset, bytes)                                                \
+if (status)                                                                                                      \
+{                                                                                                                \
+    status = bdBytePacker::rewindBytes(reinterpret_cast<const bdUByte8*>(data), size, offset, newOffset, bytes); \
+}
+
+#define RemoveBasicType(status, type, data, size, offset, newOffset, var)                                            \
+if (status)                                                                                                          \
+{                                                                                                                    \
+    status = bdBytePacker::removeBasicType<type>(reinterpret_cast<const void*>(data), size, offset, newOffset, var); \
+}
+
+#define AppendBasicType(status, type, data, size, offset, newOffset, var)                                            \
+if (status)                                                                                                          \
+{                                                                                                                    \
+    status = bdBytePacker::appendBasicType<type>(reinterpret_cast<const void*>(data), size, offset, newOffset, var); \
+}
+
+#define Deserialize(status, var, data, size, offset, newOffset)  \
+if (status)                                                      \
+{                                                                \
+    status = var.deserialize(reinterpret_cast<const bdUByte8*>(data), size, offset, newOffset);      \
+}
+
+#define Serialize(status, var, data, size, offset, newOffset)    \
+if (status)                                                      \
+{                                                                \
+    status = var.serialize(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset);      \
+}
