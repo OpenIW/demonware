@@ -24,6 +24,7 @@ public:
     void decreaseCapacity(const bdUInt decrease);
     ~bdArray();
     bdBool rangeCheck(const bdUInt i);
+    bdBool isEmpty();
     T* operator[](const bdUInt i);
     void operator=(bdArray<T>* a);
 };

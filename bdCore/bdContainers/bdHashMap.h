@@ -89,6 +89,7 @@ public:
     }
     void releaseIterator(Iterator iterator);
     dataType* getValue(Iterator iterator);
+    keyType* getKey(Iterator iterator);
     void next(Iterator* iterator);
     bdBool remove(keyType* key);
     bdBool remove(const keyType* key, dataType* value);

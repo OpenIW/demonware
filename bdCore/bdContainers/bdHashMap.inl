@@ -1,3 +1,4 @@
+#include "bdHashMap.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename keyType, typename dataType, typename hashClass>
@@ -51,6 +52,12 @@ template<typename keyType, typename dataType, typename hashClass>
 inline dataType* bdHashMap<keyType, dataType, hashClass>::getValue(Iterator iterator)
 {
     return &reinterpret_cast<Node*>(iterator)->m_data;
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline keyType* bdHashMap<keyType, dataType, hashClass>::getKey(Iterator iterator)
+{
+    return &reinterpret_cast<Node*>(iterator)->m_key;
 }
 
 template<typename keyType, typename dataType, typename hashClass>

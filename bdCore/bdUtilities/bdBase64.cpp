@@ -44,7 +44,8 @@ bdUInt findIndex(bdNChar8 c, const bdNChar8* cvt)
     {
         return 63;
     }
-    //bdLog(BD_LOG_WARNING, "Unknown base64 character ['%c'] - treating as 'A'", c);
+    bdLogWarn("bdCore/bdUtilities/bdBase64", "Unknown base64 character ['%c'] - treating as 'A'", c);
+    return 0;
 }
 
 void bdBase64::encode(const bdByte8* src, const bdUInt srcLen, bdNChar8* dest, const bdUInt destLen)

@@ -29,6 +29,7 @@ bdNATType bdNATTypeDiscoveryClient::getNATType()
     {
         return m_NATType;
     }
+    return BD_NAT_UNKNOWN;
 }
 
 bdNATTypeDiscoveryClient::bdNATTypeDiscoveryClientState bdNATTypeDiscoveryClient::getStatus()

@@ -41,7 +41,7 @@ bdByteBuffer::bdByteBuffer(const bdUInt size, bdBool isTypeChecked) : bdReferenc
 bdByteBuffer::~bdByteBuffer()
 {
     m_allocatedData = true;
-    //bdAssertMsg(m_data == BD_NULL || m_allocatedData, "Potential deallocation error with derived class");
+    bdAssert(m_data == BD_NULL || m_allocatedData, "Potential deallocation error with derived class");
     if (m_data && m_allocatedData)
     {
         bdDeallocate<bdUByte8>(m_data);
@@ -96,14 +96,7 @@ void bdByteBuffer::allocateBuffer()
 {
     if (m_data)
     {
-        bdLogMessage(
-            BD_LOG_WARNING,
-            "warn/",
-            "core/bytebuffer",
-            __FILE__,
-            __FUNCTION__,
-            __LINE__,
-            "Buffer already allocated.");
+        bdLogWarn("core/bytebuffer", "Buffer already allocated.");
     }
     else
     {
@@ -161,15 +154,7 @@ bdBool bdByteBuffer::expand(bdUInt32 increaseSize)
 
     if (!m_data)
     {
-        bdLogMessage(
-            BD_LOG_INFO,
-            "info/",
-            "core/bytebuffer",
-            __FILE__,
-            __FUNCTION__,
-            __LINE__,
-            "Expanding unallocated buffer; allocating with %u Bytes.",
-            increaseSize);
+        bdLogInfo("core/bytebuffer", "Expanding unallocated buffer; allocating with %u Bytes.", increaseSize);
         m_size = increaseSize;
         if (m_data)
         {
@@ -177,8 +162,8 @@ bdBool bdByteBuffer::expand(bdUInt32 increaseSize)
         }
         else
         {
-            //bdAssert(false, "Failed to allocate new buffer.");
-            //bdLog(BD_LOG_ERROR, "Could not allocate buffer of size = %u Bytes.", increaseSize);
+            bdAssert(false, "Failed to allocate new buffer.");
+            bdLogError("core/bytebuffer", "Could not allocate buffer of size = %u Bytes.", increaseSize);
             return false;
         }
     }
@@ -213,7 +198,7 @@ bdBool bdByteBuffer::expand(bdUInt32 increaseSize)
         m_readPtr = oldReadPtr;
         m_writePtr = oldWritePtr;
         m_allocatedData = true;
-        //bdLog(BD_LOG_ERROR, "Could not allocate new buffer for expansion. Requested size = %u Bytes.", increaseSize + m_size);
+        bdLogError("core/bytebuffer", "Could not allocate new buffer for expansion. Requested size = %u Bytes.", increaseSize + m_size);
         return false;
     }
 }
@@ -227,7 +212,7 @@ bdBool bdByteBuffer::read(void* data, bdUInt size)
     maxReadSize = getMaxReadSize();
     if (size > maxReadSize)
     {
-        //bdLog(BD_LOG_WARNING, "Could not read data from buffer. Insufficient data available.\n");
+        bdLogError("core/bytebuffer", "Could not read data from buffer. Insufficient data available.\n");
     }
     else
     {
@@ -250,12 +235,12 @@ bdBool bdByteBuffer::readArrayStart(bdUByte8 expectedType, bdUInt32* numElements
     ok = readUByte8(&type);
     if (!ok)
     {
-        //bdLog(BD_LOG_WARNING, "readArrayStart: No array\n");
+        bdLogWarn("core/bytebuffer", "readArrayStart: No array\n");
         return false;
     }
     if (type - 100 != expectedType)
     {
-        //bdLog(BD_LOG_ERROR, "readArrayStart: Expected type %d but read type %d\n", exptectedType, type);
+        bdLogError("core/bytebuffer", "readArrayStart: Expected type %d but read type %d\n", expectedType, type);
         return false;
     }
     m_typeChecked = 0;
@@ -330,7 +315,7 @@ bdBool bdByteBuffer::readDataType(const bdBitBufferDataType expectedDataType)
     {
         bdBitBuffer::typeToString(expectedDataType, string1, sizeof(string1));
         bdBitBuffer::typeToString(type, string2, sizeof(string2));
-        //bdLog(BD_LOG_ERROR, "Expected: %s , read: %s ", string1, string2);
+        bdLogError("core/bytebuffer", "Expected: %s , read: %s ", string1, string2);
     }
     return ok;
 }
@@ -465,7 +450,7 @@ bdBool bdByteBuffer::readBlob(bdUByte8* const blob, bdUInt32* length)
         ok = read(blob, (*length >= tempLength ? tempLength : *length));
         if (tempLength > *length)
         {
-            //bdLog(BD_LOG_WARNING, "Reading BLOB (%u bytes) buffer too small (%u bytes).", tempLength, *length);
+            bdLogWarn("core/bytebuffer", "Reading BLOB (%u bytes) buffer too small (%u bytes).", tempLength, *length);
         }
     }
     *length = tempLength;
@@ -519,8 +504,8 @@ bdBool bdByteBuffer::readNAN()
     {
         return readDataType(BD_BB_NAN_TYPE);
     }
-    //bdLog(BD_LOG_ERROR, "NaN types cannot be used on not type checked byte buffers");
-    return ok;
+    bdLogError("core/bytebuffer", "NaN types cannot be used on not type checked byte buffers");
+    return false;
 }
 
 bdBitBufferDataType bdByteBuffer::readDataType()
@@ -528,7 +513,7 @@ bdBitBufferDataType bdByteBuffer::readDataType()
     bdBool ok = false;
     bdUByte8 dataTypeTemp = 0;
 
-    //bdLog(BD_LOG_WARNING, "bdByteBuffer::readDataType with no parameters is unsafe and deprecated. Use bdByteBuffer::inspectDataType instead.");
+    bdLogWarn("core/bytebuffer", "bdByteBuffer::readDataType with no parameters is unsafe and deprecated. Use bdByteBuffer::inspectDataType instead.");
 
     ok = read(&dataTypeTemp, sizeof(dataTypeTemp));
     if (ok)
@@ -549,8 +534,8 @@ bdBool bdByteBuffer::write(const void* data, const bdUInt size)
         maxWriteSize = getMaxWriteSize();
         if (size > maxWriteSize)
         {
-            //bdAssert(false, "Could not write data to buffer. Insufficient space.\n");
-            //bdLog(BD_LOG_ERROR, "Could not write data to buffer. Insufficient space.");
+            bdAssert(false, "Could not write data to buffer. Insufficient space.\n");
+            bdLogError("core/bytebuffer", "Could not write data to buffer. Insufficient space.");
             return ok;
         }
         ok = bdBytePacker::appendBuffer(m_writePtr, maxWriteSize, 0, &temp, data, size);
@@ -603,7 +588,7 @@ bdBool bdByteBuffer::writeBool(bdBool b)
 
     if (writeDataType(BD_BB_BOOL_TYPE))
     {
-        ok - write<bdBool>(&b);
+        ok = write<bdBool>(&b);
     }
     return ok;
 }
@@ -772,7 +757,7 @@ bdBool bdByteBuffer::writeString(const bdNChar8* const s, const bdUWord maxLen)
     {
         lengthToWrite = maxLen - 1;
         addNullTerminator = true;
-        //bdLog(BD_LOG_WARNING, "String was not null terminated. Data will be truncated.");
+        bdLogWarn("core/bytebuffer", "String was not null terminated. Data will be truncated.");
     }
     else
     {

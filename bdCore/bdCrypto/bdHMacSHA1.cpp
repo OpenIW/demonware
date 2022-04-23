@@ -12,13 +12,13 @@ bdHMacSHA1::bdHMacSHA1(const bdUByte8* const key, const bdUInt keySize) : bdHMac
 
     if (register_hash(&sha1_desc) == -1)
     {
-        //bdLog(BD_LOG_ERROR, "Error registering SHA1");
+        bdLogError("bdHMacSHA1", "Error registering SHA1");
     }
     idx = find_hash("sha1");
     status = hmac_init(&m_state, idx, key, keySize);
     if (status)
     {
-        //bdLog(BD_LOG_ERROR, "Error setting up HMAC-SHA1: [%s]", error_to_string(status));
+        bdLogError("bdHMacSHA1", "Error setting up HMAC-SHA1: [%s]", error_to_string(status));
     }
 }
 
@@ -49,9 +49,10 @@ bdBool bdHMacSHA1::process(const bdUByte8* const data, const bdUInt length)
     status = hmac_process(&m_state, data, length);
     if (!status)
     {
-        return 1;
+        return true;
     }
-    //bdLog(BD_LOG_ERROR, "Error processing HMAC-SHA1: [%s]", error_to_string(status));
+    bdLogError("bdHMacSHA1", "Error processing HMAC-SHA1: [%s]", error_to_string(status));
+    return false;
 }
 
 bdBool bdHMacSHA1::getData(bdUByte8* dst, bdUInt* length)
@@ -61,7 +62,7 @@ bdBool bdHMacSHA1::getData(bdUByte8* dst, bdUInt* length)
 
     if (*length > 20)
     {
-        //bdLog(BD_LOG_ERROR, "Hmac result buffer of invalid size.");
+        bdLogError("bdHMacSHA1", "Hmac result buffer of invalid size.");
         return false;
     }
 
@@ -69,7 +70,7 @@ bdBool bdHMacSHA1::getData(bdUByte8* dst, bdUInt* length)
     status = hmac_done(&m_state, dst, &tmpLength);
     if (status)
     {
-        //bdLog(BD_LOG_ERROR, "Error getting HMAC-SHA1 data: [%s]", error_to_string(status));
+        bdLogError("bdHMacSHA1", "Error getting HMAC-SHA1 data: [%s]", error_to_string(status));
         return false;
     }
     *length = tmpLength;

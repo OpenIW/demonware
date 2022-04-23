@@ -17,3 +17,5 @@ typedef float bdFloat32;
 typedef double bdFloat64;
 typedef bool bdBool;
 typedef char bdNChar8;
+
+#define BD_NULL NULL

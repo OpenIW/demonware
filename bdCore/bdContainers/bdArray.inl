@@ -1,3 +1,4 @@
+#include "bdArray.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename T>
@@ -51,21 +52,11 @@ T* bdArray<T>::uninitializedCopy(const bdArray<T>* a)
 template<typename T>
 void bdArray<T>::clear()
 {
-    T* m_data;
-    unsigned int m_size;
-
-    m_data = this->m_data;
-    if (m_size)
-    {
-        for (m_size = this->m_size; m_size; --m_size, m_data++)
-        {
-            delete m_data;
-        }
-    }
-    bdMemory::deallocate(this->m_data);
-    this->m_data = 0;
-    this->m_size = 0;
-    this->m_capacity = 0;
+    destruct(m_data, m_size);
+    bdDeallocate<T>(m_data);
+    m_data = NULL;
+    m_size = 0;
+    m_capacity = 0;
 }
 
 template<typename T>
@@ -169,6 +160,12 @@ template<typename T>
 bdBool bdArray<T>::rangeCheck(const bdUInt i)
 {
     return i < this->m_size;
+}
+
+template<typename T>
+inline bdBool bdArray<T>::isEmpty()
+{
+    return m_size == 0;
 }
 
 template<typename T>

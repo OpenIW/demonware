@@ -45,7 +45,7 @@ bdBool bdHashTiger192::hash(const bdUByte8* data, const bdUInt dataSize, bdUByte
 
     if (error == 6)
     {
-        //bdLog(BD_LOG_ERROR, "Unable to create tiger hash of less than 24 bytes in length!");
+        bdLogError("bdCrypto/hash", "Unable to create tiger hash of less than 24 bytes in length!");
         return false;
     }
     else if (error)

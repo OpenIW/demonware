@@ -38,6 +38,7 @@ template<typename T>
 inline T* bdLinkedList<T>::forward(Position* position)
 {
     *position = reinterpret_cast<Node*>(*position)->m_next;
+    return &reinterpret_cast<Node*>(position)->m_data;
 }
 
 template<typename T>

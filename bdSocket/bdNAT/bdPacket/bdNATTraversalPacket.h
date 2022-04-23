@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
 
 #define BD_NAT_TRAV_HMAC_SIZE 10
 
