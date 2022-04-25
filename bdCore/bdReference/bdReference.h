@@ -8,7 +8,7 @@ public:
 	T* m_ptr;
 
 	bdReference();
-	bdReference(bdReference<T>* other);
+	bdReference(const bdReference<T>* other);
 	~bdReference();
 	bdReference(T* p);
 	bdBool isNull();
@@ -17,6 +17,7 @@ public:
 	T* operator->();
 	void operator=(T* p);
 	bdReference<T>* operator=(const bdReference<T>* other);
+	bdBool operator==(const bdReference<T>* other);
 	T* operator*();
 };
 

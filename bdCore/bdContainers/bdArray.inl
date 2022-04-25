@@ -1,3 +1,4 @@
+#include "bdArray.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename T>
@@ -22,6 +23,19 @@ inline bdArray<T>::bdArray(const bdArray<T>* a)
     m_capacity = a->m_capacity;
     m_size = a->m_size;
     m_data = uninitializedCopy(a);
+}
+
+template<typename T>
+inline bdArray<T>::bdArray(const bdUInt capacity, T* value)
+{
+    m_data = NULL;
+    m_capacity = capacity;
+    m_size = capacity;
+    if (m_capacity)
+    {
+        m_data = bdAllocate<T>(m_capacity);
+        copyConstructArrayObject(m_data, value, m_capacity);
+    }
 }
 
 template<typename T>
@@ -73,6 +87,17 @@ void bdArray<T>::pushBack(const T* value)
 }
 
 template<typename T>
+inline void bdArray<T>::pushBack(const T* value, const bdUInt n)
+{
+    bdUInt spare = this->m_capacity - this->m_size;
+    if (n > spare)
+    {
+        increaseCapacity(n - spare);
+    }
+    copyConstructArrayArray(&this->m_data[this->m_size], value, n);
+}
+
+template<typename T>
 void bdArray<T>::copyConstructObjectObject(T* dest, const T* src)
 {
     dest = new T(src);
@@ -84,6 +109,15 @@ void bdArray<T>::copyConstructArrayArray(T* dest, const T* src, unsigned int n)
     for (int i = 0; i < n; ++i)
     {
         dest[i] = new T(src[i]);
+    }
+}
+
+template<typename T>
+inline void bdArray<T>::copyConstructArrayObject(T* dest, const T* src, bdUInt n)
+{
+    for (bdUInt i = 0; i < n; ++i)
+    {
+        dest[i] = new T(*src);
     }
 }
 

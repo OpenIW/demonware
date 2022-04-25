@@ -7,11 +7,7 @@
 #include "bdServiceBandwidthArbitrator.h"
 
 #include "bdNAT/bdNAT.h"
-
-#include "bdQoS/bdQoSProbeListener.h"
-#include "bdQoS/bdQoSRemoteAddr.h"
-#include "bdQoS/bdPacket/bdQoSReplyPacket.h"
-#include "bdQoS/bdQoSProbe.h"
+#include "bdQoS/bdQoS.h"
 
 // class bdSocketRouter;
 

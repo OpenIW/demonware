@@ -15,3 +15,9 @@ bdBool bdSecurityID::operator==(const bdSecurityID* other)
 {
 	return bdMemcmp(this, other, sizeof(bdSecurityID)) == 0;
 }
+
+bdSecurityID* bdSecurityID::operator=(const bdSecurityID* other)
+{
+	bdMemcpy(ab, other->ab, sizeof(ab));
+	return this;
+}

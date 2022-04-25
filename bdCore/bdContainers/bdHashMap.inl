@@ -1,4 +1,3 @@
-#include "bdHashMap.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename keyType, typename dataType, typename hashClass>
@@ -146,7 +145,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
         {
             return false;
         }
-        if (*key == n->m_key)
+        if (*const_cast<keyType*>(key) == n->m_key)
         {
             break;
         }
@@ -164,6 +163,24 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
     value = &n->m_data;
     --m_size;
     return true;
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(Iterator* iterator)
+{
+    Iterator iter;
+    Node* n;
+
+    bdAssert(m_numIterators == 1, "bdHashMap::remove, more than one iterator held  while removing from hashmap");
+    iter = *iterator;
+    next(&iter);
+    n = reinterpret_cast<Node*>(*iterator);
+    *iterator = iter;
+    bdUInt numIterators = m_numIterators;
+    m_numIterators = 0;
+    bdBool result = remove(&n->m_key);
+    m_numIterators = numIterators;
+    return result;
 }
 
 template<typename keyType, typename dataType, typename hashClass>
@@ -254,7 +271,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType* key, c
     i = getHashIndex(hash);
     for (n = m_map[i]; n; n = n->m_next)
     {
-        if (*key == n->m_key)
+        if (const_cast<keyType*>(key) == &n->m_key)
         {
             return false;
         }

@@ -12,13 +12,16 @@ public:
     bdArray();
     bdArray(const bdUInt capacity);
     bdArray(const bdArray<T>* a);
+    bdArray(const bdUInt capacity, T* value);
     bdUInt getCapacity();
     bdUInt getSize();
     T* uninitializedCopy(const bdArray<T>* a);
     void clear();
     void pushBack(const T* value);
+    void pushBack(const T* value, const bdUInt n);
     void copyConstructObjectObject(T* dest, const T* src);
     void copyConstructArrayArray(T* dest, const T* src, unsigned int n);
+    void copyConstructArrayObject(T* dest, const T* src, bdUInt n);
     void destruct(T* src, bdUInt n);
     void increaseCapacity(unsigned int increase);
     void decreaseCapacity(const bdUInt decrease);
