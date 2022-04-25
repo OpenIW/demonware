@@ -37,7 +37,6 @@ bdBool bdQoSRequestPacket::deserialize(const void* data, const bdUInt size, cons
 
     *newOffset = offset;
     ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
-    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
     ok = ok == bdBytePacker::removeBasicType<bdUInt64>(data, size, *newOffset, newOffset, &m_timestamp);
     ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, *newOffset, newOffset, &m_id);
     ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, *newOffset, newOffset, &m_secid);
