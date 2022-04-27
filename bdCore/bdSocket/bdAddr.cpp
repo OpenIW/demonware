@@ -109,7 +109,7 @@ bdUInt bdAddr::getSerializedSize()
 	return serializedSize;
 }
 
-bdUWord bdAddr::toString(bdNChar8* const str, const bdUWord size)
+const bdUWord bdAddr::toString(bdNChar8* const str, const bdUWord size) const
 {
 	bdUWord strLength;
 

@@ -11,7 +11,7 @@ inline void bdNonce<SIZE>::ensureCreated()
 {
     if (!m_initialised)
     {
-        bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(m_nonce, SIZE);
+        bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(reinterpret_cast<bdUByte8*>(m_nonce), SIZE);
         m_initialised = true;
     }
 }

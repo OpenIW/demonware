@@ -76,14 +76,14 @@ void bdInetAddr::set(unsigned int address)
 	m_addr.inUn.m_iaddr = address;
 }
 
-bool bdInetAddr::isValid()
+const bdBool bdInetAddr::isValid() const
 {
 	bdInetAddr* chk = &bdInetAddr();
 
 	return (this == chk) == 0;
 }
 
-unsigned int bdInetAddr::toString(char* str, unsigned int size)
+const bdUInt bdInetAddr::toString(char* str, unsigned int size) const
 {
 	if (isValid())
 	{

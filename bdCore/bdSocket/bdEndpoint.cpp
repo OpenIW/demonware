@@ -38,23 +38,23 @@ bdBool bdEndpoint::operator==(bdEndpoint* other)
     return false;
 }
 
-bdCommonAddrRef bdEndpoint::getCommonAddr()
+bdCommonAddrRef bdEndpoint::getCommonAddr() const
 {
     return m_ca;
 }
 
-bdSecurityID* bdEndpoint::getSecID()
+const bdSecurityID* bdEndpoint::getSecID() const
 {
     return &m_secID;
 }
 
-bdUInt bdEndpoint::getHash()
+bdUInt bdEndpoint::getHash() const
 {
     // Not present in BO1
     return bdUInt();
 }
 
-bdUInt bdEndpoint::getSerializedLength()
+bdUInt bdEndpoint::getSerializedLength() const
 {
     return BD_ENDPOINT_SERIALIZED_SIZE;
 }

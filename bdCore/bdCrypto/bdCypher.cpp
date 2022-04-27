@@ -9,7 +9,7 @@ bdCypher::bdCypher()
 bdCypher::bdCypher(bdUInt32 blockSize)
 {
     m_blockSize = blockSize;
-    //bdAssert((blockSize <= BD_CYPHER_BLOCK_SIZE_MAX), "BD_CYPHER_BLOCK_SIZE_MAX too small for cypher of block size[%d]", blockSize);
+    bdAssert((blockSize <= BD_CYPHER_BLOCK_SIZE_MAX), "BD_CYPHER_BLOCK_SIZE_MAX too small for cypher of block size[%d]", blockSize);
 }
 
 bdCypher::~bdCypher()

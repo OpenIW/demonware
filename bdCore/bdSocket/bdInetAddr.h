@@ -19,8 +19,8 @@ public:
 	void set(const bdInetAddr* other);
 	void set(const char* address);
 	void set(unsigned int address);
-	bool isValid();
-	unsigned int toString(char* str, unsigned int size);
+	const bdBool isValid() const;
+	const bdUInt toString(char* str, unsigned int size) const;
 	bdInAddr getInAddr();
 	bool serialize(bdUByte8* data, unsigned int size, unsigned int offset, unsigned int* newOffset);
 	bool deserialize(const bdUByte8* data, unsigned int size, unsigned int offset, unsigned int* newOffset);

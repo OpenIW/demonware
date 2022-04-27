@@ -17,11 +17,11 @@ bdUWord bdTrulyRandomImpl::getRandomUInt()
 {
     bdUWord pbBuffer;
 
-    getRandomUByte8(reinterpret_cast<byte*>(&pbBuffer), sizeof(bdUWord));
+    getRandomUByte8(reinterpret_cast<bdUByte8*>(&pbBuffer), sizeof(bdUWord));
     return pbBuffer;
 }
 
-void bdTrulyRandomImpl::getRandomUByte8(byte* pbBuffer, bdUWord dwLen)
+void bdTrulyRandomImpl::getRandomUByte8(bdUByte8* pbBuffer, bdUWord dwLen)
 {
     bdGetRandomUChar8(pbBuffer, dwLen);
 }

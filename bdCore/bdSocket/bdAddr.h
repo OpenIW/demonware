@@ -23,8 +23,7 @@ public:
     bdPort getPort();
     bdUInt getSerializedSize();
 
-    bdUWord toString(bdNChar8* const str, const bdUWord size);
+    const bdUWord toString(bdNChar8* const str, const bdUWord size) const;
     bdBool serialize(bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
     bdBool deserialize(const bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-
 };

@@ -16,7 +16,7 @@ void bdInAddr::fromString(const char* addr)
     inUn.m_iaddr = inet_addr(addr);
 }
 
-int bdInAddr::toString(char* str, unsigned int size)
+const bdUInt bdInAddr::toString(char* str, unsigned int size) const
 {
     const char* src;
 

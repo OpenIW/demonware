@@ -98,6 +98,16 @@ inline void bdArray<T>::pushBack(const T* value, const bdUInt n)
 }
 
 template<typename T>
+inline void bdArray<T>::popBack()
+{
+    if (m_size)
+    {
+        destruct(&m_data[--m_size], 1u);
+        decreaseCapacity(0);
+    }
+}
+
+template<typename T>
 void bdArray<T>::copyConstructObjectObject(T* dest, const T* src)
 {
     dest = new T(src);
@@ -180,6 +190,16 @@ void bdArray<T>::decreaseCapacity(const bdUInt decrease)
         destruct(this->m_data, this->m_size);
         bdDeallocate<T>(this->m_data);
         this->m_data = newData;
+    }
+}
+
+template<typename T>
+inline void bdArray<T>::removeAt(const bdUInt i)
+{
+    if (rangeCheck(i))
+    {
+        m_data[i] = m_data[m_size - 1];
+        popBack();
     }
 }
 

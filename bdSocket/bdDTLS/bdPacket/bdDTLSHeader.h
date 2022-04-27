@@ -1,21 +1,22 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
-
-#include "../bdDTLSPackets.h"
 
 class bdDTLSHeader
 {
+protected:
+    bdUByte8 m_type;
+    bdUByte8 m_version;
+    bdUInt16 m_vtag;
+    bdUInt16 m_counter;
 public:
-	unsigned char m_type;
-	unsigned char m_version;
-	unsigned short m_vtag;
-	unsigned short m_counter;
-
-	bdDTLSHeader();
-	bdDTLSHeader(unsigned char type, unsigned short vtag, unsigned short counter);
-	unsigned char getType();
-	unsigned short getVtag();
-	unsigned short getCounter();
-
-	virtual bool serialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset);
-	virtual bool deserialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset);
+    void operator delete(void* p);
+    bdDTLSHeader();
+    bdDTLSHeader(bdDTLSPacketTypes type, bdUInt16 vtag, bdUInt16 counter);
+    virtual ~bdDTLSHeader();
+    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    bdUByte8 getType();
+    bdUByte8 getVersion();
+    bdUInt16 getVtag();
+    bdUInt16 getCounter();
 };

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdCypher3Des : protected bdCypher
+class bdCypher3Des : public bdCypher
 {
 protected:
     symmetric_CBC m_cbc;

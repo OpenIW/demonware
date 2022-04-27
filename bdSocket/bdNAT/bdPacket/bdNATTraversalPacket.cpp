@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bdSocket/bdSocketRouter.h"
+#include "bdSocket/bdSocket.h"
 
 bdNATTraversalPacket::bdNATTraversalPacket() 
     : m_type(0), m_protocolVersion(0), m_ident(0), m_addrSrc(), m_addrDest()

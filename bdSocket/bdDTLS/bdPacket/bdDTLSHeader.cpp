@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "bdPlatform/bdPlatform.h"
-#include "bdCore/bdUtilities/bdbytepacker.h"
 
-#include "bdDTLSHeader.h"
+#include "bdSocket/bdSocket.h"
 
 bdDTLSHeader::bdDTLSHeader()
 {
-    m_version = 2;
+    m_version = 0;
     m_type = 0;
     m_vtag = 0;
     m_counter = 0;
 }
 
-bdDTLSHeader::bdDTLSHeader(unsigned char type, unsigned short vtag, unsigned short counter)
+bdDTLSHeader::bdDTLSHeader(bdDTLSPacketTypes type, bdUInt16 vtag, bdUInt16 counter)
 {
     m_vtag = vtag;
     m_version = 2;
@@ -20,63 +18,60 @@ bdDTLSHeader::bdDTLSHeader(unsigned char type, unsigned short vtag, unsigned sho
     m_type = type;
 }
 
-unsigned char bdDTLSHeader::getType()
+bdDTLSHeader::~bdDTLSHeader()
+{
+    delete this;
+}
+
+bdUByte8 bdDTLSHeader::getType()
 {
     return m_type;
 }
 
-unsigned short bdDTLSHeader::getVtag()
+bdUByte8 bdDTLSHeader::getVersion()
+{
+    return m_version;
+}
+
+bdUInt16 bdDTLSHeader::getVtag()
 {
     return m_vtag;
 }
 
-unsigned short bdDTLSHeader::getCounter()
+bdUInt16 bdDTLSHeader::getCounter()
 {
     return m_counter;
 }
 
-bool bdDTLSHeader::serialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset)
+bdBool bdDTLSHeader::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
 {
+    bdBool ok;
+
     *newOffset = offset;
-    if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_type, sizeof(m_type)))
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
+    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_version);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_vtag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_counter);
+    if (!ok)
     {
-        offset = *newOffset;
-        if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_version, sizeof(m_version)))
-        {
-            offset = *newOffset;
-            if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_vtag, sizeof(m_vtag)))
-            {
-                offset = *newOffset;
-                if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_counter, sizeof(m_counter)))
-                {
-                    return true;
-                }
-            }
-        }
+        *newOffset = offset;
     }
-    *newOffset = offset;
-    return false;
+    return ok;
+
 }
 
-bool bdDTLSHeader::deserialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset)
+bdBool bdDTLSHeader::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
 {
+    bdBool ok;
+
     *newOffset = offset;
-    if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_type, sizeof(m_type)))
+    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_version);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_vtag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_counter);
+    if (!ok)
     {
-        offset = *newOffset;
-        if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_version, sizeof(m_version)))
-        {
-            offset = *newOffset;
-            if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_vtag, sizeof(m_vtag)))
-            {
-                offset = *newOffset;
-                if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_counter, sizeof(m_counter)))
-                {
-                    return true;
-                }
-            }
-        }
+        *newOffset = offset;
     }
-    *newOffset = 0;
-    return false;
+    return ok;
 }

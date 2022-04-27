@@ -10,4 +10,5 @@ public:
 	bdSecurityID(const bdSecurityID* other);
 	bdBool operator==(const bdSecurityID* other);
 	bdSecurityID* operator=(const bdSecurityID* other);
+	bdBool operator!=(const bdSecurityID* other);
 };

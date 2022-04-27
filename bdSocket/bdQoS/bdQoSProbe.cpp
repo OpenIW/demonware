@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bdSocket/bdSocketRouter.h"
+#include "bdSocket/bdSocket.h"
 
 bdQoSProbe::bdQoSProbeEntryWrapper::bdQoSProbeEntryWrapper() : m_addr(), m_id(), m_key(), m_listener(NULL), m_realAddr(), m_retries(0), m_lastTry()
 {

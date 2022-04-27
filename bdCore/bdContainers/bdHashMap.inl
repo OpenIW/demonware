@@ -88,7 +88,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator* iterator)
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(keyType* key)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key)
 {
     Node* prevNode;
     Node* n;

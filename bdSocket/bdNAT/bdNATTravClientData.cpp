@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bdSocket/bdSocketRouter.h"
+#include "bdSocket/bdSocket.h"
 
 bdNATTravClientData::bdNATTravClientData() 
     : m_state(BD_NTCDS_INITIAL), m_local(), m_remote(), m_listener(NULL), m_secondaryListener(NULL), m_tries(0), m_lastSent(), m_throttled(false), m_age()

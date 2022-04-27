@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bdSocket/bdSocketRouter.h"
+#include "bdSocket/bdSocket.h"
 
 bdQoSReplyPacket::bdQoSReplyPacket() : m_type(41), m_id(0), m_timestamp(0), m_enabledMode(true), m_data(NULL), m_dataSize(0), m_serializedSize(0)
 {

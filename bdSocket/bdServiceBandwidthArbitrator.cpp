@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bdSocket/bdSocketRouter.h"
+#include "bdSocket/bdSocket.h"
 
 bdServiceBandwidthArbitrator::bdServiceBandwidthArbitrator() : m_allowedSend(0), m_sentThisSlice(false)
 {

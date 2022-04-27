@@ -21,3 +21,8 @@ bdSecurityID* bdSecurityID::operator=(const bdSecurityID* other)
 	bdMemcpy(ab, other->ab, sizeof(ab));
 	return this;
 }
+
+bdBool bdSecurityID::operator!=(const bdSecurityID* other)
+{
+	return !(this == other);
+}

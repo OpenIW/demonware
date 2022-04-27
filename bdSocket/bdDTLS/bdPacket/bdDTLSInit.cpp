@@ -1,65 +1,53 @@
-#include "bdPlatform/bdPlatform.h"
-#include "bdCore/bdUtilities/bdbytepacker.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bdSocket/bdSocket.h"
 
-#include "bdDTLSInit.h"
-
-bdDTLSInit::bdDTLSInit() : bdDTLSHeader()
+bdDTLSInit::bdDTLSInit() 
+    : bdDTLSHeader(), m_initTag(0), m_secID()
 {
-	m_initTag = 0;
-	m_secID = new bdSecurityID();
 }
 
-bdDTLSInit::bdDTLSInit(unsigned short initTag, bdSecurityID* secID) : bdDTLSHeader(BD_DTLS_INIT, 0, 0)
+bdDTLSInit::bdDTLSInit(unsigned short initTag, bdSecurityID* secID) 
+    : bdDTLSHeader(BD_DTLS_INIT, 0, 0), m_initTag(initTag), m_secID(secID)
 {
-	m_initTag = initTag;
-	m_secID = new bdSecurityID(secID);
 }
 
 unsigned short bdDTLSInit::getInitTag()
 {
-	return m_initTag;
+    return m_initTag;
 }
 
 void bdDTLSInit::getSecID(bdSecurityID* secID)
 {
-	*secID = m_secID;
+    *secID = m_secID;
 }
 
-bool bdDTLSInit::serialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset)
+bool bdDTLSInit::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
 {
-	*newOffset = offset;
-	if (bdDTLSHeader::serialize(data, size, offset, newOffset))
-	{
-		offset = *newOffset;
-		if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_initTag, sizeof(m_initTag)))
-		{
-			offset = *newOffset;
-			if (bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_secID, sizeof(m_secID)))
-			{
-				return true;
-			}
-		}
-	}
-	*newOffset = offset;
-	return false;
+    bdBool ok;
+
+    *newOffset = offset;
+    ok = bdDTLSHeader::serialize(data, size, *newOffset, newOffset);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    if (!ok)
+    {
+        *newOffset = offset;
+    }
+    return ok;
 }
 
-bool bdDTLSInit::deserialize(void* data, unsigned int size, unsigned int offset, unsigned int* newOffset)
+bool bdDTLSInit::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
 {
-	*newOffset = offset;
-	if (bdDTLSHeader::deserialize(data, size, offset, newOffset))
-	{
-		offset = *newOffset;
-		if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_initTag, sizeof(m_initTag)))
-		{
-			offset = *newOffset;
-			if (bdBytePacker::removeBuffer(reinterpret_cast<bdUByte8*>(data), size, offset, newOffset, &m_secID, sizeof(m_secID)))
-			{
-				return 1;
-			}
-		}
-	}
-	*newOffset = offset;
-	return 0;
+    bdBool ok;
+
+    *newOffset = offset;
+    ok = bdDTLSHeader::deserialize(data, size, *newOffset, newOffset);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    if (!ok)
+    {
+        *newOffset = offset;
+    }
+    return ok;
 }
 

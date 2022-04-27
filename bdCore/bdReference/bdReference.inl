@@ -1,4 +1,3 @@
-#include "bdReference.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename T>
@@ -44,13 +43,13 @@ inline bdReference<T>::bdReference(T* p)
 }
 
 template<typename T>
-inline bdBool bdReference<T>::isNull()
+inline bdBool bdReference<T>::isNull() const
 {
     return this->m_ptr == NULL;
 }
 
 template<typename T>
-inline bdBool bdReference<T>::notNull()
+inline bdBool bdReference<T>::notNull() const
 {
     return this->m_ptr != NULL;
 }
@@ -58,7 +57,13 @@ inline bdBool bdReference<T>::notNull()
 template<typename T>
 inline T* bdReference<T>::operator->()
 {
-    return this->m_ptr;
+    return m_ptr;
+}
+
+template<typename T>
+inline const T* bdReference<T>::operator->() const
+{
+    return m_ptr;
 }
 
 template<typename T>

@@ -19,12 +19,14 @@ public:
     void clear();
     void pushBack(const T* value);
     void pushBack(const T* value, const bdUInt n);
+    void popBack();
     void copyConstructObjectObject(T* dest, const T* src);
     void copyConstructArrayArray(T* dest, const T* src, unsigned int n);
     void copyConstructArrayObject(T* dest, const T* src, bdUInt n);
     void destruct(T* src, bdUInt n);
     void increaseCapacity(unsigned int increase);
     void decreaseCapacity(const bdUInt decrease);
+    void removeAt(const bdUInt i);
     ~bdArray();
     bdBool rangeCheck(const bdUInt i);
     bdBool isEmpty();

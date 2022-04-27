@@ -14,10 +14,10 @@ public:
     bdEndpoint(const bdCommonAddrRef addr, const bdSecurityID* secID);
     ~bdEndpoint();
     bdBool operator==(bdEndpoint* other);
-    bdCommonAddrRef getCommonAddr();
-    bdSecurityID* getSecID();
-    bdUInt getHash();
-    bdUInt getSerializedLength();
+    bdCommonAddrRef getCommonAddr() const;
+    const bdSecurityID* getSecID() const;
+    bdUInt getHash() const;
+    bdUInt getSerializedLength() const;
     bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
     bdBool deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
 };

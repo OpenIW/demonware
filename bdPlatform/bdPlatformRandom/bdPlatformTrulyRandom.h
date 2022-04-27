@@ -7,7 +7,7 @@ public:
     bdTrulyRandomImpl();
     ~bdTrulyRandomImpl();
     bdUWord getRandomUInt();
-    void getRandomUByte8(byte* pbBuffer, bdUWord dwLen);
+    void getRandomUByte8(bdUByte8* pbBuffer, bdUWord dwLen);
 };
 
 void bdGetRandomUChar8(unsigned char* in, int length);
