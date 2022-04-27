@@ -9,8 +9,8 @@ protected:
 public:
     bdDTLSInit();
     bdDTLSInit(unsigned short initTag, bdSecurityID* secID);
-    bdUInt16 getInitTag();
-    void getSecID(bdSecurityID* secID);
+    const bdUInt16 getInitTag() const;
+    void getSecID(bdSecurityID* secID) const;
     virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
     virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
 };

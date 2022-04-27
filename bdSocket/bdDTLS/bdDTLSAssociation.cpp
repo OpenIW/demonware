@@ -531,10 +531,70 @@ bdInt bdDTLSAssociation::handleData(bdAddr* addr, const bdUByte8* data, const bd
 
 void bdDTLSAssociation::sendInit()
 {
+    bdUByte8 buffer[1288];
+    bdUInt tmpUInt;
+
+    if (m_initResends++ > 5.0f)
+    {
+        bdLogInfo("bdSocket/dtls", "sending init: too many retries, closing");
+        m_state = BD_DTLS_CLOSED;
+        return;
+    }
+    bdDTLSInit init(m_localTag, &bdSecurityID(m_addrHandle->m_endpoint.getSecID()));
+    init.serialize(buffer, sizeof(buffer), 0, &tmpUInt);
+    m_socket->sendTo(&m_addr, buffer, tmpUInt);
+    m_initTimer.start();
+    bdLogInfo("bdSocket/dtls", "sending init: m_localTag: %X", m_localTag);
 }
 
 void bdDTLSAssociation::sendInitAck(const bdAddr* addr, const bdDTLSInit* init)
 {
+    bdUInt16 localTieTag;
+    bdUInt16 peerTieTag;
+    bdUInt16 localTag;
+    bdUInt16 peerTag;
+    bdUInt tmpUInt;
+    bdUByte8 buffer[1288];
+
+    peerTag = init->getInitTag();
+    localTag = 0;
+    peerTieTag = 0;
+    localTieTag = 0;
+    switch (m_state)
+    {
+    case 0:
+        m_peerTag = peerTag;
+        break;
+    case 1:
+        localTag = m_localTag;
+        break;
+    case 2:
+        peerTieTag = m_peerTag;
+        localTieTag = m_localTag;
+        localTag = m_localTag;
+        break;
+    case 3:
+        localTag = bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUInt();
+        peerTieTag = m_peerTag;
+        localTieTag = m_localTag;
+        break;
+    default:
+        return;
+    }
+
+    bdSecurityID secID;
+    init->getSecID(&secID);
+    bdDTLSInitAck initAck(peerTag, localTag, localTag, peerTag, localTieTag, peerTieTag, GetTickCount(), addr, bdSecurityID(&secID));
+    bdHMacSHA1 hmac(m_cookieKey, sizeof(m_cookieKey));
+    initAck.sign(&hmac);
+    initAck.serialize(buffer, sizeof(buffer), 0, &tmpUInt);
+    // TEMP CONST_CAST
+    bdUInt sentResult = m_socket->sendTo(const_cast<bdAddr*>(addr), buffer, tmpUInt);
+    if (sentResult != tmpUInt)
+    {
+        bdLogWarn("bdSocket/dtls", "problem with socket?");
+    }
+    bdLogInfo("bdSocket/dtls", "sending init ack: m_localTag/localTag/m_peerTag: %d/%d/%d", m_localTag, localTag, m_peerTag);
 }
 
 void bdDTLSAssociation::sendCookieEcho(const bdAddr* addr)
@@ -554,17 +614,17 @@ bdInt bdDTLSAssociation::sendData(const bdAddr* addr, const void* data, const bd
     return bdInt();
 }
 
-bdInt bdDTLSAssociation::getStatus() const
+const bdInt bdDTLSAssociation::getStatus() const
 {
     return bdInt();
 }
 
-bdAddrHandleRef bdDTLSAssociation::getAddrHandle() const
+const bdAddrHandleRef bdDTLSAssociation::getAddrHandle() const
 {
     return bdAddrHandleRef();
 }
 
-bdSecurityID* bdDTLSAssociation::getLocalSecurityId() const
+const bdSecurityID* bdDTLSAssociation::getLocalSecurityId() const
 {
     return NULL;
 }

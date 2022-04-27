@@ -62,7 +62,7 @@ public:
     void sendError(const bdAddr* addr, const bdSecurityID* secID, const bdDTLSError::bdDTLSErrorType* type);
     bdInt sendData(const bdAddr* addr, const void* data, const bdUInt length);
 
-    bdInt getStatus() const;
-    bdAddrHandleRef getAddrHandle() const;
-    bdSecurityID* getLocalSecurityId() const;
+    const bdInt getStatus() const;
+    const bdAddrHandleRef getAddrHandle() const;
+    const bdSecurityID* getLocalSecurityId() const;
 };

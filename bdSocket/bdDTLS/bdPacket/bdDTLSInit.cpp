@@ -11,12 +11,12 @@ bdDTLSInit::bdDTLSInit(unsigned short initTag, bdSecurityID* secID)
 {
 }
 
-unsigned short bdDTLSInit::getInitTag()
+const bdUInt16 bdDTLSInit::getInitTag() const
 {
     return m_initTag;
 }
 
-void bdDTLSInit::getSecID(bdSecurityID* secID)
+void bdDTLSInit::getSecID(bdSecurityID* secID) const
 {
     *secID = m_secID;
 }
