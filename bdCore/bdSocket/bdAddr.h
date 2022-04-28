@@ -19,8 +19,8 @@ public:
     void setPort(const bdPort port);
 
     bdUInt getHash();
-    bdInetAddr* getAddress();
-    bdPort getPort();
+    const bdInetAddr* getAddress() const;
+    const bdPort getPort() const;
     bdUInt getSerializedSize();
 
     const bdUWord toString(bdNChar8* const str, const bdUWord size) const;

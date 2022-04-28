@@ -90,12 +90,12 @@ bdUInt bdAddr::getHash()
 	return hash;
 }
 
-bdInetAddr* bdAddr::getAddress()
+const bdInetAddr* bdAddr::getAddress() const
 {
 	return &m_address;
 }
 
-bdPort bdAddr::getPort()
+const bdPort bdAddr::getPort() const
 {
 	return m_port;
 }

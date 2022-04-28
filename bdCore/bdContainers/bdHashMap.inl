@@ -6,7 +6,7 @@ inline bdHashMap<keyType, dataType, hashClass>::Node::Node()
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType* key, dataType* value, Node* const next) : m_data(value), m_key(*key)
+inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType* key, dataType* value, Node* const next) : m_data(*value), m_key(*key)
 {
     m_next = next;
 }
@@ -123,45 +123,6 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
     }
     --m_size;
 
-    return true;
-}
-
-template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key, dataType* value)
-{
-    Node* n;
-    Node* prevNode;
-    bdUInt i;
-    bdUInt hash;
-
-    hash = m_hashClass.getHash(key);
-    i = getHashIndex(hash);
-    n = m_map[i];
-    prevNode = NULL;
-    bdAssert(m_numIterators == 0, "bdHashMap::remove, another iterator is being held while removing from hashmap");
-    while (1)
-    {
-        if (!n)
-        {
-            return false;
-        }
-        if (*const_cast<keyType*>(key) == n->m_key)
-        {
-            break;
-        }
-        prevNode = n;
-        n = n->m_next;
-    }
-    if (prevNode)
-    {
-        prevNode->m_next = n->m_next;
-    }
-    else
-    {
-        m_map[i] = n->m_next;
-    }
-    value = &n->m_data;
-    --m_size;
     return true;
 }
 

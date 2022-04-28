@@ -40,7 +40,7 @@ bdBool bdEndpoint::operator==(bdEndpoint* other)
 
 bdCommonAddrRef bdEndpoint::getCommonAddr() const
 {
-    return m_ca;
+    return bdCommonAddrRef(&m_ca);
 }
 
 const bdSecurityID* bdEndpoint::getSecID() const
@@ -48,10 +48,17 @@ const bdSecurityID* bdEndpoint::getSecID() const
     return &m_secID;
 }
 
-bdUInt bdEndpoint::getHash() const
+const bdUInt bdEndpoint::getHash() const
 {
-    // Not present in BO1
-    return bdUInt();
+    bdUInt hash = 0;
+
+    if (bdCommonAddrRef(m_ca).notNull())
+    {
+        hash = bdCommonAddrRef(m_ca)->getHash();
+        bdHashingClass hasher;
+        hash += hasher.getHash<bdSecurityID>(getSecID());
+    }
+    return hash;
 }
 
 bdUInt bdEndpoint::getSerializedLength() const
@@ -100,4 +107,9 @@ bdBool bdEndpoint::deserialize(bdCommonAddrRef me, const void* data, const bdUIn
     }
     bdMemcpy(&m_secID, (bdUByte8*)data + *newOffset, sizeof(m_secID));
     return true;
+}
+
+bdUInt bdEndpointHashingClass::getHash(const bdEndpoint* other)
+{
+    return other->getHash();
 }

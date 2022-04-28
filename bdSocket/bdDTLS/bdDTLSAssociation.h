@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+enum bdDTLSAssociationStatus : bdInt
+{
+    BD_SOCKET_IDLE = 0x0,
+    BD_SOCKET_PENDING = 0x1,
+    BD_SOCKET_CONNECTED = 0x2,
+    BD_SOCKET_LOST = 0x3,
+};
+
 class bdDTLSAssociation
 {
 public:
@@ -45,7 +53,7 @@ public:
     bdBool verify(bdDTLSData* dataPacket);
     bdBool calculateSharedKey(const bdUByte8* const pubKey, const bdUInt keylen, const bdSecurityID* secID);
     bdBool checkCookieValidity(const bdAddr* peerAddr, const bdDTLSCookieEcho* cookiePacket);
-    bdInt sendTo(const bdAddr* addr, const void* data, const bdUInt length);
+    bdInt sendTo(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID);
     bdInt receiveFrom(bdAddr* addr, const void* data, const bdUInt size, bdAddrHandleRef* addrHandle, void* buffer, const bdUInt bufferSize);
 
     bdInt handleInit(const bdAddr* addr, const void* data, const bdUInt size);
@@ -60,7 +68,7 @@ public:
     void sendCookieEcho(const bdAddr* addr);
     void sendCookieAck(const bdAddr* addr, const bdDTLSCookieEcho* cookie);
     void sendError(const bdAddr* addr, const bdSecurityID* secID, const bdDTLSError::bdDTLSErrorType* type);
-    bdInt sendData(const bdAddr* addr, const void* data, const bdUInt length);
+    bdInt sendData(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID);
 
     const bdInt getStatus() const;
     const bdAddrHandleRef getAddrHandle() const;

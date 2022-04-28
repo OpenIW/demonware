@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdCore/bdCore.h"
 
-#define BD_MAX_LOCAL_ADDRS 5
-
 void* bdCommonAddr::operator new(bdUWord nbytes)
 {
     return bdMemory::allocate(nbytes);
@@ -167,32 +165,32 @@ bdBool bdCommonAddr::deserialize(bdCommonAddrRef me, const bdUByte8* buffer)
     return status;
 }
 
-bdUInt bdCommonAddr::getHash()
+const bdUInt bdCommonAddr::getHash() const
 {
     return m_hash;
 }
 
-const bdAddr* bdCommonAddr::getLocalAddrByIndex(const bdUInt index)
+const bdAddr* bdCommonAddr::getLocalAddrByIndex(const bdUInt index) const
 {
     return m_localAddrs[index];
 }
 
-const bdArray<bdAddr>* bdCommonAddr::getLocalAddrs()
+const bdArray<bdAddr>* bdCommonAddr::getLocalAddrs() const
 {
     return &m_localAddrs;
 }
 
-bdNATType bdCommonAddr::getNATType()
+const bdNATType bdCommonAddr::getNATType() const
 {
     return m_natType;
 }
 
-const bdAddr* bdCommonAddr::getPublicAddr()
+const bdAddr* bdCommonAddr::getPublicAddr() const
 {
     return &m_publicAddr;
 }
 
-bdBool bdCommonAddr::isLoopback()
+const bdBool bdCommonAddr::isLoopback() const
 {
     return m_isLoopback;
 }
@@ -229,16 +227,16 @@ void bdCommonAddr::serialize(bdUByte8* buffer)
         var = m_natType;
         status = bdBytePacker::appendBasicType<bdNChar8>(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, &offset, &var);
     }
-    //bdAssert(status && offset == BD_COMMON_ADDR_SERIALIZED_SIZE, "bdCommonAddr::serialize, wrong size.");
+    bdAssert(status && offset == BD_COMMON_ADDR_SERIALIZED_SIZE, "bdCommonAddr::serialize, wrong size.");
 }
 
 void bdCommonAddr::setNATType(const bdNATType natType)
 {
     if (natType < BD_NAT_UNKNOWN || natType > BD_NAT_STRICT)
     {
-        //bdLogWarn("Attempting to set invalid NAT type of %d. Ignoring.", natType);
+        bdLogWarn("warn", "Attempting to set invalid NAT type of %d. Ignoring.", natType);
         return;
     }
     m_natType = natType;
-    //bdLogWarn("Overriding NAT type of bdCommonAddr. This should be done for testing purposes only!");
+    bdLogWarn("warn", "Overriding NAT type of bdCommonAddr. This should be done for testing purposes only!");
 }

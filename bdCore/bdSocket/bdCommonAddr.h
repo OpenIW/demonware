@@ -2,6 +2,7 @@
 #pragma once
 
 #define BD_COMMON_ADDR_SERIALIZED_SIZE 37
+#define BD_MAX_LOCAL_ADDRS 5
 
 enum bdNATType : __int32
 {
@@ -38,13 +39,14 @@ public:
     void calculateHash();
     bdBool deserialize(bdCommonAddrRef me, bdBitBufferRef buffer);
     bdBool deserialize(bdCommonAddrRef me, const bdUByte8* buffer);
-    bdUInt getHash();
-    const bdAddr* getLocalAddrByIndex(const bdUInt index);
-    const bdArray<bdAddr>* getLocalAddrs();
-    bdNATType getNATType();
-    const bdAddr* getPublicAddr();
-    bdBool isLoopback();
     void serialize(bdBitBufferRef buffer);
     void serialize(bdUByte8* buffer);
     void setNATType(const bdNATType natType);
+
+    const bdUInt getHash() const;
+    const bdAddr* getLocalAddrByIndex(const bdUInt index) const;
+    const bdArray<bdAddr>* getLocalAddrs() const;
+    const bdNATType getNATType() const;
+    const bdAddr* getPublicAddr() const;
+    const bdBool isLoopback() const;
 };

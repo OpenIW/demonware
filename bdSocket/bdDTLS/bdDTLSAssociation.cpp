@@ -159,12 +159,12 @@ bdBool bdDTLSAssociation::calculateSharedKey(const bdUByte8* const pubKey, const
     return true;
 }
 
-bdInt bdDTLSAssociation::sendTo(const bdAddr* addr, const void* data, const bdUInt length)
+bdInt bdDTLSAssociation::sendTo(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID)
 {
     bdInt val = -1;
     if (m_state == BD_DTLS_ESTABLISHED)
     {
-        return sendData(addr, data, length);
+        return sendData(addr, data, length, secID);
     }
     if (m_state <= BD_DTLS_COOKIE_ECHOED)
     {
@@ -599,32 +599,106 @@ void bdDTLSAssociation::sendInitAck(const bdAddr* addr, const bdDTLSInit* init)
 
 void bdDTLSAssociation::sendCookieEcho(const bdAddr* addr)
 {
+    bdUByte8 buffer[1288];
+    bdUInt tmpUInt;
+
+    if (m_cookieResends++ > 5.0)
+    {
+        bdLogInfo("bdSocket/dtls", "sending cookie echo: too many retries, closing");
+        m_state = BD_DTLS_CLOSED;
+        return;
+    }
+    bdDTLSCookieEcho cookieEcho(m_peerTag, &m_initAck, bdCommonAddrRef(&m_localCommonAddr), m_ECCKey);
+    cookieEcho.serialize(buffer, sizeof(buffer), 0, &tmpUInt);
+    if (m_socket->sendTo(const_cast<bdAddr*>(addr), buffer, tmpUInt) < 0)
+    {
+        bdLogError("bdSocket/dtls", "Failed to send cookie echo");
+    }
+    else
+    {
+        bdLogInfo("bdSocket/dtls", "sending cookie echo: m_localTag/m_peerTag: %X/%X");
+        m_state = BD_DTLS_COOKIE_ECHOED;
+    }
+    m_cookieTimer.start();
 }
 
 void bdDTLSAssociation::sendCookieAck(const bdAddr* addr, const bdDTLSCookieEcho* cookie)
 {
+    bdUByte8 buffer[1288];
+    bdUInt tmpUInt;
+    bdUInt keyLen;
+    bdUByte8 key[100];
+
+    keyLen = 100;
+    if (!m_ECCKey->exportKey(key, &keyLen) || keyLen != 100)
+    {
+        bdLogWarn("bdSocket/dtls", "problem with dh key");
+    }
+    bdDTLSCookieAck cookieAck(m_peerTag, key, bdSecurityID(m_addrHandle->m_endpoint.getSecID()));
+    cookieAck.serialize(buffer, sizeof(buffer), 0, &tmpUInt);
+    m_socket->sendTo(const_cast<bdAddr*>(addr), buffer, tmpUInt);
+    bdLogInfo("bdSocket/dtls", "sending cookie ack: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
 }
 
 void bdDTLSAssociation::sendError(const bdAddr* addr, const bdSecurityID* secID, const bdDTLSError::bdDTLSErrorType* type)
 {
+    bdUInt tmpUInt;
+    bdUByte8 buffer[1288];
+
+    bdDTLSError error(m_peerTag, *type, secID);
+    error.serialize(buffer, sizeof(buffer), 0, &tmpUInt);
+    m_socket->sendTo(const_cast<bdAddr*>(addr), buffer, tmpUInt);
+    bdLogInfo("bdSocket/dtls", "sending error: etype: %d", *type);
 }
 
-bdInt bdDTLSAssociation::sendData(const bdAddr* addr, const void* data, const bdUInt length)
+bdInt bdDTLSAssociation::sendData(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID)
 {
-    return bdInt();
+    bdUInt packetLength;
+    bdUByte8 outData[1288];
+
+    if (length >= 1264)
+    {
+        return -6;
+    }
+    m_seqNum++;
+    bdDTLSData dataPacket(m_peerTag, m_seqNum.getValue());
+    if (!dataPacket.serialize(outData, sizeof(outData), 0, &packetLength, &m_seqNum, m_sharedKey, reinterpret_cast<const bdUByte8* const>(data), length, &m_cypher, secID))
+    {
+        bdLogWarn("bdSocket/dtls", "Packet creation failed.");
+        return -1;
+    }
+    bdAssert(packetLength < BD_MAX_DATAGRAM_SIZE, "overflow");
+    return m_socket->sendTo(const_cast<bdAddr*>(addr), outData, packetLength);
 }
 
 const bdInt bdDTLSAssociation::getStatus() const
 {
-    return bdInt();
+    bdNChar8 commonAddrInfo[1024];
+
+    switch (m_state)
+    {
+    case BD_DTLS_CLOSED:
+        return 3;
+    case BD_DTLS_COOKIE_WAIT:
+        return 3;
+    case BD_DTLS_COOKIE_ECHOED:
+        return 1;
+    case BD_DTLS_ESTABLISHED:
+        return 2;
+    default:
+        bdLogError("bdSocket/dtls", "Bad state!");
+        bdCommonAddrInfo::getBriefInfo(m_addrHandle->m_endpoint.getCommonAddr(), commonAddrInfo, sizeof(commonAddrInfo));
+        bdLogInfo("bdSocket/dtls", commonAddrInfo);
+        return 3;
+    }
 }
 
 const bdAddrHandleRef bdDTLSAssociation::getAddrHandle() const
 {
-    return bdAddrHandleRef();
+    return bdAddrHandleRef(&m_addrHandle);
 }
 
 const bdSecurityID* bdDTLSAssociation::getLocalSecurityId() const
 {
-    return NULL;
+    return &m_localId;
 }

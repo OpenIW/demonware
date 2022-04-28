@@ -9,6 +9,13 @@ public:
     unsigned int m_capacity;
     unsigned int m_size;
 
+    bdFastArray(const bdUInt capacity) : m_data(NULL), m_capacity(capacity)
+    {
+        if (m_capacity)
+        {
+            m_data = bdAllocate<T>(m_capacity);
+        }
+    };
     void ensureCapacity(unsigned int capacity)
     {
         unsigned int newCapacity;
@@ -197,6 +204,14 @@ public:
         return j;
     };
 
+    void clear()
+    {
+        bdDeallocate<T>(m_data);
+        m_data = NULL;
+        m_size = 0;
+        m_capacity = 0;
+    }
+
     bdBool rangeCheck(const bdUInt i)
     {
         return (i < this->m_size);
@@ -222,8 +237,9 @@ public:
         return this->m_size;
     }
 
-    bdUByte8* operator[](const bdUInt i)
+    T* operator[](const bdUInt i)
     {
-        return &this->m_data[i];
-    };
+        bdAssert(rangeCheck(i), "bdFastArray<T>::operator[], rangecheck failed");
+        return &m_data[i];
+    }
 };

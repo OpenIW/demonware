@@ -21,7 +21,7 @@ public:
 	void set(unsigned int address);
 	const bdBool isValid() const;
 	const bdUInt toString(char* str, unsigned int size) const;
-	bdInAddr getInAddr();
+	const bdInAddr getInAddr() const;
 	bool serialize(bdUByte8* data, unsigned int size, unsigned int offset, unsigned int* newOffset);
 	bool deserialize(const bdUByte8* data, unsigned int size, unsigned int offset, unsigned int* newOffset);
 };

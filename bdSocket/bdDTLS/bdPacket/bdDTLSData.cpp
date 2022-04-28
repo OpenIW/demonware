@@ -6,8 +6,12 @@ bdDTLSData::bdDTLSData() : bdDTLSHeader()
 {
 }
 
+bdDTLSData::bdDTLSData(bdUInt16 vtag, bdUInt16 counter) : bdDTLSHeader(BD_DTLS_DATA, vtag, counter)
+{
+}
+
 bdBool bdDTLSData::serialize(void* outData, const bdUInt outDataSize, const bdUInt outDataOffset, bdUInt* outDataNewOffset, const bdSequenceNumber* lastSequenceNumber, const bdUByte8* sharedKey,
-    const bdUByte8* const inData, const bdUInt inDataSize, bdCypher* const cypher, bdSecurityID* const secID)
+    const bdUByte8* const inData, const bdUInt inDataSize, bdCypher* const cypher, const bdSecurityID* secID)
 {
     bdBool ok;
     bdUInt inDataOffset;

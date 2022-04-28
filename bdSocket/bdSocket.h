@@ -16,3 +16,4 @@
 #include "bdDTLS/bdDTLS.h"
 
 #include "bdSocketRouterConfig.h"
+#include "bdSocketRouter.h"

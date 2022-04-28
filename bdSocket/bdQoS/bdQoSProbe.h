@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdQoSProbe : bdNATTravListener, bdPacketInterceptor
+class bdQoSProbe : public bdNATTravListener, public bdPacketInterceptor
 {
 public:
     enum bdQoSListenerState : bdInt

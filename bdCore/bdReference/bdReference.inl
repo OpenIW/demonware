@@ -117,7 +117,7 @@ inline bdBool bdReference<T>::operator==(const bdReference<T>* other)
 }
 
 template<typename T>
-inline T* bdReference<T>::operator*()
+inline const T* bdReference<T>::operator*() const
 {
     return this->m_ptr;
 }

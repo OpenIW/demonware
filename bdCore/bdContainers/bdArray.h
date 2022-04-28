@@ -13,8 +13,8 @@ public:
     bdArray(const bdUInt capacity);
     bdArray(const bdArray<T>* a);
     bdArray(const bdUInt capacity, T* value);
-    bdUInt getCapacity();
-    bdUInt getSize();
+    const bdUInt getCapacity() const;
+    const bdUInt getSize() const;
     T* uninitializedCopy(const bdArray<T>* a);
     void clear();
     void pushBack(const T* value);
@@ -30,6 +30,7 @@ public:
     ~bdArray();
     bdBool rangeCheck(const bdUInt i);
     bdBool isEmpty();
+    const T* operator[](const bdUInt i) const;
     T* operator[](const bdUInt i);
     void operator=(bdArray<T>* a);
 };

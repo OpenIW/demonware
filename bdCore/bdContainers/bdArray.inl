@@ -39,13 +39,13 @@ inline bdArray<T>::bdArray(const bdUInt capacity, T* value)
 }
 
 template<typename T>
-inline bdUInt bdArray<T>::getCapacity()
+inline const bdUInt bdArray<T>::getCapacity() const
 {
     return m_capacity;
 }
 
 template<typename T>
-inline bdUInt bdArray<T>::getSize()
+inline const bdUInt bdArray<T>::getSize() const
 {
     return m_size;
 }
@@ -222,7 +222,13 @@ inline bdBool bdArray<T>::isEmpty()
 }
 
 template<typename T>
-T* bdArray<T>::operator[](const bdUInt i)
+inline const T* bdArray<T>::operator[](const bdUInt i) const
+{
+    return &this->m_data[i];
+}
+
+template<typename T>
+inline T* bdArray<T>::operator[](const bdUInt i)
 {
     return &this->m_data[i];
 }

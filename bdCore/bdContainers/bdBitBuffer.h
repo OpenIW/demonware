@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#define BD_BB_NUM_HEADER_BITS 1
+
 class bdBitBuffer : bdReferencable
 {
 public:

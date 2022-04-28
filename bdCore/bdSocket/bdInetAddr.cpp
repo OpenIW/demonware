@@ -92,7 +92,7 @@ const bdUInt bdInetAddr::toString(char* str, unsigned int size) const
 	return 0;
 }
 
-bdInAddr bdInetAddr::getInAddr()
+const bdInAddr bdInetAddr::getInAddr() const
 {
 	return m_addr;
 }

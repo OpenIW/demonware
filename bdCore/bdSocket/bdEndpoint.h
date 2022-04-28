@@ -16,8 +16,14 @@ public:
     bdBool operator==(bdEndpoint* other);
     bdCommonAddrRef getCommonAddr() const;
     const bdSecurityID* getSecID() const;
-    bdUInt getHash() const;
+    const bdUInt getHash() const;
     bdUInt getSerializedLength() const;
     bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
     bdBool deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+};
+
+class bdEndpointHashingClass
+{
+public:
+    bdUInt getHash(const bdEndpoint* other);
 };

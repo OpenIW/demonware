@@ -18,7 +18,7 @@ public:
 	void operator=(T* p);
 	bdReference<T>* operator=(const bdReference<T>* other);
 	bdBool operator==(const bdReference<T>* other);
-	T* operator*();
+	const T* operator*() const;
 };
 
 #include "bdReference.inl"

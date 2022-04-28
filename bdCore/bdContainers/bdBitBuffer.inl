@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-inline bdBitBuffer::bdBitBuffer(const bdUInt capacityBits, const bdBool typeChecked)
+inline bdBitBuffer::bdBitBuffer(const bdUInt capacityBits, const bdBool typeChecked) : bdReferencable(), m_data(((capacityBits & 7) == 0 ? 0 : 1) + (capacityBits >> 3))
 {
     bdUByte8 byte;
 
@@ -19,11 +19,11 @@ inline bdBitBuffer::bdBitBuffer(const bdUInt capacityBits, const bdBool typeChec
         byte = 0;
         writeBits(&byte, 1u);
     }
-    // bdAssertMsg(BD_BB_NUM_HEADER_BITS == m_writePosition, "BD_BB_NUM_HEADER_BITS and written header don't match.");
+    bdAssert(BD_BB_NUM_HEADER_BITS == m_writePosition, "BD_BB_NUM_HEADER_BITS and written header don't match.");
     resetReadPosition();
 }
 
-inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, const bdBool dataHasTypeCheckedBit)
+inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, const bdBool dataHasTypeCheckedBit) : bdReferencable(), m_data(0)
 {
     bdUByte8 byte;
 
@@ -50,7 +50,7 @@ inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, cons
 
 inline bdBitBuffer::~bdBitBuffer()
 {
-    operator delete(this);
+    delete this;
 }
 
 inline void* bdBitBuffer::operator new(bdUWord nbytes)
