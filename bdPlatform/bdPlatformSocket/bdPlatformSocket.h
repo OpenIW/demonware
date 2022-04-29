@@ -20,6 +20,8 @@ enum bdSocketStatusCode
     BD_NET_HOST_UNREACH = 0xFFFFFFF3,
 };
 
+typedef bdInt bdDNSHandle;
+
 class bdPlatformSocket
 {
 private:

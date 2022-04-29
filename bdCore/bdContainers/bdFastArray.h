@@ -71,13 +71,13 @@ public:
     void decreaseCapacity(unsigned int decrease)
     {
         unsigned int newCapacity;
-        void* newData = 0;
+        T* newData = 0;
 
         if (m_capacity > sizeof(T) * m_size)
         {
             if (decrease <= m_capacity - m_size)
             {
-                newCapacity = size;
+                newCapacity = m_size;
             }
             else
             {
@@ -92,7 +92,7 @@ public:
 
             if (m_capacity)
             {
-                newData = bdMemory::reallocate(m_data, sizeof(T) * m_capacity);
+                newData = bdReallocate<T>(m_data, m_capacity);
             }
             m_data = newData;
         }
@@ -132,11 +132,11 @@ public:
         m_size += n;
     };
 
-    void pushBack(T* value)
+    void pushBack(T const* value)
     {
         unsigned int totalSize = sizeof(T);
         unsigned int newCapacity;
-        void* newData = 0;
+        T* newData = 0;
 
         if (m_size == m_capacity)
         {
@@ -148,17 +148,17 @@ public:
             newCapacity = totalSize + m_capacity;
             if (newCapacity)
             {
-                newData = bdMemory::allocate(newCapacity * sizeof(T));
+                newData = bdAllocate<T>(newCapacity);
                 if (m_size)
                 {
-                    memcpy(newData, m_data, newCapacity * sizeof(T));
+                    bdMemcpy(newData, m_data, newCapacity * sizeof(T));
                 }
             }
-            bdMemory::deallocate(m_data);
+            bdDeallocate<T>(m_data);
             m_data = newData;
             m_capacity = newCapacity;
         }
-        memcpy(m_data[m_size], value, sizeof(m_data[m_size]));
+        bdMemcpy(m_data[m_size], value, sizeof(m_data[m_size]));
         ++m_size;
     };
 
@@ -188,7 +188,7 @@ public:
         }
     }
 
-    unsigned int removeAllKeepOrder(T* value)
+    unsigned int removeAllKeepOrder(T value)
     {
         unsigned int i, j;
 
@@ -203,6 +203,21 @@ public:
         }
         return j;
     };
+
+    bdBool findFirst(T const* value, bdUInt* i)
+    {
+        bdUInt j;
+
+        for (j = 0; j < this->m_size; ++j)
+        {
+            if (*value == this->m_data[j])
+            {
+                *i = j;
+                return true;
+            }
+        }
+        return false;
+    }
 
     void clear()
     {

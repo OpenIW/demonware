@@ -45,7 +45,7 @@ protected:
     bdAddressMap* m_addrMap;
     bdFloat32 m_receiveTimeout;
 public:
-    bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap, bdFloat32 receiveTimeout);
+    bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, const bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap, bdFloat32 receiveTimeout);
     ~bdDTLSAssociation();
     void connect();
     void pump();

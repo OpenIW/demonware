@@ -46,8 +46,8 @@ public:
     virtual void onSecurityKeyRemove(const bdSecurityID* id);
     void registerInterceptor(bdPacketInterceptor* const interceptor);
     void unregisterInterceptor(bdPacketInterceptor* const interceptor);
+    bdInt getStatus(const bdAddrHandleRef addrHandle);
 
-    const bdInt getStatus(bdCommonAddrRef localCommonAddr) const;
     const bdQoSProbe* getQoSProber() const;
     const bdAddressMap* getAddressMap() const;
     const bdSecurityKeyMap* getKeyMap() const;

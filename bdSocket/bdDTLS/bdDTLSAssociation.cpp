@@ -2,7 +2,7 @@
 
 #include "bdSocket/bdSocket.h"
 
-bdDTLSAssociation::bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap,
+bdDTLSAssociation::bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, const bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap,
     bdFloat32 receiveTimeout)
     : m_socket(socket), m_keyMap(keyMap), m_ECCKey(ECCKey), m_cypher(), m_addr(addr), m_addrHandle(addrHandle), m_state(BD_DTLS_CLOSED), m_lastReceived(), m_initTimer(), m_initResends(0),
     m_cookieTimer(), m_cookieResends(0), m_seqNum(-1), m_incomingSeqNums(&bdSequenceNumber()), m_initAck(), m_localId(), m_localCommonAddr(localCommonAddr), m_addrMap(addrMap), m_receiveTimeout(receiveTimeout)
@@ -660,7 +660,7 @@ bdInt bdDTLSAssociation::sendData(const bdAddr* addr, const void* data, const bd
     {
         return -6;
     }
-    m_seqNum++;
+    ++m_seqNum;
     bdDTLSData dataPacket(m_peerTag, m_seqNum.getValue());
     if (!dataPacket.serialize(outData, sizeof(outData), 0, &packetLength, &m_seqNum, m_sharedKey, reinterpret_cast<const bdUByte8* const>(data), length, &m_cypher, secID))
     {

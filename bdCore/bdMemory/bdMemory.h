@@ -15,6 +15,12 @@ inline void bdDeallocate(T* p)
     bdMemory::deallocate(reinterpret_cast<void*>(p));
 }
 
+template<typename T>
+inline T* bdReallocate(T* p, const bdUWord n)
+{
+    return reinterpret_cast<T*>(bdMemory::reallocate(p, sizeof(T) * n));
+}
+
 class bdMemory
 {
 public:

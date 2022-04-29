@@ -4,11 +4,11 @@
 class bdRunnable
 {
 public:
-	bool m_stop;
+    bdBool m_stop;
 
-	virtual ~bdRunnable();
-	virtual void stop();
-	virtual int run(void*) { return 0; };
-	bdRunnable();
-	void start();
+    virtual ~bdRunnable();
+    virtual void stop();
+    virtual bdUInt run(void* args) { return 0; };
+    bdRunnable();
+    void start();
 };
