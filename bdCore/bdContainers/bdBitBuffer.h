@@ -29,7 +29,7 @@ public:
     void writeRangedInt32(const bdInt i, const bdInt begin, const bdInt end);
     void writeRangedFloat32(const bdFloat32 f, const bdFloat32 begin, const bdFloat32 end, const bdFloat32 precision);
     bdBool readBits(void* bits, bdUInt numBits);
-    bdBool readUint32(bdUInt* u);
+    bdBool readUInt32(bdUInt* u);
     bdBool readInt32(bdInt32* i);
     bdBool readFloat32(bdFloat32* f);
     bdBool readRangedUInt32(bdUInt* u, const bdUInt begin, const bdUInt end, const bdBool typeChecked);

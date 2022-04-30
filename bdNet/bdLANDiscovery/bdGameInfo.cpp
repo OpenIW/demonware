@@ -53,23 +53,52 @@ void bdGameInfo::serialize(bdBitBuffer* bitBuffer)
 
 bdBool bdGameInfo::deserialize(const bdCommonAddrRef localAddr, bdBitBuffer* bitBuffer)
 {
-    return bdBool();
+    bdSecurityID tempSecID;
+    bdSecurityKey tempSecKey;
+    bdCommonAddrRef tempCommonAddr;
+    bdUByte8 tempAddrBuffer[25];
+    bdUInt tempTitleID;
+    bdBool ok;
+
+    ok = bitBuffer->readDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+    ok = ok == bitBuffer->readBits(&tempTitleID, CHAR_BIT * sizeof(tempTitleID));
+    ok = ok == bitBuffer->readDataType(BD_BB_FULL_TYPE);
+    ok = ok == bitBuffer->readBits(&tempSecID, CHAR_BIT * sizeof(tempSecID));
+    ok = ok == bitBuffer->readDataType(BD_BB_FULL_TYPE);
+    ok = ok == bitBuffer->readBits(&tempSecKey, CHAR_BIT * sizeof(tempSecKey));
+    ok = ok == bitBuffer->readBits(tempAddrBuffer, 200u);
+
+    tempCommonAddr = new bdCommonAddr();
+    if (!tempCommonAddr->deserialize(localAddr, tempAddrBuffer) || !ok)
+    {
+        bdLogError("discovery/gameinfo", "Deserialization failed");
+        return false;
+    }
+    m_titleId = tempTitleID;
+    m_secID = tempSecID;
+    m_secKey = tempSecKey;
+    m_hostAddr = tempCommonAddr;
+    return ok;
 }
 
 void bdGameInfo::setHostAddr(const bdCommonAddrRef hostAddr)
 {
+    m_hostAddr = hostAddr;
 }
 
 void bdGameInfo::setSecurityID(const bdSecurityID* secID)
 {
+    m_secID = *secID;
 }
 
 void bdGameInfo::setSecurityKey(const bdSecurityKey* secKey)
 {
+    m_secKey = *secKey;
 }
 
 void bdGameInfo::setTitleID(const bdUInt titleID)
 {
+    m_titleId = titleID;
 }
 
 const bdUInt bdGameInfo::getTitleID() const

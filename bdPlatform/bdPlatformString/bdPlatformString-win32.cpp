@@ -36,6 +36,11 @@ const bdNChar8* bdStrchr(const bdNChar8* s, const bdInt c)
 	return reinterpret_cast<const bdNChar8*>(strchr(s, c));
 }
 
+bdNChar8* bdStrstr(bdNChar8* const str, const bdNChar8* const searchStr)
+{
+	return strstr(str, searchStr);
+}
+
 int bdSnprintf(char* buf, unsigned int maxlen, const char* format, ...)
 {
 	bdInt ret;

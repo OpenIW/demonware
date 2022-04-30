@@ -4,8 +4,9 @@
 #include "bdGetHostByName/bdGetHostByNameConfig.h"
 #include "bdGetHostByName/bdGetHostByName.h"
 
-#include "bdLANDiscovery/bdGameInfo.h"
-#include "bdLANDiscovery/bdGameInfoFactory.h"
-#include "bdLANDiscovery/bdLANDiscoveryListener.h"
+#include "bdLANDiscovery/bdLANDiscovery.h"
+
+#include "bdUPnP/bdUPnPConfig.h"
+#include "bdUPnP/bdUPnPDevice.h"
 
 #include "bdNetStartParams.h"

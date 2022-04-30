@@ -75,8 +75,8 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
     bdUInt bitsToWrite;
     bdUInt lastByteIndex;
 
-    lastByteIndex = (numBits + m_writePosition - 1) >> 3;
-    if (!this->m_data.rangeCheck(lastByteIndex))
+    lastByteIndex = (numBits + m_writePosition - 1) / 8;
+    if (!m_data.rangeCheck(lastByteIndex))
     {
         bdUByte8 value = 0;
         m_data.setGrow(lastByteIndex, &value);
@@ -84,33 +84,33 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
     bitsToWrite = numBits;
     while (bitsToWrite)
     {
-        upShift = this->m_writePosition & 7;
+        upShift = m_writePosition & 7;
         if (bitsToWrite >= 8 - upShift)
         {
             bitsToWrite = 8 - upShift;
         }
         mask = (255 >> (8 - upShift)) | (255 << (upShift + bitsToWrite));
-        nextDestByteIndex = this->m_writePosition >> 3;
+        nextDestByteIndex = m_writePosition / 8;
         maskedDest = mask & *m_data[nextDestByteIndex];
-        currentSrcByteIndex = (numBits - bitsToWrite) >> 3;
+        currentSrcByteIndex = (numBits - bitsToWrite) / 8;
         nextSrcByte = 0;
-        if ((numBits - 1) >> 3 > currentSrcByteIndex)
+        if ((numBits - 1) / 8 > currentSrcByteIndex)
         {
             nextSrcByte = ((bdUByte8*)bits)[currentSrcByteIndex + 1];
         }
-        currentSrcByte = ((bdUByte8*)bits)[((numBits - bitsToWrite) >> 3)];
+        currentSrcByte = ((bdUByte8*)bits)[((numBits - bitsToWrite) / 8)];
         *m_data[nextDestByteIndex] = ~mask & ((bdUByte8)((nextSrcByte << (8 - ((numBits - bitsToWrite) & 7))) | ((bdInt)currentSrcByte >> ((numBits - bitsToWrite) & 7))) << upShift) | maskedDest;
-        this->m_writePosition += bitsToWrite;
+        m_writePosition += bitsToWrite;
         bitsToWrite -= bitsToWrite;
-        if (this->m_maxWritePosition <= this->m_writePosition)
+        if (m_maxWritePosition <= m_writePosition)
         {
-            m_writePosition = this->m_writePosition;
+            m_writePosition = m_writePosition;
         }
         else
         {
-            m_writePosition = this->m_maxWritePosition;
+            m_writePosition = m_maxWritePosition;
         }
-        this->m_maxWritePosition = m_writePosition;
+        m_maxWritePosition = m_writePosition;
     }
 }
 
@@ -368,7 +368,7 @@ inline bdBool bdBitBuffer::readBits(void* bits, bdUInt numBits)
     return true;
 }
 
-inline bdBool bdBitBuffer::readUint32(bdUInt* u)
+inline bdBool bdBitBuffer::readUInt32(bdUInt* u)
 {
     bdBool ok = false;
     bdUInt nu;
@@ -437,11 +437,11 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const
             bufEnd = 0;
             if (ok)
             {
-                ok = readUint32(&bufBegin);
+                ok = readUInt32(&bufBegin);
             }
             if (ok)
             {
-                ok = readUint32(&bufEnd);
+                ok = readUInt32(&bufEnd);
             }
             if (ok && (begin != bufBegin || end != bufEnd))
             {

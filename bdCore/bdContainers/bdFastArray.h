@@ -9,6 +9,12 @@ public:
     unsigned int m_capacity;
     unsigned int m_size;
 
+    bdFastArray()
+    {
+        m_data = NULL;
+        m_capacity = 0;
+        m_size = 0;
+    };
     bdFastArray(const bdUInt capacity) : m_data(NULL), m_capacity(capacity)
     {
         if (m_capacity)
@@ -245,12 +251,12 @@ public:
     bdUByte8* begin()
     {
         return this->m_data;
-    }
+    };
 
     bdUInt getSize()
     {
         return this->m_size;
-    }
+    };
 
     T* operator[](const bdUInt i)
     {
