@@ -11,9 +11,9 @@ public:
     static bdBool skipBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt bytes);
     static bdBool rewindBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt bytes);
     template <typename varType>
-    static bdBool removeBasicType(const void* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var);
+    static bdBool removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var);
     template <typename varType>
-    static bdBool appendBasicType(const void* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var);
+    static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var);
 };
 
 // Keep this just in case.
@@ -38,7 +38,7 @@ if (status)                                                                     
 #define AppendBasicType(status, type, data, size, offset, newOffset, var)                                            \
 if (status)                                                                                                          \
 {                                                                                                                    \
-    status = bdBytePacker::appendBasicType<type>(reinterpret_cast<const void*>(data), size, offset, newOffset, var); \
+    status = bdBytePacker::appendBasicType<type>(reinterpret_cast<void*>(data), size, offset, newOffset, var); \
 }
 
 #define Deserialize(status, var, data, size, offset, newOffset)  \

@@ -9,7 +9,7 @@ void bdLANDiscoveryClient::operator delete(void* p)
 
 void* bdLANDiscoveryClient::operator new(bdUWord nbytes)
 {
-    bdMemory::allocate(nbytes);
+    return bdMemory::allocate(nbytes);
 }
 
 bdLANDiscoveryClient::bdLANDiscoveryClient() : m_timeout(0.0f), m_timer(), m_socket(), m_listeners(), m_status(BD_IDLE)

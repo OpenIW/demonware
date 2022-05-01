@@ -12,7 +12,7 @@ bdUPnPDevice::~bdUPnPDevice()
 {
 }
 
-bdBool bdUPnPDevice::init(bdArray<bdInetAddr>* localAddrs, const bdUByte8* const fetchLocation, const bdInt fetchLen, bdInetAddr* deviceAddr, const bdUInt16 port, const bdUPnPConfig config)
+bdBool bdUPnPDevice::init(bdArray<bdInetAddr>* localAddrs, const bdByte8* const fetchLocation, const bdInt fetchLen, const bdInetAddr* deviceAddr, const bdUInt16 port, const bdUPnPConfig config)
 {
     if (m_state)
     {
@@ -37,7 +37,6 @@ bdBool bdUPnPDevice::init(bdArray<bdInetAddr>* localAddrs, const bdUByte8* const
 void bdUPnPDevice::pump()
 {
     bdBool ok;
-    bdInt32 errorCode;
     bdBool isComplete;
     bdBool mappingExists;
     bdBool mappingIsMine;
@@ -157,7 +156,7 @@ void bdUPnPDevice::pump()
             m_state = BD_UPNP_DEVICE_FINISHED;
             break;
         }
-        prepareGetMappingRequest();
+        prepareGetMappingsRequest();
         if (connectToDevice())
         {
             m_state = BD_UPNP_DEVICE_SENDING_PORT_QUERY_REQ;
@@ -527,7 +526,7 @@ bdBool bdUPnPDevice::pumpReceive()
     }
     else
     {
-        bytesRecieved = m_streamSocket.recv(&m_readBuffer[m_bytesReceived], 0x1800 - m_bytesReceived);
+        bytesRecieved = m_streamSocket.recv(&m_readBuffer[m_bytesReceived], sizeof(m_readBuffer) - m_bytesReceived);
         if (bytesRecieved <= 0)
         {
             if (bytesRecieved = -2)
@@ -578,91 +577,379 @@ bdBool bdUPnPDevice::confirmHttpSuccess()
     return bdStrstr(m_readBuffer, "200 OK") != 0;
 }
 
-bdBool bdUPnPDevice::extractUPnPError(bdInt32* errorCode)
-{
-    return bdBool();
-}
-
-void bdUPnPDevice::selectNewExternalPort()
-{
-}
-
 void bdUPnPDevice::preparePortUnMappingRequest()
 {
+    bdNChar8 buf[112];
+
+    bdSnprintf(buf, sizeof(buf), "<NewRemoteHost></NewRemoteHost>\r\n<NewExternalPort>%d</NewExternalPort>\r\n<NewProtocol>UDP</NewProtocol>\r\n", m_gamePort);
+    genUPnPCommand("DeletePortMapping", buf);
 }
 
 void bdUPnPDevice::setupReceive()
 {
+    m_bytesReceived = 0;
+    bdMemset(m_readBuffer, 0, sizeof(m_readBuffer));
+    m_responseTimer.reset();
+    m_responseTimer.start();
 }
 
 void bdUPnPDevice::prepareCreatePortMappingRequest()
 {
+    bdByte8 addrString[22];
+    bdByte8 portMapArguments[412];
+
+    m_localConnectedAddr.toString(addrString, sizeof(addrString));
+    bdSnprintf(
+        portMapArguments,
+        0x19CuLL,
+        "      <NewRemoteHost></NewRemoteHost>\r\n"
+        "      <NewExternalPort>%d</NewExternalPort>\r\n"
+        "      <NewProtocol>UDP</NewProtocol>\r\n"
+        "      <NewInternalPort>%d</NewInternalPort>\r\n"
+        "      <NewInternalClient>%s</NewInternalClient>\r\n"
+        "      <NewEnabled>1</NewEnabled>\r\n"
+        "      <NewPortMappingDescription>DemonwarePortMapping</NewPortMappingDescription>\r\n"
+        "      <NewLeaseDuration>0</NewLeaseDuration>\r\n",
+        m_gamePort,
+        m_gamePort,
+        addrString);
+    genUPnPCommand("AddPortMapping", portMapArguments);
 }
 
 bdBool bdUPnPDevice::extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** value, bdUInt* valueLen)
 {
-    return bdBool();
-}
+    bdNChar8* elementEnd;
+    bdByte8* elementStart;
 
-bdBool bdUPnPDevice::checkForFinishedSoapResponse()
-{
-    return bdBool();
+    *value = 0LL;
+    *valueLen = 0;
+    elementStart = bdStrstr(buffer, tag);
+    if (!elementStart)
+    {
+        return false;
+    }
+    elementStart = bdStrstr(elementStart, ">");
+    if (!elementStart)
+    {
+        return false;
+    }
+    elementEnd = bdStrstr(++elementStart, "</");
+    if (!elementEnd)
+    {
+        bdLogWarn("bdnet/upnpdevice", "Tag %s is improperly formatted");
+        return false;
+    }
+    if (elementEnd != elementStart)
+    {
+        *value = elementStart;
+        *valueLen = elementEnd - elementStart;
+        return true;
+    }
+    return false;
 }
 
 void bdUPnPDevice::genUPnPCommand(const bdByte8* const command, const bdByte8* const arguments)
 {
+    bdUInt actualSoapSize;
+    bdByte8 numBuff[10];
+    bdByte8 addressBuff[22];
+    bdByte8 soapBuffer[682];
+    bdUInt totalRequestSize;
+    bdInt numLen;
+
+    actualSoapSize = bdSnprintf(
+        soapBuffer,
+        sizeof(soapBuffer),
+        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schema"
+        "s.xmlsoap.org/soap/encoding/\">\r\n"
+        "<s:Body>\r\n"
+        "<u:%s xmlns:u=\"urn:schemas-upnp-org:service:%s\">\r\n"
+        "%s</u:%s>\r\n"
+        "</s:Body>\r\n"
+        "</s:Envelope>\r\n",
+        command,
+        m_isIp ? "WANIPConnection:1" : "WANPPPConnection:1",
+        arguments,
+        command);
+    m_deviceAddr.toString(addressBuff, sizeof(addressBuff));
+    numLen = bdSnprintf(numBuff, sizeof(numBuff), "%u", actualSoapSize);
+    totalRequestSize = actualSoapSize + numLen + bdStrlen(command) + 
+        (bdStrlen(m_isIp ? "WANIPConnection:1" : "WANPPPConnection:1") + bdStrlen(addressBuff) + bdStrlen(m_controlURL) + bdStrlen("POST %s HTTP/1.1\r\n"
+            "HOST: %s\r\n"
+            "SOAPACTION: \"urn:schemas-upnp-org:service:%s#%s\"\r\n"
+            "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n"
+            "CONTENT-LENGTH: %d\r\n"
+            "\r\n"
+            "%s"));
+    bdAssert(totalRequestSize < BD_UPNP_MAX_DEVICE_REQUEST_SIZE, "Request is too large for buffer");
+    m_requestSize = bdSnprintf(
+        m_requestBuffer,
+        sizeof(m_requestBuffer),
+        "POST %s HTTP/1.1\r\n"
+        "HOST: %s\r\n"
+        "SOAPACTION: \"urn:schemas-upnp-org:service:%s#%s\"\r\n"
+        "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n"
+        "CONTENT-LENGTH: %d\r\n"
+        "\r\n"
+        "%s",
+        m_controlURL,
+        addressBuff,
+        m_isIp ? "WANIPConnection:1" : "WANPPPConnection:1",
+        command,
+        actualSoapSize,
+        soapBuffer,
+        soapBuffer
+    );
 }
 
 bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt* baseLen)
 {
-    return bdBool();
+    bdNChar8* slashLoc;
+    bdByte8* elementEnd;
+    bdNChar8* addressEnd;
+    bdNChar8* addressStart;
+    bdUInt elementLen;
+    bdByte8* elementStart;
+    bdByte8 addrString[22];
+    bdByte8 urlBase[9];
+
+    *baseLoc = 0LL;
+    *baseLen = 0;
+    elementStart = 0LL;
+    elementLen = 0;
+    strcpy(urlBase, "<URLBase");
+    
+    if (!extractTag(urlBase, m_readBuffer, &elementStart, &elementLen))
+    {
+        return true;
+    }
+    addressStart = bdStrstr(elementStart, "http://");
+    if (addressStart != elementStart)
+    {
+        bdLogWarn("bdnet/upnpdevice", "Description [URLBase tag] is improperly formatted. Missing http://");
+        return false;
+    }
+    elementEnd = &elementStart[elementLen];
+    addressStart += bdStrlen("http://");
+    slashLoc = bdStrstr(addressStart, "/");
+
+    if (slashLoc >= elementEnd)
+    {
+        addressEnd = elementEnd;
+    }
+    else
+    {
+        *baseLoc = slashLoc;
+        *baseLen = elementEnd - slashLoc;
+        addressEnd = slashLoc;
+    }
+
+    if ((addressEnd - addressStart) < sizeof(addrString))
+    {
+        bdStrlcpy(addrString, addressStart, (addressEnd - addressStart + 1));
+        m_deviceAddr.set(addrString);
+        return true;
+    }
+    return false;
 }
 
 bdBool bdUPnPDevice::extractServiceType(bdBool* serviceType)
 {
-    return bdBool();
+    if (bdStrstr(m_readBuffer, "WANIPConnection:1"))
+    {
+        *serviceType = true;
+    }
+    else if (bdStrstr(m_readBuffer, "WANPPPConnection:1"))
+    {
+        *serviceType = false;
+    }
+    else
+    {
+        bdLogWarn("bdnet/upnpdevice", "No service type found.");
+        return false;
+    }
+    return true;
 }
 
 bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt* controlLen)
 {
-    return bdBool();
+    bdByte8* elementEnd;
+    bdNChar8* addressEnd;
+    bdNChar8* addressStart;
+    bdNChar8* buffStart;
+    bdUInt elementLen;
+    bdByte8* elementStart;
+    bdByte8 addrString[22];
+    bdByte8 control_url[12];
+
+    *controlLoc = 0LL;
+    *controlLen = 0;
+    elementStart = 0LL;
+    elementLen = 0;
+
+    if (m_isIp)
+    {
+        buffStart = bdStrstr(m_readBuffer, "WANIPConnection:1");
+    }
+    else
+    {
+        buffStart = bdStrstr(this->m_readBuffer, "WANPPPConnection:1");
+    }
+
+    if (!buffStart)
+    {
+        return false;
+    }
+    strcpy(control_url, "<controlURL");
+
+    if (!extractTag(control_url, buffStart, &elementStart, &elementLen))
+    {
+        bdLogWarn("bdnet/upnpdevice", "ControlURL specifier tag is missing");
+        return false;
+    }
+    addressStart = bdStrstr(elementStart, "http://");
+    elementEnd = &elementStart[elementLen];
+    if (addressStart == elementStart)
+    {
+        addressStart += bdStrlen("http://");
+        addressEnd = bdStrstr(addressStart, "/");
+        if (!addressEnd || addressEnd > elementEnd)
+        {
+            addressEnd = elementEnd;
+        }
+        if ((addressEnd - addressStart) < sizeof(addrString))
+        {
+            bdStrlcpy(addrString, addressStart, (addressEnd - addressStart + 1));
+            m_deviceAddr.set(addrString);
+        }
+        *controlLoc = addressEnd;
+        *controlLen = elementEnd - addressEnd;
+    }
+    else
+    {
+        *controlLoc = elementStart;
+        *controlLen = elementLen;
+    }
+    return true;
 }
 
 bdBool bdUPnPDevice::extractExternalAddress(bdInetAddr* externalAddress)
 {
-    return bdBool();
+    bdByte8 external_ip_address_string[22];
+    bdByte8 addrString[22];
+
+    bdMemcpy(externalAddress, &bdInetAddr(), sizeof(bdInetAddr));
+    bdByte8* addrLoc = NULL;
+    bdUInt addrLen = 0;
+
+    strcpy(external_ip_address_string, "<NewExternalIPAddress");
+    if (!extractTag(external_ip_address_string, m_readBuffer, &addrLoc, &addrLen))
+    {
+        return true;
+    }
+    if (addrLen && addrLen < sizeof(addrString))
+    {
+        bdStrlcpy(addrString, addrLoc, addrLen + 1);
+        externalAddress->set(addrString);
+        bdLogInfo("bdnet/upnpdevice", "External address on device determined to be: %s", addrString);
+        return true;
+    }
+    return false;
 }
 
-void bdUPnPDevice::prepareGetMappingRequest()
+void bdUPnPDevice::prepareGetMappingsRequest()
 {
+    bdByte8 queryMapArguments[110];
+
+    bdSnprintf(
+        queryMapArguments,
+        sizeof(queryMapArguments),
+        "<NewRemoteHost></NewRemoteHost>\r\n<NewExternalPort>%d</NewExternalPort>\r\n<NewProtocol>UDP</NewProtocol>\r\n",
+        m_gamePort);
+    genUPnPCommand("GetSpecificPortMappingEntry", queryMapArguments);
+    bdLogInfo("bdnet/upnpdevice", "Querying UPnP device for existing mappings on port %u.", m_gamePort);
 }
 
 bdBool bdUPnPDevice::parseGetMappingsResponse(bdBool* mappingExists, bdBool* mappingIsMine)
 {
-    return bdBool();
+    bdNChar8 addressBuffer[22];
+    bdByte8 internal_client_string[19];
+
+    strcpy(internal_client_string, "<NewInternalClient");
+    bdByte8* addrLoc = NULL;
+    bdUInt addrLen = 0;
+    bdBool ok = true;
+    *mappingExists = false;
+    *mappingIsMine = false;
+    *mappingExists = confirmHttpSuccess();
+
+    if (*mappingExists)
+    {
+        if (!extractTag(internal_client_string, m_readBuffer, &addrLoc, &addrLen))
+        {
+            *mappingExists = 0;
+        }
+    }
+    if (*mappingExists)
+    {
+        bdInetAddr mappingOwner;
+        ok = extractMappingOwner(&mappingOwner, addrLoc, addrLen);
+        for (bdUInt i = 0; i < m_localAddrs->getSize() && !*mappingIsMine; ++i)
+        {
+            bdInetAddr currAddress;
+            m_localAddrs->get(i, &currAddress);
+            if (currAddress == &mappingOwner)
+            {
+                *mappingIsMine = true;
+            }
+        }
+        if (!*mappingIsMine)
+        {
+            mappingOwner.toString(addressBuffer, sizeof(addressBuffer));
+            bdLogInfo("bdnet/upnpdevice", "Port Mapping collision found, owned by %s.", addressBuffer);
+        }
+    }
+    return ok;
 }
 
 bdBool bdUPnPDevice::extractMappingOwner(bdInetAddr* owner, bdByte8* addrLoc, bdUInt addrLen)
 {
-    return bdBool();
+    bdByte8 addrString[22];
+
+    *owner = bdInetAddr();
+    if (!addrLen)
+    {
+        return false;
+    }
+    if (addrLen < sizeof(addrString))
+    {
+        bdStrlcpy(addrString, addrLoc, addrLen + 1);
+        bdInetAddr mappingOwner(addrString);
+        if (mappingOwner.isValid())
+        {
+            owner->set(&mappingOwner);
+            return true;
+        }
+    }
+    return false;
 }
 
 const bdUPnPDevice::bdUPnPDeviceState bdUPnPDevice::getDeviceState() const
 {
-    return bdUPnPDeviceState();
+    return m_state;
 }
 
 const bdUPnPDevice::bdUPnPPortStatus bdUPnPDevice::getPortStatus() const
 {
-    return bdUPnPPortStatus();
+    return m_portStatus;
 }
 
-const bdAddr* bdUPnPDevice::getExternalAddr() const
+bdAddr* bdUPnPDevice::getExternalAddr()
 {
-    return nullptr;
+    return &bdAddr(&m_externalDeviceAddr, m_gamePort);
 }
 
-const bdAddr* bdUPnPDevice::getDeviceAddr() const
+bdAddr* bdUPnPDevice::getDeviceAddr()
 {
-    return nullptr;
+    return &bdAddr(&m_deviceAddr);
 }

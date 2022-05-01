@@ -115,7 +115,7 @@ bdBool bdBytePacker::rewindBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUI
 }
 
 template<typename varType>
-inline bdBool bdBytePacker::removeBasicType(const void* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var)
+inline bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var)
 {
 	bdBool read;
 	varType nvar;
@@ -130,7 +130,7 @@ inline bdBool bdBytePacker::removeBasicType(const void* buffer, bdUInt bufferSiz
 }
 
 template<typename varType>
-bdBool bdBytePacker::appendBasicType(const void* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var)
+bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var)
 {
 	varType nvar;
 

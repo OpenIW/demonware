@@ -31,9 +31,14 @@ bdUWord bdStrnlen(const bdNChar8* const s, const bdUWord maxLen)
 	return pos ? pos - s : maxLen;
 }
 
-const bdNChar8* bdStrchr(const bdNChar8* s, const bdInt c)
+bdNChar8* bdStrchr(bdNChar8* const s, const bdInt c)
 {
-	return reinterpret_cast<const bdNChar8*>(strchr(s, c));
+	return strchr(s, c);
+}
+
+const bdNChar8* bdStrchr(const bdNChar8* const s, const bdInt c)
+{
+	return strchr(s, c);
 }
 
 bdNChar8* bdStrstr(bdNChar8* const str, const bdNChar8* const searchStr)

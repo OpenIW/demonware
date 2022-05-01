@@ -9,7 +9,7 @@ protected:
     bdArray<bdString> m_natTravHosts;
     bdUInt16 m_natTravPort;
     bdArray<bdInetAddr> m_localAddresses;
-    //bdGetHostByNameConfig m_hostNameLookupConfig;
-    //bdUPnPConfig m_UPnPConfig;
+    bdGetHostByNameConfig m_hostNameLookupConfig;
+    bdUPnPConfig m_UPnPConfig;
     bdBool m_useAnyIP;
 };

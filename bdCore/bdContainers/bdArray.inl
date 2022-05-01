@@ -1,4 +1,3 @@
-#include "bdArray.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename T>
@@ -48,6 +47,17 @@ template<typename T>
 inline const bdUInt bdArray<T>::getSize() const
 {
     return m_size;
+}
+
+template<typename T>
+inline bdBool bdArray<T>::get(const bdUInt i, T* value)
+{
+    bdBool inRange = rangeCheck(i);
+    if (inRange)
+    {
+        bdMemcpy(value, &m_data[i], sizeof(T));
+    }
+    return inRange;
 }
 
 template<typename T>
