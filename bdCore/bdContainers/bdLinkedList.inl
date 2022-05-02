@@ -75,6 +75,12 @@ inline Position bdLinkedList<T>::getTailPosition()
 }
 
 template<typename T>
+inline T* bdLinkedList<T>::getAt(const Position position)
+{
+    return reinterpret_cast<T*>(position);
+}
+
+template<typename T>
 inline void bdLinkedList<T>::insertAfter(const Position position, const T* value)
 {
     Node* node = new Node((T*)value);
@@ -111,9 +117,9 @@ inline void bdLinkedList<T>::insertAfter(const Position position, const T* value
 }
 
 template<typename T>
-inline bdBool bdLinkedList<T>::isEmpty()
+inline const bdBool bdLinkedList<T>::isEmpty() const
 {
-    return (bdBool)(this->m_size == 0);
+    return m_size == 0;
 }
 
 template<typename T>

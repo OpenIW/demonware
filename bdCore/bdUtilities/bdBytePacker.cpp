@@ -43,7 +43,7 @@ bdBool bdBytePacker::appendEncodedUInt16(bdUByte8* buffer, bdUInt bufferSize, bd
 	}
 }
 
-bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt offset, bdUInt* newOffset, void* dest, bdUInt readSize)
+bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt offset, bdUInt* newOffset, void* const dest, bdUInt readSize)
 {
 	*newOffset = readSize + offset;
 
@@ -63,7 +63,7 @@ bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt of
 	return false;
 }
 
-bdBool bdBytePacker::removeEncodedUInt16(bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt16* value)
+bdBool bdBytePacker::removeEncodedUInt16(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt16* value)
 {
 	unsigned char firstByte = 0;
 

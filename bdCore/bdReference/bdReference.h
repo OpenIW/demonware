@@ -9,8 +9,9 @@ public:
 
 	bdReference();
 	bdReference(const bdReference<T>* other);
-	~bdReference();
+	bdReference(bdReference<T>* other);
 	bdReference(T* p);
+	~bdReference();
 	bdBool isNull() const;
 	bdBool notNull() const;
 	T* operator->();

@@ -25,13 +25,13 @@ public:
     bdByteBuffer(const bdUInt size, bdBool isTypeChecked);
     ~bdByteBuffer();
 
-    bdUInt getDataSize();
-    bdUInt getReadSize();
+    const bdUInt getDataSize() const;
+    const bdUInt getReadSize() const;
     bdBool getStringLength(bdUInt* length);
-    bdUByte8* getData();
-    bdUInt getSize();
-    bdUInt getMaxWriteSize();
-    bdUInt getMaxReadSize();
+    const bdUByte8* getData() const;
+    const bdUInt getSize() const;
+    const bdUInt getMaxWriteSize() const;
+    const bdUInt getMaxReadSize() const;
 
     void setTypeCheck(const bdBool flag);
     void allocateBuffer();
@@ -105,3 +105,5 @@ public:
         return write(reinterpret_cast<void*>(&evar), sizeof(dataType));
     }
 };
+
+typedef bdReference<bdByteBuffer> bdByteBufferRef;

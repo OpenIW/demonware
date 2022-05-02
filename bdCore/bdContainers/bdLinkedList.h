@@ -7,6 +7,7 @@ template<typename T>
 class bdLinkedList
 {
 public:
+    typedef void* Position;
     class Node
     {
     public:
@@ -16,7 +17,7 @@ public:
 
         Node(T* data)
         {
-            m_data = T(data);
+            m_data = T(*data);
         }
         void operator delete(void* p)
         {
@@ -41,8 +42,9 @@ public:
     Position getHeadPosition();
     bdUInt getSize();
     Position getTailPosition();
+    T* getAt(const Position position);
     void insertAfter(const Position position, const T* value);
-    bdBool isEmpty();
+    const bdBool isEmpty() const;
     void removeAt(Position* position);
     void removeHead();
 };

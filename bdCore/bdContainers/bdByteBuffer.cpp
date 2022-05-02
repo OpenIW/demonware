@@ -51,12 +51,12 @@ bdByteBuffer::~bdByteBuffer()
     m_writePtr = NULL;
 }
 
-bdUInt bdByteBuffer::getDataSize()
+const bdUInt bdByteBuffer::getDataSize() const
 {
     return (bdInt32)m_writePtr - (bdInt32)m_data;
 }
 
-bdUInt bdByteBuffer::getReadSize()
+const bdUInt bdByteBuffer::getReadSize() const
 {
     return (bdInt32)m_readPtr - (bdInt32)m_data;
 }
@@ -66,22 +66,22 @@ bdBool bdByteBuffer::getStringLength(bdUInt* length)
     return bdBool();
 }
 
-bdUByte8* bdByteBuffer::getData()
+const bdUByte8* bdByteBuffer::getData() const
 {
     return m_data;
 }
 
-bdUInt bdByteBuffer::getSize()
+const bdUInt bdByteBuffer::getSize() const
 {
     return m_size;
 }
 
-bdUInt bdByteBuffer::getMaxWriteSize()
+const bdUInt bdByteBuffer::getMaxWriteSize() const
 {
     return m_size - getDataSize();
 }
 
-bdUInt bdByteBuffer::getMaxReadSize()
+const bdUInt bdByteBuffer::getMaxReadSize() const
 {
 
     return m_size - getReadSize();

@@ -17,6 +17,16 @@ bdCookie::bdCookie(bdUInt32 localTag, bdUInt32 peerTag, bdUInt32 localTieTag, bd
     }
 }
 
+void* bdCookie::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
+void bdCookie::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
 bdUInt bdCookie::serialize(bdUByte8* data, const bdUInt32 size)
 {
     bdBool ok = true;

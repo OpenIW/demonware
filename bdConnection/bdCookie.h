@@ -11,6 +11,8 @@ protected:
     bdUInt32 m_localTieTag;
     bdUInt32 m_peerTieTag;
 public:
+    void* operator new(bdUWord nbytes);
+    void operator delete(void* p);
     bdCookie();
     bdCookie(bdUInt32 localTag, bdUInt32 peerTag, bdUInt32 localTieTag, bdUInt32 peerTieTag);
     bdUInt serialize(bdUByte8* data, const bdUInt32 size);
@@ -22,3 +24,5 @@ public:
     const bdUInt32 getLocalTieTag() const;
     const bdUInt32 getPeerTieTag() const;
 };
+
+typedef bdReference<bdCookie> bdCookieRef;

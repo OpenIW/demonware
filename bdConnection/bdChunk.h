@@ -40,3 +40,5 @@ public:
     const bdChunkTypes getType() const;
     const bdBool isControl() const;
 };
+
+typedef bdReference<bdChunk> bdChunkRef;

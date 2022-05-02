@@ -17,6 +17,16 @@ inline bdReference<T>::bdReference(const bdReference<T>* other)
 }
 
 template<typename T>
+inline bdReference<T>::bdReference(bdReference<T>* other)
+{
+    this->m_ptr = other->m_ptr;
+    if (this->m_ptr)
+    {
+        reinterpret_cast<bdReferencable*>(this->m_ptr)->addRef();
+    }
+}
+
+template<typename T>
 inline bdReference<T>::~bdReference()
 {
     if (this->m_ptr)
