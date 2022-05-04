@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdSAckChunk : bdChunk
+class bdSAckChunk : public bdChunk
 {
 public:
     enum bdSAckFlags : bdInt
@@ -26,15 +26,15 @@ public:
     void* operator new(bdUWord nbytes);
     bdSAckChunk();
     bdSAckChunk(const bdWord windowCredit, bdSAckFlags flags);
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdUInt getSerializedSize();
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt getSerializedSize();
 
     void addGap(const bdSAckChunk::bdGapAckBlock* gap);
     void setCumulativeAck(bdSeqNumber cumulativeAck);
     void setWindowCredit(bdWord windowCredit);
 
-    const bdLinkedList<bdSAckChunk::bdGapAckBlock>* getGapList() const;
+    bdLinkedList<bdSAckChunk::bdGapAckBlock>* getGapList();
     const bdWord getWindowCredit() const;
     const bdSeqNumber getCumulativeAck() const;
 };

@@ -127,7 +127,19 @@ inline bdBool bdReference<T>::operator==(const bdReference<T>* other)
 }
 
 template<typename T>
-inline const T* bdReference<T>::operator*() const
+inline T* bdReference<T>::operator*() const
 {
     return this->m_ptr;
+}
+
+template<typename Cast, typename Reference>
+inline Cast* reference_cast(bdReference<Reference> referenceClass)
+{
+    return dynamic_cast<Cast*>(referenceClass.operator->());
+}
+
+template<typename T>
+inline bdBool bdReference<T>::operator!() const
+{
+    return m_ptr == BD_NULL;
 }

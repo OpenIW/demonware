@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdShutdownCompleteChunk : bdChunk
+class bdShutdownCompleteChunk : public bdChunk
 {
 public:
     enum bdShutdownCompleteFlags : bdInt
@@ -14,8 +14,8 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdShutdownCompleteChunk();
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdUInt getSerializedSize();
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt getSerializedSize();
     const bdShutdownCompleteChunk::bdShutdownCompleteFlags getFlags() const;
 };

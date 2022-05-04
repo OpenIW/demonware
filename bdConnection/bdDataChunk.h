@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdDataChunk : bdChunk
+class bdDataChunk : public bdChunk
 {
 public:
     enum bdDataFlags : bdInt
@@ -20,12 +20,13 @@ public:
     void* operator new(bdUWord nbytes);
     bdDataChunk();
     bdDataChunk(bdMessageRef data, const bdDataChunk::bdDataFlags flags);
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual ~bdDataChunk();
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
     bdUInt serializeUnencrypted(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, bdUInt* unencOffset);
-    bdUInt getSerializedSize();
-    void setSequenceNUmber(bdSeqNumber seqNum);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt* unencOffset);
+    virtual bdUInt getSerializedSize();
+    void setSequenceNumber(bdSeqNumber seqNum);
 
     const bdSeqNumber getSequenceNumber() const;
     const bdMessageRef getMessage() const;

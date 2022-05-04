@@ -32,3 +32,15 @@ const bdBool bdChunk::isControl() const
 {
     return m_type != 2;
 }
+
+bdChunkTypes bdChunk::getType(const bdUByte8* const data, const bdUInt size)
+{
+    bdUInt offset = 0;
+    bdUByte8 tmp = 0;
+    bdBool ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, 0, &offset, &tmp);
+    if (ok)
+    {
+        return static_cast<bdChunkTypes>(tmp);
+    }
+    return BD_CT_INVALID;
+}

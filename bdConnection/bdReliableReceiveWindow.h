@@ -19,5 +19,5 @@ public:
     bdBool add(bdDataChunkRef chunk);
     void calculateAck();
     void getDataToSend(bdPacket* packet);
-    bdChunkRef getNextToRead();
+    bdDataChunkRef getNextToRead();
 };

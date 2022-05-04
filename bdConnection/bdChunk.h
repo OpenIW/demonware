@@ -20,7 +20,7 @@ enum bdChunkTypes : bdInt
     BD_CT_COOKIE_ACK = 0xE,
 };
 
-class bdChunk : bdReferencable
+class bdChunk : public bdReferencable
 {
 public:
     struct bdChunkData
@@ -34,11 +34,13 @@ protected:
     bdChunk::bdChunkData m_headerData;
 public:
     bdChunk(const bdChunkTypes type) : bdReferencable(), m_type(type) {};
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdUInt getSerializedSize();
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt getSerializedSize();
     const bdChunkTypes getType() const;
     const bdBool isControl() const;
+
+    static bdChunkTypes getType(const bdUByte8* const data, const bdUInt size);
 };
 
 typedef bdReference<bdChunk> bdChunkRef;

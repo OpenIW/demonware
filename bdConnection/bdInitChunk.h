@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdInitChunk : bdChunk
+class bdInitChunk : public bdChunk
 {
 public:
     enum bdInitChunkFlags : bdInt
@@ -19,9 +19,9 @@ public:
     void* operator new(bdUWord nbytes);
     bdInitChunk();
     bdInitChunk(bdUInt32 initTag, const bdWord windowCredit);
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdUInt getSerializedSize();
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt getSerializedSize();
 
     const bdWord getWindowCredit() const;
     const bdUInt32 getInitTag() const;

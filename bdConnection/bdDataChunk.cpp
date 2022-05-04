@@ -109,10 +109,11 @@ bdUInt bdDataChunk::serializeUnencrypted(bdUByte8* data, const bdUInt32 size)
 
 bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
 {
-    return deserialize(data, size, offset, NULL, NULL);
+    bdUInt unencOffset = 0;
+    return deserialize(data, size, offset, NULL, NULL, &unencOffset);
 }
 
-bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, bdUInt* unencOffset)
+bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt* unencOffset)
 {
     bdUInt16 unencPayloadSize;
     bdUInt16 payloadSize;
@@ -164,7 +165,7 @@ bdUInt bdDataChunk::getSerializedSize()
     return serialize(NULL, NULL);
 }
 
-void bdDataChunk::setSequenceNUmber(bdSeqNumber seqNum)
+void bdDataChunk::setSequenceNumber(bdSeqNumber seqNum)
 {
     m_seqNum = seqNum;
 }

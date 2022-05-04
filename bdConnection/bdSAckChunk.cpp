@@ -118,7 +118,7 @@ void bdSAckChunk::setWindowCredit(bdWord windowCredit)
     m_windowCredit = windowCredit;
 }
 
-const bdLinkedList<bdSAckChunk::bdGapAckBlock>* bdSAckChunk::getGapList() const
+bdLinkedList<bdSAckChunk::bdGapAckBlock>* bdSAckChunk::getGapList()
 {
     return &m_gaps;
 }

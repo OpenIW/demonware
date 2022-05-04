@@ -16,10 +16,14 @@ public:
 	bdBool notNull() const;
 	T* operator->();
 	const T* operator->() const;
+	bdBool operator!() const;
 	void operator=(T* p);
 	bdReference<T>* operator=(const bdReference<T>* other);
 	bdBool operator==(const bdReference<T>* other);
-	const T* operator*() const;
+	T* operator*() const;
 };
+
+template <typename Cast, typename Reference>
+Cast* reference_cast(bdReference<Reference> referenceClass);
 
 #include "bdReference.inl"
