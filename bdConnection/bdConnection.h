@@ -85,4 +85,6 @@ public:
     virtual bdUInt getDataToSend() { return 0; };
 };
 
+#include "bdReceivedMessage.h"
+#include "bdDispatcher.h"
 #include "bdConnectionStore.h"
