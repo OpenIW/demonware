@@ -22,11 +22,11 @@ void* bdConnection::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
-bdConnection::bdConnection() : bdReferencable(), m_addr(), m_addrHandle(), m_listeners(0), m_maxTransmissionRate(0), m_status(BD_NOT_CONNECTED)
+bdConnection::bdConnection() : bdReferencable(), m_addr(), m_addrHandle(), m_listeners(0u), m_maxTransmissionRate(0), m_status(BD_NOT_CONNECTED)
 {
 }
 
-bdConnection::bdConnection(bdCommonAddrRef addr) : bdReferencable(), m_addr(addr), m_addrHandle(), m_listeners(0), m_maxTransmissionRate(0), m_status(BD_NOT_CONNECTED)
+bdConnection::bdConnection(bdCommonAddrRef addr) : bdReferencable(), m_addr(addr), m_addrHandle(), m_listeners(0u), m_maxTransmissionRate(0), m_status(BD_NOT_CONNECTED)
 {
 }
 

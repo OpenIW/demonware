@@ -22,6 +22,29 @@ public:
             m_data = bdAllocate<T>(m_capacity);
         }
     };
+    bdFastArray(const bdFastArray<T>* a)
+    {
+        m_capacity = a->m_capacity;
+        m_size = a->m_size;
+        m_data = uninitializedCopy(a);
+    }
+    T* uninitializedCopy(const bdFastArray<T>* a)
+    {
+        T* data = NULL;
+        if (a->m_capacity)
+        {
+            data = bdAllocate<T>(a->m_capacity);
+            copyArrayArray(data, a->m_data, a->m_size);
+        }
+        return data;
+    }
+    void copyArrayArray(T* dest, T const* src, const bdUInt n)
+    {
+        if (n)
+        {
+            bdMemcpy(dest, src, sizeof(T) * n);
+        }
+    }
     void ensureCapacity(unsigned int capacity)
     {
         unsigned int newCapacity;

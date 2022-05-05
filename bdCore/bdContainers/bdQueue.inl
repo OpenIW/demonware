@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename T>
+inline bdQueue<T>::bdQueue() : m_list()
+{
+}
+
+template<typename T>
 inline void bdQueue<T>::dequeue()
 {
-	//bdAssertMsg(getSize() > 0, "bdQueue::dequeue, queue empty, can't dequeue.");
+	bdAssert(getSize() > 0, "bdQueue::dequeue, queue empty, can't dequeue.");
 	m_list.removeHead();
 }
 
@@ -28,7 +33,7 @@ inline bdBool bdQueue<T>::isEmpty()
 template<typename T>
 inline T* bdQueue<T>::peek()
 {
-	//bdAssertMsg(getSize() > 0, "bdQueue::dequeue, queue empty, can't peek.");
+	bdAssert(getSize() > 0, "bdQueue::dequeue, queue empty, can't peek.");
 	return m_list.getHead();
 }
 

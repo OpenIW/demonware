@@ -49,7 +49,7 @@ public:
     bdInt getStatus(const bdAddrHandleRef addrHandle);
 
     const bdQoSProbe* getQoSProber() const;
-    const bdAddressMap* getAddressMap() const;
+    bdAddressMap* getAddressMap();
     const bdSecurityKeyMap* getKeyMap() const;
     const bdCommonAddrRef getLocalCommonAddr() const;
 };

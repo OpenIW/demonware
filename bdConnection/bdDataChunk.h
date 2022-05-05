@@ -29,7 +29,7 @@ public:
     void setSequenceNumber(bdSeqNumber seqNum);
 
     const bdSeqNumber getSequenceNumber() const;
-    const bdMessageRef getMessage() const;
+    bdMessageRef getMessage() const;
     const bdUByte8 getFlags() const;
 };
 

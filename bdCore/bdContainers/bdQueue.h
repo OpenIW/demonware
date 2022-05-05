@@ -7,6 +7,7 @@ class bdQueue
 protected:
     bdLinkedList<T> m_list;
 public:
+    bdQueue();
     void dequeue();
     void enqueue(const T* item);
     bdUInt getSize();

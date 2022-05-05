@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#define BD_MAX_MESSAGE_SIZE 1236
 typedef bdUByte8 bdMessageType;
 
 class bdMessage : bdReferencable

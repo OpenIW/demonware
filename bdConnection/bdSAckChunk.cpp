@@ -133,6 +133,11 @@ const bdSeqNumber bdSAckChunk::getCumulativeAck() const
     return m_cumulativeAck;
 }
 
+bdSAckChunk::bdGapAckBlock::bdGapAckBlock(bdSAckChunk::bdGapAckBlock* other)
+    : m_start(other->m_start), m_end(other->m_end)
+{
+}
+
 bdSAckChunk::bdGapAckBlock::bdGapAckBlock()
     : m_start(0), m_end(0)
 {

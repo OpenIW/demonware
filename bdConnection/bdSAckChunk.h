@@ -8,12 +8,16 @@ public:
     {
         BD_SC_NO_FLAGS = 0x0,
     };
-    struct bdGapAckBlock
+    class bdGapAckBlock
     {
+    public:
         bdUInt m_start;
         bdUInt m_end;
 
+        void operator delete(void* p);
+        void* operator new(bdUWord nbytes);
         bdGapAckBlock();
+        bdGapAckBlock(bdGapAckBlock* other);
         bdGapAckBlock(bdUInt start, bdUInt end);
     };
 protected:

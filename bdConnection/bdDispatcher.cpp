@@ -16,7 +16,7 @@ bdDispatchInterceptor::~bdDispatchInterceptor()
 {
 }
 
-bdDispatcher::bdDispatcher() : m_interceptors(0)
+bdDispatcher::bdDispatcher() : m_interceptors(0u)
 {
 }
 

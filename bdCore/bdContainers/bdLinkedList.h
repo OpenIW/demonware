@@ -15,9 +15,8 @@ public:
         Node* m_next;
         Node* m_prev;
 
-        Node(T* data)
+        Node(T* data) : m_data(T(data))
         {
-            m_data = T(*data);
         }
         void operator delete(void* p)
         {

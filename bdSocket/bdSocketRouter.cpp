@@ -15,7 +15,7 @@ void* bdSocketRouter::operator new(bdUWord nbytes)
 }
 
 bdSocketRouter::bdSocketRouter() 
-    : bdNATTravListener(), bdSecurityKeyMapListener(), m_socket(NULL), m_interceptors(0), m_status(BD_SOCKET_ROUTER_UNINITIALIZED), m_config(), 
+    : bdNATTravListener(), bdSecurityKeyMapListener(), m_socket(NULL), m_interceptors(0u), m_status(BD_SOCKET_ROUTER_UNINITIALIZED), m_config(), 
     m_localCommonAddr(), m_addrMap(), m_keyStore(), m_qosProber(), m_natTrav(), m_ECCKey(), m_qosBandwidth(), m_dtls(4u, 0.75), m_endpointToAddrMap(4u, 0.75)
 {
 }
@@ -857,7 +857,7 @@ const bdQoSProbe* bdSocketRouter::getQoSProber() const
     return &m_qosProber;
 }
 
-const bdAddressMap* bdSocketRouter::getAddressMap() const
+bdAddressMap* bdSocketRouter::getAddressMap()
 {
     return &m_addrMap;
 }

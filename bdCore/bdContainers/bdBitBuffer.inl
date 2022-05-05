@@ -23,7 +23,7 @@ inline bdBitBuffer::bdBitBuffer(const bdUInt capacityBits, const bdBool typeChec
     resetReadPosition();
 }
 
-inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, const bdBool dataHasTypeCheckedBit) : bdReferencable(), m_data(0)
+inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, const bdBool dataHasTypeCheckedBit) : bdReferencable(), m_data(0u)
 {
     bdUByte8 byte;
 

@@ -82,9 +82,11 @@ public:
     virtual void disconnect();
     virtual void close();
     virtual bdFloat32 GetAvgRTT();
-    virtual bdUInt getDataToSend() { return 0; };
+    virtual bdUInt getDataToSend(bdUByte8* const data, const bdUInt size) { return 0; };
 };
 
 #include "bdReceivedMessage.h"
 #include "bdDispatcher.h"
+#include "bdLoopbackConnection.h"
+#include "bdUnicastConnection.h"
 #include "bdConnectionStore.h"

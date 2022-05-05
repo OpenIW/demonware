@@ -175,7 +175,7 @@ const bdSeqNumber bdDataChunk::getSequenceNumber() const
     return m_seqNum;
 }
 
-const bdMessageRef bdDataChunk::getMessage() const
+bdMessageRef bdDataChunk::getMessage() const
 {
     return bdMessageRef(&m_message);
 }
