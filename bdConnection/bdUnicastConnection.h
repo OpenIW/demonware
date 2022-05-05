@@ -76,11 +76,11 @@ public:
     bdBool handleShutdownAck(bdReference<bdChunk>* chunk);
     bdBool handleShutdownComplete(bdReference<bdChunk>* chunk);
     bdBool sendInit();
-    bdBool sendInitAck(bdReference<bdInitChunk>);
-    bdBool sendCookieEcho(bdReference<bdInitAckChunk>);
+    bdBool sendInitAck(bdReference<bdInitChunk> chunk);
+    bdBool sendCookieEcho(bdReference<bdInitAckChunk> chunk);
     bdBool sendCookieAck();
-    bdBool sendHeartbeat(bdReference<bdInitChunk>);
-    bdBool sendHeartbeatAck(bdReference<bdInitChunk>);
+    bdBool sendHeartbeat(bdReference<bdInitChunk> chunk);
+    bdBool sendHeartbeatAck(bdReference<bdInitChunk> chunk);
     bdBool sendShutdown();
     bdBool sendShutdownAck();
     bdBool sendShutdownComplete();
