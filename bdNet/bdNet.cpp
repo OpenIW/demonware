@@ -25,7 +25,7 @@ bdNetImpl::~bdNetImpl()
         m_getHostByName->quit();
         if (m_getHostByName)
         {
-            delete m_getHostByName;
+            m_getHostByName->~bdGetHostByName();
         }
         m_getHostByName = NULL;
     }
@@ -34,7 +34,7 @@ bdNetImpl::~bdNetImpl()
         m_natTypeDiscClient->quit();
         if (m_natTypeDiscClient)
         {
-            delete m_natTypeDiscClient;
+            m_natTypeDiscClient->~bdNATTypeDiscoveryClient();
         }
         m_natTypeDiscClient = NULL;
     }
@@ -43,7 +43,7 @@ bdNetImpl::~bdNetImpl()
         m_ipDiscClient->quit();
         if (m_ipDiscClient)
         {
-            delete m_ipDiscClient;
+            m_ipDiscClient->~bdIPDiscoveryClient();
         }
         m_ipDiscClient = NULL;
     }
@@ -52,7 +52,7 @@ bdNetImpl::~bdNetImpl()
         m_socketRouter->quit();
         if (m_socketRouter)
         {
-            delete m_socketRouter;
+            m_socketRouter->~bdSocketRouter();
         }
         m_socketRouter = NULL;
     }
