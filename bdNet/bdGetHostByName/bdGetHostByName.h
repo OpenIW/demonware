@@ -22,11 +22,10 @@ protected:
     bdInAddr m_addresses[4];
     bdUInt m_numAddresses;
     bdDNSHandle m_handle;
-    bdUInt m_threadStackSize;
 public:
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
-    bdGetHostByName(bdUInt threadStackSize);
+    bdGetHostByName();
     ~bdGetHostByName();
     bdBool start(const bdNChar8* hostname, bdGetHostByNameConfig config);
     virtual bdUInt run(void* args);
@@ -34,7 +33,7 @@ public:
     void pump();
     void cancelLookup();
 
-    void getAddressAt(bdInAddr* addr, bdUInt index) const;
+    bdInAddr* getAddressAt(bdUInt index) const;
     const bdUInt getNumAddresses() const;
-    const bdInt getStatus() const;
+    const bdGetHostByName::bdStatus getStatus() const;
 };

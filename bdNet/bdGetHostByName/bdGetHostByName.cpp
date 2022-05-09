@@ -17,8 +17,8 @@ bdGetHostByName::~bdGetHostByName()
     quit();
 }
 
-bdGetHostByName::bdGetHostByName(bdUInt threadStackSize)
-    : bdRunnable(), m_timer(), m_status(BD_LOOKUP_UNINITIALIZED), m_thread(NULL), m_config(), m_numAddresses(0), m_addresses(), m_threadStackSize(threadStackSize)
+bdGetHostByName::bdGetHostByName()
+    : bdRunnable(), m_timer(), m_status(BD_LOOKUP_UNINITIALIZED), m_thread(NULL), m_config(), m_numAddresses(0), m_addresses()
 {
 }
 
@@ -29,7 +29,7 @@ bdBool bdGetHostByName::start(const bdNChar8* hostname, bdGetHostByNameConfig co
         bdLogWarn("gethostbyname", "Cannot start a host name lookup unless class is in the uninitialized state.");
         return false;
     }
-    m_thread = new bdThread(this, 0, m_threadStackSize);
+    m_thread = new bdThread(this, 0, 0);
     m_config.m_timeout = config.m_timeout;
     m_timer.reset();
     m_timer.start();
@@ -104,12 +104,11 @@ void bdGetHostByName::cancelLookup()
     m_status = BD_LOOKUP_CANCELLED;
 }
 
-void bdGetHostByName::getAddressAt(bdInAddr* addr, bdUInt index) const
+bdInAddr* bdGetHostByName::getAddressAt(bdUInt index) const
 {
     if (index < m_numAddresses)
     {
-        *addr = m_addresses[index];
-        return;
+        return &bdInAddr(m_addresses[index]);
     }
     if (index >= 4)
     {
@@ -119,7 +118,7 @@ void bdGetHostByName::getAddressAt(bdInAddr* addr, bdUInt index) const
     {
         bdLogWarn("gethostbyname", "No address at index %u , blank bdInAddr returned");
     }
-    *addr = bdInAddr();
+    return &bdInAddr(m_addresses[index]);
 }
 
 const bdUInt bdGetHostByName::getNumAddresses() const
@@ -127,7 +126,7 @@ const bdUInt bdGetHostByName::getNumAddresses() const
     return m_numAddresses;
 }
 
-const bdInt bdGetHostByName::getStatus() const
+const bdGetHostByName::bdStatus bdGetHostByName::getStatus() const
 {
     return m_status;
 }

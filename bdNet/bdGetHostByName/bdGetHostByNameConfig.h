@@ -6,6 +6,7 @@ class bdGetHostByNameConfig
 public:
     bdFloat32 m_timeout;
     bdGetHostByNameConfig();
+    bdGetHostByNameConfig(bdFloat32 timeout);
     void sanityCheckConfig();
     void reset();
 };

@@ -61,6 +61,20 @@ inline bdBool bdArray<T>::get(const bdUInt i, T* value)
 }
 
 template<typename T>
+inline bdBool bdArray<T>::findFirst(const T* value, bdUInt* i) const
+{
+    for (bdUInt j = 0; j < m_size; ++j)
+    {
+        if (value == &m_data[j])
+        {
+            *i = j;
+            return true;
+        }
+    }
+    return false;
+}
+
+template<typename T>
 T* bdArray<T>::uninitializedCopy(const bdArray<T>* a)
 {
     T* data = NULL;

@@ -6,7 +6,7 @@ class bdInetAddr
 protected:
 	bdInAddr m_addr;
 public:
-	bool operator == (bdInetAddr* comp);
+	bdBool operator==(const bdInetAddr* other);
 	static bdInetAddr Broadcast();
 	static bdInetAddr All();
 	static bdInetAddr Any();

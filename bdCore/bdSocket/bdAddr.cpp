@@ -25,6 +25,15 @@ bdAddr::bdAddr(const bdNChar8* socketAddress)
 	set(socketAddress);
 }
 
+bdBool bdAddr::operator==(const bdAddr* other)
+{
+	if (m_port == other->m_port)
+	{
+		return m_address == &other->m_address;
+	}
+	return false;
+}
+
 void bdAddr::set(const bdNChar8* socketAddress)
 {
 	const bdNChar8* sep;

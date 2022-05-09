@@ -16,6 +16,7 @@ public:
     const bdUInt getCapacity() const;
     const bdUInt getSize() const;
     bdBool get(const bdUInt i, T* value);
+    bdBool findFirst(const T* value, bdUInt* i) const;
     T* uninitializedCopy(const bdArray<T>* a);
     void clear();
     void pushBack(const T* value);

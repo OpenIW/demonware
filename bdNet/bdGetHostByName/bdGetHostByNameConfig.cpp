@@ -2,9 +2,12 @@
 
 #include "bdNet/bdNet.h"
 
-bdGetHostByNameConfig::bdGetHostByNameConfig()
+bdGetHostByNameConfig::bdGetHostByNameConfig() : m_timeout(10.0f)
 {
-    m_timeout = 10.0f;
+}
+
+bdGetHostByNameConfig::bdGetHostByNameConfig(bdFloat32 timeout) : m_timeout(timeout)
+{
 }
 
 void bdGetHostByNameConfig::sanityCheckConfig()

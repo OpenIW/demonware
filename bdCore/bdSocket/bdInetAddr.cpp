@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdCore/bdCore.h"
 
-bool bdInetAddr::operator==(bdInetAddr* comp)
+bdBool bdInetAddr::operator==(const bdInetAddr* other)
 {
-	return (int*)this == (int*)comp;
+	return m_addr.inUn.m_iaddr == other->m_addr.inUn.m_iaddr;
 }
 
 bdInetAddr bdInetAddr::Broadcast()

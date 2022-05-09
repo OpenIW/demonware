@@ -276,6 +276,7 @@ bdBool bdUnicastConnection::receive(bdUByte8* buffer, const bdUInt bufferSize)
     {
         close();
     }
+    return handled;
 }
 
 bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt bufferSize)
@@ -502,6 +503,11 @@ bdBool bdUnicastConnection::handleSAck(bdReference<bdChunk>* chunk)
             m_smoothedRTT = (0.875f * m_smoothedRTT) + (0.125f * rtt);
         }
         m_stats.setLastRTT(m_smoothedRTT);
+        if (m_RTTVariation == 0.0f)
+        {
+            m_RTTVariation = 100.0f;
+        }
+        rto = m_smoothedRTT * (2.0f * m_RTTVariation);
         if (rto >= 0.02f)
         {
             if (rto > 2.0f)
@@ -659,6 +665,7 @@ bdBool bdUnicastConnection::handleCookieEcho(bdReference<bdChunk>* chunk, const 
         }
         return false;
     }
+    return false;
 }
 
 bdBool bdUnicastConnection::handleCookieAck(bdReference<bdChunk>* chunk, const bdUInt vtag)

@@ -2,7 +2,7 @@
 
 class bdNetStartParams
 {
-protected:
+public:
     bdBool m_onlineGame;
     bdUInt16 m_gamePort;
     bdSocket* m_socket;
@@ -12,4 +12,8 @@ protected:
     bdGetHostByNameConfig m_hostNameLookupConfig;
     bdUPnPConfig m_UPnPConfig;
     bdBool m_useAnyIP;
+    bdNetStartParams();
+    bdNetStartParams(const bdNetStartParams* other);
+    ~bdNetStartParams();
+    bdNetStartParams* operator=(bdNetStartParams* other);
 };

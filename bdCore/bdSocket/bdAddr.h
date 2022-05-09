@@ -13,6 +13,7 @@ public:
     bdAddr(const bdAddr* other);
     bdAddr(const bdInetAddr* address, const bdPort port);
     bdAddr(const bdNChar8* socketAddress);
+    bdBool operator==(const bdAddr* other);
 
     void set(const bdNChar8* socketAddress);
     void set(const bdInetAddr* address, const bdPort port);

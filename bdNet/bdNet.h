@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-#include "bdSocket/bdSocket.h"
+#include "bdConnection/bdConnection.h"
 
 #include "bdGetHostByName/bdGetHostByNameConfig.h"
 #include "bdGetHostByName/bdGetHostByName.h"
@@ -29,7 +29,7 @@ public:
     };
 protected:
     bdNetStartParams m_params;
-    //bdConnectionStore m_connectionStore;
+    bdConnectionStore m_connectionStore;
     bdSocketRouter* m_socketRouter;
     bdNetImpl::bdNetStatus m_status;
     bdIPDiscoveryClient* m_ipDiscClient;
@@ -40,4 +40,29 @@ protected:
     bdUInt m_currentNatTravAddrIndex;
     bdUInt m_currentNatTravHostIndex;
     bdUInt m_upnpCollisionRetryCount;
+public:
+    void operator delete(void* p);
+    void* operator new (bdUWord nbytes);
+    bdNetImpl();
+    ~bdNetImpl();
+    static bdBool findFreePort(bdNetStartParams* params, bdAddr* addr);
+    bdBool start(const bdNetStartParams* params);
+    void pump();
+    void stop();
+    bdBool receiveAll();
+    void dispatchAll();
+    bdBool sendAll();
+    bdBool getBindAddr(bdAddr* addr);
+
+    bdNetStatus getStatus() const;
+    bdSocketRouter* getSocketRouter() const;
+    const bdConnectionStore* getConnectionStore() const;
+    bdCommonAddrRef getLocalCommonAddr() const;
+    bdString getStatusAsString() const;
+    bdUPnPDevice::bdUPnPPortStatus getUPnPStatus() const;
+};
+
+class bdNet : bdSingleton<bdNetImpl>
+{
+
 };

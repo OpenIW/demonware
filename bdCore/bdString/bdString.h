@@ -52,7 +52,7 @@ class bdString
 public:
     char *m_string;
 
-    bdString(bdString *s)
+    bdString(const bdString *s)
     {
         bdStringData *StringData;
 
