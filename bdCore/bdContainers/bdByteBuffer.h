@@ -28,14 +28,13 @@ public:
     const bdUInt getDataSize() const;
     const bdUInt getReadSize() const;
     bdBool getStringLength(bdUInt* length);
-    const bdUByte8* getData() const;
+    bdUByte8* getData();
     const bdUInt getSize() const;
     const bdUInt getMaxWriteSize() const;
     const bdUInt getMaxReadSize() const;
 
     void setTypeCheck(const bdBool flag);
     void allocateBuffer();
-    bdBool zlibUncompress(bdUByte8** destBuffer, const bdUInt32 destLength, bdUByte8** srcBuffer, const bdUInt32 srcLength);
     bdBitBufferDataType inspectDataType();
     void resizeToFit(bdUInt32 newDataSize);
     bdBool expand(bdUInt32 increaseSize);

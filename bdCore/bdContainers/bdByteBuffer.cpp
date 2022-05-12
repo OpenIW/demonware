@@ -66,7 +66,7 @@ bdBool bdByteBuffer::getStringLength(bdUInt* length)
     return bdBool();
 }
 
-const bdUByte8* bdByteBuffer::getData() const
+bdUByte8* bdByteBuffer::getData()
 {
     return m_data;
 }
@@ -105,11 +105,6 @@ void bdByteBuffer::allocateBuffer()
         m_writePtr = m_data;
         m_readPtr = m_data;
     }
-}
-
-bdBool bdByteBuffer::zlibUncompress(bdUByte8** destBuffer, const bdUInt32 destLength, bdUByte8** srcBuffer, const bdUInt32 srcLength)
-{
-    return bdBool();
 }
 
 bdBitBufferDataType bdByteBuffer::inspectDataType()

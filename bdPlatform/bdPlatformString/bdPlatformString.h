@@ -7,6 +7,8 @@ bdUWord bdStrnlen(const bdNChar8* const s, const bdUWord maxLen);
 bdNChar8* bdStrchr(bdNChar8* const s, const bdInt c);
 const bdNChar8* bdStrchr(const bdNChar8* const s, const bdInt c);
 bdNChar8* bdStrstr(bdNChar8* const str, const bdNChar8* const searchStr);
+bdInt bdToLower(const bdInt c);
+bdNChar8* bdStrlwr(bdNChar8* const s);
 int bdSnprintf(char* buf, unsigned int maxlen, const char* format, ...);
 bdInt bdVsnprintf(bdNChar8* buf, const bdUWord maxlen, const bdNChar8* format, va_list* argPtr);
 int bdPrintf(const char* format, ...);
