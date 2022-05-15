@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 unsigned int bdStrlcpy(char* dst, const char* src, size_t size)
@@ -135,4 +136,9 @@ bool bdDelimSubstr(const char* str, const char* substr, const char* delimeters)
         }
     }
     return isSubStr;
+}
+
+bdInt bdStrncmp(const bdNChar8* const s1, const bdNChar8* s2, const bdInt len)
+{
+    return strncmp(s1, s2, len);
 }

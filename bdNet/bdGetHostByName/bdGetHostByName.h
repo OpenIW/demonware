@@ -16,7 +16,7 @@ public:
     };
 protected:
     bdStopwatch m_timer;
-    bdStatus m_status;
+    bdGetHostByName::bdStatus m_status;
     bdThread* m_thread;
     bdGetHostByNameConfig m_config;
     bdInAddr m_addresses[4];

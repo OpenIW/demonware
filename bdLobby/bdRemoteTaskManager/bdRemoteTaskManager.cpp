@@ -51,6 +51,7 @@ bdLobbyErrorCode bdRemoteTaskManager::sendTask(bdRemoteTaskRef newTask, bdTaskBy
     }
     m_tasks.addTail(&newTask);
     newTask->start(0.0f);
+    return BD_NO_ERROR;
 }
 
 bdUInt64 bdRemoteTaskManager::getConnectionID() const

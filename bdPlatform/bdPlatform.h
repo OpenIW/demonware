@@ -24,6 +24,7 @@
 #include "bdPlatformTiming/bdPlatformTiming.h"
 #include "bdPlatformThread/bdPlatformThread.h"
 #include "bdPlatformThread/bdPlatformMutex.h"
+#include "bdPlatformThread/bdPlatformSemaphore.h"
 #include "bdPlatformString/bdPlatformString.h"
 #include "bdPlatformSocket/bdInAddr.h"
 #include "bdPlatformSocket/bdPlatformSocket.h"

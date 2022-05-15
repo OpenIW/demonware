@@ -14,3 +14,4 @@ bdInt bdVsnprintf(bdNChar8* buf, const bdUWord maxlen, const bdNChar8* format, v
 int bdPrintf(const char* format, ...);
 unsigned int bdStrGetToken(const char* str, const char* delimeters, char* tokenBuffer, unsigned int tokenBufferSize, const char** end);
 bool bdDelimSubstr(const char* str, const char* substr, const char* delimeters);
+bdInt bdStrncmp(const bdNChar8* const s1, const bdNChar8* s2, const bdInt len);
