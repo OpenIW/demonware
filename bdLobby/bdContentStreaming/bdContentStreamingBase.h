@@ -13,6 +13,7 @@ public:
         DONE = 4,
         FAILED = 5
     };
+    static bdNChar8 const* const statusStrings[];
 protected:
     bdUInt m_operation;
     bdContentStreamingBase::bdStatus m_state;
@@ -25,7 +26,7 @@ protected:
     bdUInt m_thumbDataSize;
     bdUInt m_httpSite;
     bdBool m_sendChecksum;
-    bdUInt m_checksum[33];
+    bdNChar8 m_checksum[33];
     bdDownloadInterceptor* m_downloadHandler;
     bdFileMetaData* m_downloadMetaData;
     void* m_downloadData;
@@ -46,16 +47,17 @@ protected:
     bdRemoteTaskManager* m_remoteTaskManager;
     bdNChar8* s_statusStrings[0];
 public:
-    bdContentStreamingBase(bdContentStreamingBase* other);
-    bdContentStreamingBase(const bdRemoteTaskManager*);
+    void operator delete(void* p);
+    void* operator new(bdUWord nbytes);
+    bdContentStreamingBase(bdRemoteTaskManager* const remoteTaskManager);
     ~bdContentStreamingBase();
     void abortHTTPOperation();
-    void checkProgress(bdUInt*, bdFloat32*);
+    void checkProgress(bdUInt* bytesTransfered, bdFloat32* dataRate);
     int getLastHTTPError();
     void pump();
-    void enableVerboseOutput(bdBool);
-    void enableProgressMeter(bdBool);
-    void enablePersistentThread(bdBool);
+    void enableVerboseOutput(bdBool enable);
+    void enableProgressMeter(bdBool enable);
+    void enablePersistentThread(bdBool enable);
     void setTestLSPServerAddresses(bdURL*, bdUInt);
 protected:
     void handlePreHTTPComplete();
@@ -65,16 +67,16 @@ protected:
     bdRemoteTaskRef _postUploadFile();
     bdRemoteTaskRef _postUploadSummary();
     bdRemoteTaskRef _postCopy();
-    bool initUpload(const unsigned int, void*, bdUploadInterceptor*, const unsigned int, const char*, const unsigned int, void*, const unsigned int,
-        const unsigned int, bdTag*, bdFileID*, const unsigned int, const bool);
-    bool initDownload(void*, unsigned int, bdDownloadInterceptor*, bdFileMetaData*, unsigned int, unsigned int);
+    bool initUpload(const bdUInt16 fileSlot, const void* fileData, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* const fileName,
+        const bdUInt16 category, const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, const bdTag* tags, bdFileID* fileID, const bdUInt __formal, const bool isSummary);
+    bool initDownload(void* fileData, bdUInt fileSize, bdDownloadInterceptor* downloadHandler, bdFileMetaData* fileMetaData, bdUInt startByte, bdUInt endByte);
     bool initDelete();
     unsigned int getMaxMetaDataSize();
     bdRemoteTaskRef startUpload();
     bdRemoteTaskRef startCopy();
     bdRemoteTaskRef startDownload();
     bdRemoteTaskRef startDelete();
-    bdRemoteTaskRef start(unsigned int);
-    void setState(bdContentStreamingBase::bdStatus, bdLobbyErrorCode);
-    void swapURLInfo(char*);
+    bdRemoteTaskRef start(bdUInt16 operation);
+    void setState(bdContentStreamingBase::bdStatus newState, bdLobbyErrorCode errorCode);
+    void swapURLInfo(bdNChar8* url);
 };

@@ -25,7 +25,6 @@ public:
     void resetTransferStats();
     bdInt getLastHTTPError();
     bdUInt run(void* args);
-protected:
     bdHTTPWrapperBase::bdStatus _startDownload(const bdNChar8* const downloadURL, void* const downloadBuffer, bdUInt bufferSize, bdDownloadInterceptor* downloadHandler,
         bdUInt64 transactionID, bdUInt startByte, bdUInt endByte);
     bdHTTPWrapperBase::bdStatus _startUpload(const bdNChar8* const uploadURL, const void* const fileData, bdUploadInterceptor* uploadHandler, bdUInt uploadSize,
