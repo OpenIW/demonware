@@ -46,7 +46,7 @@ bdRemoteTaskRef bdTags::searchByTags(const bdUInt32 collectionID, const bdUInt s
 {
     bdRemoteTaskRef task;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(16 * numTags + 92, true));
-    bdRemoteTaskManager::initTaskBuffer(&buffer, 52, 5);
+    m_remoteTaskManager->initTaskBuffer(&buffer, 52, 5);
     buffer->writeUInt32(collectionID);
     buffer->writeUInt32(startIndex);
     buffer->writeUInt32(maxNumResults);

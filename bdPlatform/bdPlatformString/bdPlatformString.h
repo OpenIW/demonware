@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-unsigned int bdStrlcpy(char* dst, const char* src, size_t size);
+bdUWord bdStrlcpy(bdNChar8* const dst, const bdNChar8* const src, const bdUWord size);
 bdUWord bdStrlen(const bdNChar8* const s);
 bdUWord bdStrnlen(const bdNChar8* const s, const bdUWord maxLen);
 bdNChar8* bdStrchr(bdNChar8* const s, const bdInt c);

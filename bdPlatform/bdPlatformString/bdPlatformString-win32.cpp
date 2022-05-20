@@ -2,18 +2,18 @@
 
 #include "bdPlatform/bdPlatform.h"
 
-unsigned int bdStrlcpy(char* dst, const char* src, size_t size)
+bdUWord bdStrlcpy(bdNChar8* const dst, const bdNChar8* const src, const bdUWord size)
 {
-    unsigned int slen;
+    bdUInt slen;
 
-    slen = strlen(src);
+    slen = bdStrlen(src);
     if (size && dst)
     {
         if (slen >= size - 1)
         {
             slen = size - 1;
         }
-        memcpy(dst, (char*)src, slen);
+        bdMemcpy(dst, src, slen);
         dst[slen] = 0;
     }
     return slen;

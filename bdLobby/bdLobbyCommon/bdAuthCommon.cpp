@@ -79,3 +79,37 @@ bdUInt64 bdAuthUtility::getUserID(const bdNChar8* username)
     bdBytePacker::removeBasicType<bdUInt64>(hashBuffer, hashBufferSize, 0, &offset, &userID);
     return userID;
 }
+
+void bdAuthCreateAccountPlainText::serialize(void* buffer, const bdUInt bufferSize)
+{
+    bdUInt offset = 0;
+    bdMemset(buffer, 0, bufferSize);
+    bdBool status = bdBytePacker::appendBasicType<bdUInt64>(buffer, bufferSize, 0, &offset, &m_licenseID);
+    bdAssert(status, "Failed to serialize.");
+}
+
+void bdAuthCreateAccountPlainText::deserialize(const void* buffer, const bdUInt bufferSize)
+{
+    bdUInt offset = 0;
+    bdBool status = bdBytePacker::removeBasicType<bdUInt64>(buffer, bufferSize, 0, &offset, &m_licenseID);
+    bdAssert(status, "Failed to deserialize.");
+}
+
+void bdAuthCreateAccountCypherText::serialize(void* buffer, const bdUInt bufferSize)
+{
+    bdUInt offset = 0;
+    bdMemset(buffer, 0, sizeof(bufferSize));
+    bdBool status = bdBytePacker::appendBasicType<bdUInt>(buffer, bufferSize, 0, &offset, &m_magicNumber);
+    status = status == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(buffer), bufferSize, offset, &offset, m_username, sizeof(m_username));
+    status = status == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(buffer), bufferSize, offset, &offset, m_userKey, sizeof(m_userKey));
+    bdAssert(status, "Failed to serialize.");
+}
+
+void bdAuthCreateAccountCypherText::deserialize(const void* buffer, const bdUInt bufferSize)
+{
+    bdUInt offset = 0;
+    bdBool status = bdBytePacker::removeBasicType<bdUInt>(buffer, bufferSize, 0, &offset, &m_magicNumber);
+    status = status == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(buffer), bufferSize, offset, &offset, m_username, sizeof(m_username));
+    status = status == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(buffer), bufferSize, offset, &offset, m_userKey, sizeof(m_userKey));
+    bdAssert(status, "Failed to deserialize.");
+}

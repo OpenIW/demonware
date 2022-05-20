@@ -25,7 +25,6 @@ private:
     bdUByte8 m_hash[4];
 public:
     bdAuthTicket();
-    ~bdAuthTicket();
     void deserialize(const void* buffer);
     void serialize(void* buffer);
 };

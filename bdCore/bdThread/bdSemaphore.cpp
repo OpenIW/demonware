@@ -13,19 +13,25 @@ void* bdSemaphore::operator new(bdUWord nbytes)
 }
 
 bdSemaphore::bdSemaphore(LONG lInitialCount, LONG lMaximumCount)
-    : m_handle()
+    : m_handle(bdPlatformSemaphore::createSemaphore(lInitialCount, lMaximumCount))
 {
 }
 
 void bdSemaphore::release()
 {
+    bdPlatformSemaphore::release(&m_handle);
 }
 
-bool bdSemaphore::wait()
+bdBool bdSemaphore::wait()
 {
-    return false;
+    return bdPlatformSemaphore::wait(&m_handle);
 }
 
 void bdSemaphore::destroy()
 {
+    bdPlatformSemaphore::destroy(&m_handle);
+    if (this)
+    {
+        delete this;
+    }
 }

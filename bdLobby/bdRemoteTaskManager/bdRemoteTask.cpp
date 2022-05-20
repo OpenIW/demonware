@@ -178,6 +178,11 @@ void bdRemoteTask::stop(bdByteBufferRef results, const bdUInt64 id)
     m_transactionID = id;
 }
 
+void bdRemoteTask::setNumResults(bdUInt numResults)
+{
+    m_numResults = numResults;
+}
+
 void bdRemoteTask::setStatus(const bdRemoteTask::bdStatus status)
 {
     m_status = status;

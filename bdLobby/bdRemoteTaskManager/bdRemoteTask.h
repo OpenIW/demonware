@@ -41,6 +41,7 @@ public:
     void start(const bdFloat32 timeout);
     void stop(bdByteBufferRef results, const bdUInt64 id);
 
+    void setNumResults(bdUInt numResults);
     void setStatus(const bdRemoteTask::bdStatus status);
     void setErrorCode(const bdLobbyErrorCode errorCode);
     void setTimeout(const bdFloat32 timeout);

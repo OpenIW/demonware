@@ -4,40 +4,50 @@ template<typename T>
 inline bdReference<T>::bdReference()
 {
     m_ptr = NULL;
+    // Will never enter this statement. But it exists in the inline func
+    /*
+    ref->m_ptr = 0;
+    if ( ref->m_ptr )
+      InterlockedIncrement(&ref->m_ptr->m_refCount);
+    */
+    if (m_ptr)
+    {
+        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+    }
 }
 
 template<typename T>
 inline bdReference<T>::bdReference(const bdReference<T>* other)
 {
-    this->m_ptr = other->m_ptr;
-    if (this->m_ptr)
+    m_ptr = other->m_ptr;
+    if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(this->m_ptr)->addRef();
+        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
     }
 }
 
 template<typename T>
 inline bdReference<T>::bdReference(bdReference<T>* other)
 {
-    this->m_ptr = other->m_ptr;
-    if (this->m_ptr)
+    m_ptr = other->m_ptr;
+    if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(this->m_ptr)->addRef();
+        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
     }
 }
 
 template<typename T>
 inline bdReference<T>::~bdReference()
 {
-    if (this->m_ptr)
+    if (m_ptr)
     {
-        if (!reinterpret_cast<bdReferencable*>(this->m_ptr)->releaseRef())
+        if (!reinterpret_cast<bdReferencable*>(m_ptr)->releaseRef())
         {
-            if (this->m_ptr)
+            if (m_ptr)
             {
-                reinterpret_cast<bdReferencable*>(this->m_ptr)->~bdReferencable();
+                reinterpret_cast<bdReferencable*>(m_ptr)->~bdReferencable();
             }
-            this->m_ptr = NULL;
+            m_ptr = NULL;
         }
     }
 }
@@ -45,23 +55,23 @@ inline bdReference<T>::~bdReference()
 template<typename T>
 inline bdReference<T>::bdReference(T* p)
 {
-    this->m_ptr = p;
-    if (this->m_ptr)
+    m_ptr = p;
+    if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(this->m_ptr)->addRef();
+        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
     }
 }
 
 template<typename T>
 inline bdBool bdReference<T>::isNull() const
 {
-    return this->m_ptr == NULL;
+    return m_ptr == NULL;
 }
 
 template<typename T>
 inline bdBool bdReference<T>::notNull() const
 {
-    return this->m_ptr != NULL;
+    return m_ptr != NULL;
 }
 
 template<typename T>

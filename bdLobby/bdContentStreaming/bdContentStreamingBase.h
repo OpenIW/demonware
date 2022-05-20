@@ -19,10 +19,10 @@ protected:
     bdContentStreamingBase::bdStatus m_state;
     bdUploadInterceptor* m_uploadHandler;
     bdFileMetaData m_taskData;
-    void* m_uploadData;
+    const void* m_uploadData;
     bdFileID* m_uploadFileID;
     bdURL m_URLs[3];
-    void* m_thumbData;
+    const void* m_thumbData;
     bdUInt m_thumbDataSize;
     bdUInt m_httpSite;
     bdBool m_sendChecksum;
@@ -45,15 +45,15 @@ protected:
     bdBool m_useTestAddresses;
     bdBool m_finalizeOnComplete;
     bdRemoteTaskManager* m_remoteTaskManager;
-    bdNChar8* s_statusStrings[0];
+    bdNChar8* s_statusStrings[6];
 public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdContentStreamingBase(bdRemoteTaskManager* const remoteTaskManager);
-    ~bdContentStreamingBase();
+    virtual ~bdContentStreamingBase();
     void abortHTTPOperation();
     void checkProgress(bdUInt* bytesTransfered, bdFloat32* dataRate);
-    int getLastHTTPError();
+    bdInt getLastHTTPError();
     void pump();
     void enableVerboseOutput(bdBool enable);
     void enableProgressMeter(bdBool enable);
@@ -64,14 +64,14 @@ protected:
     void handleHTTPComplete();
     void handleHTTPFailed();
     bdRemoteTaskRef _postUpload();
-    bdRemoteTaskRef _postUploadFile();
-    bdRemoteTaskRef _postUploadSummary();
-    bdRemoteTaskRef _postCopy();
-    bool initUpload(const bdUInt16 fileSlot, const void* fileData, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* const fileName,
+    virtual bdRemoteTaskRef _postUploadFile();
+    virtual bdRemoteTaskRef _postUploadSummary();
+    virtual bdRemoteTaskRef _postCopy();
+    bdBool initUpload(const bdUInt16 fileSlot, const void* fileData, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* const fileName,
         const bdUInt16 category, const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, const bdTag* tags, bdFileID* fileID, const bdUInt __formal, const bool isSummary);
-    bool initDownload(void* fileData, bdUInt fileSize, bdDownloadInterceptor* downloadHandler, bdFileMetaData* fileMetaData, bdUInt startByte, bdUInt endByte);
-    bool initDelete();
-    unsigned int getMaxMetaDataSize();
+    bdBool initDownload(void* fileData, bdUInt fileSize, bdDownloadInterceptor* downloadHandler, bdFileMetaData* fileMetaData, bdUInt startByte, bdUInt endByte);
+    bdBool initDelete();
+    virtual bdUInt getMaxMetaDataSize();
     bdRemoteTaskRef startUpload();
     bdRemoteTaskRef startCopy();
     bdRemoteTaskRef startDownload();

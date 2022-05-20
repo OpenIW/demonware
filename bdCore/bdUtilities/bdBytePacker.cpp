@@ -51,7 +51,7 @@ bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt of
 	{
 		if (*newOffset > srcSize)
 		{
-			bdLogMessage(BD_LOG_WARNING, "warn/", "byte packer", __FILE__, __FUNCTION__, __LINE__, "Not enough data left to read %u bytes.", readSize);
+			bdLogWarn("byte packer", "Not enough data left to read %u bytes.", readSize);
 		}
 
 		if ((*newOffset <= srcSize) && offset <= srcSize)

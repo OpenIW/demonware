@@ -42,3 +42,10 @@ void bdTag::set(bdUInt64 priTag, bdUInt64 secTag)
     m_priTag = priTag;
     m_secTag = secTag;
 }
+
+bdTag* bdTag::operator=(const bdTag* other)
+{
+    m_priTag = other->m_priTag;
+    m_secTag = other->m_secTag;
+    return this;
+}

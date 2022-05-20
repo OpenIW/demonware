@@ -4,12 +4,12 @@
 class bdSemaphore
 {
 protected:
-    void* m_handle;
+    HANDLE m_handle;
 public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdSemaphore(LONG lInitialCount, LONG lMaximumCount);
     void release();
-    bool wait();
+    bdBool wait();
     void destroy();
 };

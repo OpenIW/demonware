@@ -15,4 +15,5 @@ public:
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
     void set(bdUInt64 priTag, bdUInt64 secTag);
+    bdTag* operator=(const bdTag* other);
 };
