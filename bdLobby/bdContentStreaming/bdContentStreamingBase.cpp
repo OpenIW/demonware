@@ -295,7 +295,7 @@ bdRemoteTaskRef bdContentStreamingBase::_postCopy()
 }
 
 bdBool bdContentStreamingBase::initUpload(const bdUInt16 fileSlot, const void* fileData, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* const fileName, 
-    const bdUInt16 category, const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, const bdTag* tags, bdFileID* fileID, const bdUInt __formal, const bool isSummary)
+    const bdUInt16 category, const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, const bdTag* tags, bdFileID* fileID, const bdUInt __formal, const bdBool isSummary)
 {
     bdUByte8 md5[16];
 

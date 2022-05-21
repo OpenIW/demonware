@@ -10,6 +10,10 @@ bdBool bdTaskResult::deserialize(bdByteBufferRef)
     return false;
 }
 
+void bdTaskResult::serialize(bdByteBuffer* buffer)
+{
+}
+
 bdUInt bdTaskResult::sizeOf()
 {
     return 0;

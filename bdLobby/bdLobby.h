@@ -46,3 +46,71 @@
 #include "bdContentStreaming/bdPrecopyResult.h"
 #include "bdContentStreaming/bdContentStreamingBase.h"
 #include "bdContentStreaming/bdContentStreaming.h"
+
+// Profile headers
+#include "bdProfiles/bdProfileInfo.h"
+#include "bdProfiles/bdProfiles.h"
+
+// Counter headers
+#include "bdCounter/bdCounterValue.h"
+#include "bdCounter/bdCounter.h"
+
+// DML headers
+#include "bdDML/bdDML.h"
+
+// Friend headers
+#include "bdFriends/bdFriends.h"
+#include "bdFriends/bdRichPresence.h"
+
+// Group headers
+#include "bdGroup/bdGroupID.h"
+#include "bdGroup/bdGroupCount.h"
+#include "bdGroup/bdGroup.h"
+
+// KeyArchive headers
+#include "bdKeyArchive/bdKeyValuePair.h"
+#include "bdKeyArchive/bdKeyArchive.h"
+
+// Messaging headers
+#include "bdMessaging/bdLobbyMessageType.h"
+#include "bdMessaging/bdMailHeader.h"
+#include "bdMessaging/bdMailBody.h"
+#include "bdMessaging/bdNotification.h"
+#include "bdMessaging/bdMessaging.h"
+
+// PooledStorage headers
+#include  "bdPooledStorage/bdPooledStorage.h"
+
+// Stats headers
+#include "bdStats/bdStatsInfo.h"
+#include "bdStats/bdStats.h"
+
+// VoteRank headers
+#include "bdVoteRank/bdRatingInfo.h"
+#include "bdVoteRank/bdVoteRank.h"
+#include "bdVoteRank/bdVoteRankStatsInfo.h"
+
+// Storage headers
+#include "bdStorage/bdFileInfo.h"
+#include "bdStorage/bdFileData.h"
+#include "bdStorage/bdStorage.h"
+
+// TitleUtilities headers
+#include "bdTitleUtilities/bdVerifyString.h"
+#include "bdTitleUtilities/bdTimestamp.h"
+#include "bdTitleUtilities/bdOnlineUserInfo.h"
+#include "bdTitleUtilities/bdTitleUtilities.h"
+
+// MatchMaking headers
+#include "bdMatchmaking/bdSessionID.h"
+#include "bdMatchmaking/bdSessionParams.h"
+#include "bdMatchmaking/bdSessionInvite.h"
+#include "bdMatchmaking/bdPerformanceValue.h"
+#include "bdMatchmaking/bdPagingToken.h"
+#include "bdMatchmaking/bdMatchmakingInfo.h"
+#include "bdMatchmaking/bdMatchmaking.h"
+
+// EventHandler headers
+#include "bdLobbyEventHandler.h"
+
+#include "bdLobbyService.h"

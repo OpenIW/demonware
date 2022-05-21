@@ -4,7 +4,7 @@
 class bdSecurityID
 {
 public:
-	char ab[8];
+	bdUByte8 ab[8];
 
 	bdSecurityID();
 	bdSecurityID(const bdSecurityID* other);
