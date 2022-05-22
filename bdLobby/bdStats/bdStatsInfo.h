@@ -6,7 +6,7 @@ class bdStatsInfo : public bdTaskResult
 public:
     bdUInt m_leaderboardID;
     bdUInt64 m_entityID;
-    enum bdStats::bdWriteType m_writeType;
+    bdStats::bdWriteType m_writeType;
     bdInt64 m_rating;
     bdUInt64 m_rank;
     bdNChar8 m_entityName[65];

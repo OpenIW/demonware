@@ -112,6 +112,7 @@ bdRemoteTaskRef bdPooledStorage::getPooledMetaDataByID(const bdUInt numFiles, co
     buffer->writeArrayEnd();
     m_remoteTaskManager->startTask(&task, &buffer);
     task->setTaskResult(fileMetas, numFiles);
+    return &task;
 }
 
 bdRemoteTaskRef bdPooledStorage::_postUploadFile()

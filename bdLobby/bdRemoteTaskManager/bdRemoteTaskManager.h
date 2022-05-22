@@ -20,7 +20,6 @@ public:
     bdLobbyErrorCode startLSGTask(bdRemoteTaskRef* newTask, const bdUByte8 serviceID, const bdUByte8 taskID, const void* const queryParams, const bdUInt queryParamsSize);
     bdLobbyErrorCode sendTask(bdRemoteTaskRef newTask, bdTaskByteBufferRef* queryParams);
     bdUInt64 getConnectionID() const;
-protected:
     void handleTaskReply(const bdByteBufferRef buffer);
     void handleLSGTaskReply(const bdByteBufferRef buffer);
     void handleAsyncResult(const bdByteBufferRef buffer);

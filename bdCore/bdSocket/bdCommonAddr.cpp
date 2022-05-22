@@ -75,9 +75,9 @@ bdCommonAddr::bdCommonAddr(bdCommonAddrRef me, const bdArray<bdAddr>* localAddrs
     //bdAssert(localAddrs.getSize() > 0, "Too few local addresses!");
     //bdAssert(localAddrs.getSize() <= BD_MAX_LOCAL_ADDRS, "Too many local addresses!);
     calculateHash();
-    if (me.m_ptr)
+    if (*me)
     {
-        if (me.m_ptr == this)
+        if (*me == this)
         {
             m_isLoopback = true;
         }
@@ -120,12 +120,12 @@ void bdCommonAddr::calculateHash()
     {
         status = bdBytePacker::removeBasicType<bdUInt>(hash, sizeof(hash), 0, &offset, &m_hash);
     }
-    //bdAssert(status, "Failed to calculate hash.");
+    bdAssert(status, "Failed to calculate hash.");
 }
 
 bdBool bdCommonAddr::deserialize(bdCommonAddrRef me, bdBitBufferRef buffer)
 {
-    bdUByte8 tmpBuffer[37];
+    bdUByte8 tmpBuffer[BD_COMMON_ADDR_SERIALIZED_SIZE];
 
     if (buffer.m_ptr->readBits(tmpBuffer, BD_COMMON_ADDR_SERIALIZED_SIZE * 8))
     {
@@ -141,7 +141,7 @@ bdBool bdCommonAddr::deserialize(bdCommonAddrRef me, const bdUByte8* buffer)
     bdCommonAddr* other = this;
 
     m_localAddrs.clear();
-    for (bdUInt i = 0; i < 5; ++i)
+    for (bdUInt i = 0; i < BD_MAX_LOCAL_ADDRS; ++i)
     {
         bdAddr localAddr = bdAddr();
         status = status == localAddr.deserialize(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, &offset);
@@ -210,7 +210,7 @@ void bdCommonAddr::serialize(bdUByte8* buffer)
     bdAddr invalidAddr;
     bdNChar8 var;
 
-    for (bdUInt i = 0; i < 5; ++i)
+    for (bdUInt i = 0; i < BD_MAX_LOCAL_ADDRS; ++i)
     {
         if (i >= m_localAddrs.getSize())
         {

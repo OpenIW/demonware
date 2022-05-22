@@ -473,7 +473,7 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const
         {
             bdBitOperations::endianSwap<bdUInt>(&nu, u);
             *u += begin;
-            //bdHandleAssert(u >= begin && u <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
+            bdAssert(*u >= begin && *u <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
             if (*u <= end)
             {
                 if (*u >= begin)

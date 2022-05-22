@@ -15,4 +15,3 @@ public:
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
 };
-#pragma pop

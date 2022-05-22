@@ -82,8 +82,8 @@
 #include  "bdPooledStorage/bdPooledStorage.h"
 
 // Stats headers
-#include "bdStats/bdStatsInfo.h"
 #include "bdStats/bdStats.h"
+#include "bdStats/bdStatsInfo.h"
 
 // VoteRank headers
 #include "bdVoteRank/bdRatingInfo.h"

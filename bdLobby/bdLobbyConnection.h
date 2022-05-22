@@ -81,6 +81,8 @@ public:
     void disconnect();
     void close();
     bdBool pump();
+    bdLobbyConnection::Status getStatus() const;
+    bdUInt getReceiveBufferSize() const;
 protected:
     void callListenersConnect(const bdBool success);
     void callListenersDisconnect();

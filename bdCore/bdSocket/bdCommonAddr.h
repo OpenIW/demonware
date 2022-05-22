@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-#define BD_COMMON_ADDR_SERIALIZED_SIZE 37
-#define BD_MAX_LOCAL_ADDRS 5
+#define BD_COMMON_ADDR_SERIALIZED_SIZE 25
+#define BD_MAX_LOCAL_ADDRS 3
 
 enum bdNATType : __int32
 {

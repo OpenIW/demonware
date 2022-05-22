@@ -28,7 +28,7 @@ bdSessionID::~bdSessionID()
 {
 }
 
-void bdSessionID::serialize(bdByteBuffer* buffer)
+void bdSessionID::serialize(bdByteBuffer* buffer) const
 {
     buffer->writeBlob(m_sessionID.ab, sizeof(m_sessionID.ab));
 }

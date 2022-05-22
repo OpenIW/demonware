@@ -544,6 +544,11 @@ bdInt bdLobbyConnection::recvMessageSize()
     return sockStatus;
 }
 
+bdLobbyConnection::Status bdLobbyConnection::getStatus() const
+{
+    return m_status;
+}
+
 bdInt bdLobbyConnection::recvEncryptType()
 {
     bdInt sockStatus = m_socket.recv(&m_recvEncryptType, 1u);
@@ -569,6 +574,11 @@ bdInt bdLobbyConnection::recvEncryptType()
     m_recvTransfer = new bdPendingBufferTransfer(&bdTaskByteBufferRef(&m_recvMessage), m_messageSize - 1);
     m_recvState = BD_READ_MESSAGE;
     return sockStatus;
+}
+
+bdUInt bdLobbyConnection::getReceiveBufferSize() const
+{
+    return m_maxRecvMessageSize;
 }
 
 bdBool bdLobbyConnection::receivedFullMessage()

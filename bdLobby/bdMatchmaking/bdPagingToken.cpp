@@ -45,7 +45,7 @@ bdBool bdPagingToken::processResult(bdTaskResult* lastResultSet, bdUInt numResul
 
     if (numResults)
     {
-        // TODO
+        m_sessionID = reinterpret_cast<bdPagingToken*>(lastResultSet)[numResults - 1].getSessionID();
     }
     return true;
 }
