@@ -48,7 +48,7 @@ target_compile_definitions(demonware PUBLIC
     "_CRT_SECURE_NO_WARNINGS"
 )
 
-target_link_libraries(demonware libeay32.lib ssleay32.lib ws2_32.lib libtomcrypt)
+target_link_libraries(demonware ws2_32.lib libtomcrypt)
 
 add_virtual_path(demonware)
 
