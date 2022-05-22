@@ -59,6 +59,11 @@ bdUInt64 bdRemoteTaskManager::getConnectionID() const
     return m_connectionID;
 }
 
+void bdRemoteTaskManager::setConnectionID(bdUInt64 connectionID)
+{
+    m_connectionID = connectionID;
+}
+
 void bdRemoteTaskManager::handleTaskReply(const bdByteBufferRef buffer)
 {
     bdRemoteTaskRef task(m_tasks.getHead());
