@@ -13,10 +13,6 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(MASTER_PROJECT ON)
 endif()
 
-link_directories(
-	external/openssl/lib
-)
-
 # source_group following the directory hierarchy
 function(add_virtual_path target_name)
     get_target_property(target_sources  "${target_name}" SOURCES)
@@ -29,8 +25,6 @@ endfunction()
 
 include_directories(. 
     external/libtomcrypt/src/headers 
-    external/curl/include 
-    external/openssl/include
 )
 
 add_compile_options(
