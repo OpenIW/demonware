@@ -10,6 +10,7 @@ protected:
     bdUInt16 m_counter;
 public:
     void operator delete(void* p);
+    void* operator new(bdUWord nbytes);
     bdDTLSHeader();
     bdDTLSHeader(bdDTLSPacketTypes type, bdUInt16 vtag, bdUInt16 counter);
     virtual ~bdDTLSHeader();

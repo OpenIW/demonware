@@ -2,6 +2,9 @@
 
 #include "bdConnection/bdConnection.h"
 
+bdBool bdCookie::m_secretInitialized = false;
+bdUByte8 bdCookie::m_secret[20];
+
 bdCookie::bdCookie() : bdReferencable(), m_localTag(0), m_peerTag(0), m_localTieTag(0), m_peerTieTag(0)
 {
 

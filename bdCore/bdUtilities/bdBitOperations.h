@@ -8,5 +8,8 @@ public:
 	static unsigned int highBitNumber(unsigned int v);
 
 	template<typename T>
-	static void endianSwap(const T* src, T* dest);
+    static void endianSwap(const T* src, T* dest)
+    {
+        *dest = *src;
+    };
 };

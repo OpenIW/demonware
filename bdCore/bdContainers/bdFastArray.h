@@ -271,9 +271,14 @@ public:
         this->m_data[i] = *value;
     };
 
-    bdUByte8* begin()
+    T* begin()
     {
         return this->m_data;
+    };
+
+    T* end()
+    {
+        return &m_data[m_size];
     };
 
     bdUInt getSize()

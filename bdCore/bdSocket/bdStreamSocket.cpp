@@ -51,7 +51,7 @@ bdInt bdStreamSocket::send(const void* data, const bdUInt length)
 
 bdInt bdStreamSocket::recv(void* data, const bdUInt size)
 {
-    return bdPlatformStreamSocket::recieve(m_handle, data, size);
+    return bdPlatformStreamSocket::receive(m_handle, data, size);
 }
 
 void bdStreamSocket::close()

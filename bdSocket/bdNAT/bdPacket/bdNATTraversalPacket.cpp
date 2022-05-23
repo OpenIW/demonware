@@ -2,6 +2,8 @@
 
 #include "bdSocket/bdSocket.h"
 
+bdUInt bdNATTraversalPacket::serializedSize = 0;
+
 bdNATTraversalPacket::bdNATTraversalPacket() 
     : m_type(0), m_protocolVersion(0), m_ident(0), m_addrSrc(), m_addrDest()
 {

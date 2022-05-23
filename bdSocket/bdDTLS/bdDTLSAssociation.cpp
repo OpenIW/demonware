@@ -2,6 +2,9 @@
 
 #include "bdSocket/bdSocket.h"
 
+bdBool bdDTLSAssociation::m_cookieInited = false;
+bdUByte8 bdDTLSAssociation::m_cookieKey[16];
+
 bdDTLSAssociation::bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, const bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap,
     bdFloat32 receiveTimeout)
     : m_socket(socket), m_keyMap(keyMap), m_ECCKey(ECCKey), m_cypher(), m_addr(addr), m_addrHandle(addrHandle), m_state(BD_DTLS_CLOSED), m_lastReceived(), m_initTimer(), m_initResends(0),

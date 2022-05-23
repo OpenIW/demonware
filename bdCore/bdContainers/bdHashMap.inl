@@ -1,6 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 template<typename keyType, typename dataType, typename hashClass>
+inline void* bdHashMap<keyType, dataType, hashClass>::Node::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline void bdHashMap<keyType, dataType, hashClass>::Node::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+template<typename keyType, typename dataType, typename hashClass>
 inline bdHashMap<keyType, dataType, hashClass>::Node::Node()
 {
 }
@@ -123,6 +135,40 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
     }
     --m_size;
 
+    return true;
+}
+
+template<typename keyType, typename dataType, typename hashClass>
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key, dataType* value)
+{
+    bdUInt hash = m_hashClass.getHash(key);
+    bdUInt i = getHashIndex(hash);
+    Node* n = m_map[i];
+    Node* prevNode = NULL;
+    bdAssert(m_numIterators == 0, "bdHashMap::remove, another iterator is being held while removing from hashmap");
+    for (;;)
+    {
+        if (!n)
+        {
+            return false;
+        }
+        if (*key == n->m_key)
+        {
+            break;
+        }
+        prevNode = n;
+        n = n->m_next;
+    }
+    if (prevNode)
+    {
+        prevNode->m_next = n->m_next;
+    }
+    else
+    {
+        m_map[i] = n->m_next;
+    }
+    value = &n->m_data;
+    --m_size;
     return true;
 }
 

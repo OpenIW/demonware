@@ -1,60 +1,49 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdCore/bdCore.h"
 
-template<typename T>
-T* bdSingleton<T>::getInstance()
+void bdSingletonRegistryImpl::operator delete(void* p)
 {
-	T* instance;
-	void(*destructor)();
-	bdSingletonRegistryImpl* singletonInstance;
-
-	if (m_instance)
-	{
-		return m_instance;
-	}
-	instance = bdMemory::allocate(sizeof(T));
-	if (instance)
-	{
-		instance = new T();
-	}
-	else
-	{
-		instance = 0;
-	}
-
-	m_instance = instance;
-	if (instance)
-	{
-		destructor = destroyInstance;
-		singletonInstance = bdSingleton<bdSingletonRegistryImpl>::getInstance();
-
-		if (!singletonInstance->m_cleaningUp)
-		{
-			singletonInstance->m_destoryFunctions.pushBack(&destructor);
-		}
-
-		if (!!singletonInstance->m_cleaningUp)
-		{
-			if (m_instance)
-			{
-				delete m_instance;
-			}
-			m_instance = 0;
-			DebugBreak();
-		}
-	}
-	else
-	{
-		DebugBreak()
-	}
+    bdMemory::deallocate(p);
 }
 
-template<typename T>
-T* bdSingleton<T>::destroyInstance()
+void* bdSingletonRegistryImpl::operator new(bdUWord nbytes)
 {
-	if (m_instance)
-	{
-		delete m_instance;
-		m_instance = 0;
-	}
+    return bdMemory::allocate(nbytes);
 }
+
+bdSingletonRegistryImpl::bdSingletonRegistryImpl()
+    : m_destroyFunctions(0u), m_cleaningUp(false)
+{
+}
+
+bdSingletonRegistryImpl::~bdSingletonRegistryImpl()
+{
+}
+
+void bdSingletonRegistryImpl::cleanUp()
+{
+    void (**end)(void);
+    void (**begin)(void);
+
+    begin = m_destroyFunctions.begin();
+    end = m_destroyFunctions.end();
+    m_cleaningUp = true;
+
+    while (end != begin)
+    {
+        (*--end)();
+    }
+}
+
+bdBool bdSingletonRegistryImpl::add(const bdSingletonDestroyFunction destroyFunction)
+{
+    bdBool added = !m_cleaningUp;
+    if (added)
+    {
+        m_destroyFunctions.pushBack(&destroyFunction);
+    }
+    return added;
+}
+
+bdSingletonRegistryImpl* bdSingleton<bdSingletonRegistryImpl>::m_instance = NULL;
+bdTrulyRandomImpl* bdSingleton<bdTrulyRandomImpl>::m_instance = NULL;

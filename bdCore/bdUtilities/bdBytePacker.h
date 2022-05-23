@@ -16,6 +16,30 @@ public:
     static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var);
 };
 
+template<typename varType>
+bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var)
+{
+    bdBool read;
+    varType nvar;
+
+    read = removeBuffer(reinterpret_cast<const bdUByte8*>(buffer), bufferSize, offset, newOffset, &nvar, sizeof(varType));
+    if (read)
+    {
+        buffer = &nvar;
+        bdBitOperations::endianSwap<varType>(&nvar, var);
+    }
+    return read;
+}
+
+template<typename varType>
+bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var)
+{
+    varType nvar;
+
+    bdBitOperations::endianSwap<varType>(var, &nvar);
+    return appendBuffer(reinterpret_cast<bdUByte8*>(buffer), bufferSize, offset, newOffset, &nvar, sizeof(varType));
+}
+
 // Keep this just in case.
 #define SkipBytes(status, data, size, offset, newOffset, bytes)                                                \
 if (status)                                                                                                    \

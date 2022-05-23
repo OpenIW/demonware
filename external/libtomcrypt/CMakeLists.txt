@@ -136,6 +136,8 @@ add_library(libtomcrypt STATIC
 
 target_include_directories(${PROJECT_NAME} PUBLIC src/headers)
 
+target_link_libraries(libtommath)
+
 add_virtual_path(libtomcrypt)
 
 target_compile_definitions(libtomcrypt PUBLIC

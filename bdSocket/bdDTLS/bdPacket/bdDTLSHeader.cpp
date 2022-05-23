@@ -2,6 +2,16 @@
 
 #include "bdSocket/bdSocket.h"
 
+void bdDTLSHeader::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdDTLSHeader::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
 bdDTLSHeader::bdDTLSHeader()
 {
     m_version = 0;
@@ -20,7 +30,6 @@ bdDTLSHeader::bdDTLSHeader(bdDTLSPacketTypes type, bdUInt16 vtag, bdUInt16 count
 
 bdDTLSHeader::~bdDTLSHeader()
 {
-    delete this;
 }
 
 bdUByte8 bdDTLSHeader::getType()

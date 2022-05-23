@@ -34,11 +34,11 @@ public:
         keyType m_key;
         Node* m_next;
 
+        void* operator new(bdUWord nbytes);
+        void operator delete(void* p);
         Node();
         Node(keyType* key, dataType* value, Node* const next);
         ~Node();
-        void* operator new(bdUWord mbytes);
-        void operator delete(void* p);
     };
     bdUInt m_size;
     bdUInt m_capacity;

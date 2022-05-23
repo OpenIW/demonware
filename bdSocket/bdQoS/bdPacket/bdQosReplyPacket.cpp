@@ -2,6 +2,8 @@
 
 #include "bdSocket/bdSocket.h"
 
+bdUInt bdQoSReplyPacket::headerSize = 0;
+
 bdQoSReplyPacket::bdQoSReplyPacket() : m_type(41), m_id(0), m_timestamp(0), m_enabledMode(true), m_data(NULL), m_dataSize(0), m_serializedSize(0)
 {
 }

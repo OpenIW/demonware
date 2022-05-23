@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
+
+bdUInt64 bdPlatformStreamSocket::m_totalBytesSent = 0;
+bdUInt64 bdPlatformStreamSocket::m_totalBytesRecvd = 0;
 
 SOCKET bdPlatformStreamSocket::create(bdBool blocking)
 {
@@ -16,13 +20,13 @@ SOCKET bdPlatformStreamSocket::create(bdBool blocking)
 
 bdSocketStatusCode bdPlatformStreamSocket::connect(SOCKET handle, bdInAddr addr, bdUInt16 port)
 {
-    sockaddr_in remoteAddr;
+    sockaddr remoteAddr;
 
     memset(&remoteAddr, 0, sizeof(remoteAddr));
-    remoteAddr.sin_family = AF_INET;
-    remoteAddr.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
-    remoteAddr.sin_port = htons(port);
-    if (::connect(handle, (SOCKADDR*)&remoteAddr, sizeof(remoteAddr)))
+    remoteAddr.sa_family = AF_INET;
+    *(bdInAddr*)&remoteAddr.sa_data[2] = addr;
+    *remoteAddr.sa_data = htons(port);
+    if (::connect(handle, &remoteAddr, sizeof(remoteAddr)))
     {
         return BD_NET_SUCCESS;
     }
@@ -54,10 +58,10 @@ bool bdPlatformStreamSocket::close(SOCKET handle)
     case 0:
         return true;
     case -1:
-        bdLogMessage(BD_LOG_WARNING, "warn/", "platform stream socket", __FILE__, "bdPlatformStreamSocket::close", __LINE__, "Failed to close socket Error %i.", WSAGetLastError());
+        bdLogWarn("platform stream socket", "Failed to close socket Error %i.", WSAGetLastError());
         break;
     default:
-        bdLogMessage(BD_LOG_WARNING, "warn/", "platform stream socket", __FILE__, "bdPlatformStreamSocket::close", __LINE__, "Failed to close socket. Unknown Error Code.");
+        bdLogWarn("platform stream socket", "Failed to close socket. Unknown Error Code.");
         break;
     }
     return false;
@@ -76,7 +80,7 @@ bool bdPlatformStreamSocket::checkSocketException(SOCKET handle)
     return select(0, 0, 0, &fdset, &zero) || __WSAFDIsSet(handle, &fdset);
 }
 
-bool bdPlatformStreamSocket::isWritable(SOCKET handle, bdSocketStatusCode* error)
+bdBool bdPlatformStreamSocket::isWritable(SOCKET handle, bdSocketStatusCode* error)
 {
     timeval zero;
     fd_set fdwrite;
@@ -129,4 +133,72 @@ bool bdPlatformStreamSocket::getSocketAddr(SOCKET handle, bdInAddr* socketAddr)
     }
     *socketAddr = *(bdInAddr*)&retrievedAddr.sin_addr;
     return 1;
+}
+
+bdInt bdPlatformStreamSocket::send(SOCKET handle, const void* const data, bdUInt length)
+{
+    if (handle == -1)
+    {
+        return BD_NET_INVALID_HANDLE;
+    }
+    bdInt sent = ::send(handle, reinterpret_cast<const char*>(data), length, 0);
+    if (sent >= 0)
+    {
+        m_totalBytesSent += sent;
+        return sent;
+    }
+
+    switch (WSAGetLastError())
+    {
+    case WSAEINTR:
+        return BD_NET_BLOCKING_CALL_CANCELED;
+    case WSAEADDRNOTAVAIL:
+        return BD_NET_ADDRESS_INVALID;
+    case WSAEWOULDBLOCK:
+        return BD_NET_WOULD_BLOCK;
+    case WSAEMSGSIZE:
+        return BD_NET_MSG_SIZE;
+    case WSAEHOSTUNREACH:
+        return BD_NET_HOST_UNREACH;
+    case WSAENOTCONN:
+        return checkSocketException(handle) ? BD_NET_CONNECTION_RESET : BD_NET_NOT_CONNECTED;
+    default:
+        return BD_NET_ERROR;
+    }
+}
+
+bdInt bdPlatformStreamSocket::receive(SOCKET handle, void* const data, bdUInt length)
+{
+    if (handle == -1)
+    {
+        return BD_NET_INVALID_HANDLE;
+    }
+    bdInt recvd = ::recv(handle, reinterpret_cast<char*>(data), length, 0);
+    if (recvd >= 0)
+    {
+        m_totalBytesRecvd += recvd;
+        return recvd;
+    }
+
+    switch (WSAGetLastError())
+    {
+    case WSAEINTR:
+        return BD_NET_BLOCKING_CALL_CANCELED;
+    case WSAEINVAL:
+        return BD_NET_NOT_BOUND;
+    case WSAEMSGSIZE:
+        return BD_NET_MSG_SIZE;
+    case WSAEHOSTUNREACH:
+        return BD_NET_HOST_UNREACH;
+    case WSAENOTCONN:
+        return checkSocketException(handle) ? BD_NET_CONNECTION_RESET : BD_NET_NOT_CONNECTED;
+    default:
+        return BD_NET_ERROR;
+    }
+}
+
+bdBool bdPlatformStreamSocket::isWritable(SOCKET handle)
+{
+    bdSocketStatusCode ignored;
+    return isWritable(handle, &ignored);
 }

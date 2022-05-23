@@ -34,6 +34,10 @@ bdDataChunk::bdDataChunk(bdMessageRef data, const bdDataChunk::bdDataFlags flags
     }
 }
 
+bdDataChunk::~bdDataChunk()
+{
+}
+
 bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size)
 {
     bdUByte8* payloadData;

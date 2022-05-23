@@ -40,9 +40,3 @@ unsigned int bdBitOperations::highBitNumber(unsigned int v)
 	}
 	return (v >> 1) | i;
 }
-
-template<typename T>
-void bdBitOperations::endianSwap(const T* src, T* dest)
-{
-	*dest = *src;
-}

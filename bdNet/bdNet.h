@@ -54,6 +54,7 @@ public:
     bdBool sendAll();
     bdBool getBindAddr(bdAddr* addr);
 
+    const bdNetStartParams* getParams() const;
     bdNetStatus getStatus() const;
     bdSocketRouter* getSocketRouter() const;
     const bdConnectionStore* getConnectionStore() const;
@@ -62,7 +63,7 @@ public:
     bdUPnPDevice::bdUPnPPortStatus getUPnPStatus() const;
 };
 
-class bdNet : bdSingleton<bdNetImpl>
+class bdNet : public bdSingleton<bdNetImpl>
 {
 
 };

@@ -2,6 +2,8 @@
 
 #include "bdNet/bdNet.h"
 
+bdNetImpl* bdSingleton<bdNetImpl>::m_instance = NULL;
+
 void bdNetImpl::operator delete(void* p)
 {
     bdMemory::deallocate(p);
@@ -553,6 +555,11 @@ bdBool bdNetImpl::getBindAddr(bdAddr* addr)
     }
     addr = &bdAddr(&bdInetAddr::Any(), m_params.m_gamePort);
     return true;
+}
+
+const bdNetStartParams* bdNetImpl::getParams() const
+{
+    return &m_params;
 }
 
 bdNetImpl::bdNetStatus bdNetImpl::getStatus() const
