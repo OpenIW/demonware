@@ -254,7 +254,7 @@
 #define LTC_YARROW
 /* which descriptor of AES to use?  */
 /* 0 = rijndael_enc 1 = aes_enc, 2 = rijndael [full], 3 = aes [full] */
-#define LTC_YARROW_AES 0
+#define LTC_YARROW_AES 2
 
 #if defined(LTC_YARROW) && !defined(LTC_CTR_MODE)
    #error LTC_YARROW requires LTC_CTR_MODE chaining mode to be defined!
@@ -287,7 +287,7 @@
 #ifndef LTC_NO_MATH
 
 /* LibTomMath */
-/* #define LTM_LTC_DESC */
+#define LTM_LTC_DESC
 
 /* TomsFastMath */
 /* #define TFM_LTC_DESC */

@@ -27,6 +27,8 @@ include_directories(.
     external/libtomcrypt/src/headers 
 )
 
+add_definitions(-DLTM_DESC)
+
 add_compile_options(
     /MP                      # Build with Multiple Processes
     $<$<CONFIG:Debug>:/Zi>   # The /Zi option produces a separate PDB file that contains all the symbolic debugging information for use with the debugger.
@@ -40,15 +42,13 @@ add_library(demonware STATIC
     ${SRC}
 )
 
-add_definitions(-DLTM_DESC)
-
 target_compile_definitions(demonware PUBLIC
     "_DEBUG"
     "_WINDOWS"
     "_CRT_SECURE_NO_WARNINGS"
 )
 
-target_link_libraries(demonware ws2_32.lib libtomcrypt)
+target_link_libraries(demonware ws2_32.lib libtomcrypt libtommath)
 
 add_virtual_path(demonware)
 
