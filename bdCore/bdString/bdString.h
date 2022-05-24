@@ -52,6 +52,18 @@ class bdString
 public:
     char *m_string;
 
+    void* operator new(bdUWord nbytes)
+    {
+        return bdMemory::allocate(nbytes);
+    }
+    void operator delete(void* p)
+    {
+        bdMemory::deallocate(p);
+    }
+    void* operator new(const bdUWord nbytes, void* p)
+    {
+        return p;
+    }
     bdString(const bdString *s)
     {
         bdStringData *StringData;
@@ -121,6 +133,7 @@ public:
         stringData->m_referenceCount = 1;
         stringData->m_capacity = numChunks << 6;
         stringData->m_length = length;
+        m_string = (char*)stringData + sizeof(bdStringData);
     }
     void freeBuffer(bdStringData* stringData)
     {

@@ -27,6 +27,9 @@ public:
     bdUInt m_summaryFileSize;
     bdTag m_tags[40];
 
+    void* operator new(const bdUWord nbytes);
+    void operator delete(void* p);
+    void* operator new(const bdUWord nbytes, void* p);
     bdFileMetaData();
     ~bdFileMetaData();
     void reset();

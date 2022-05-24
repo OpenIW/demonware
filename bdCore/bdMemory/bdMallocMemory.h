@@ -4,26 +4,27 @@
 class bdMallocMemory
 {
 public:
-	struct bdMemoryChainElement
-	{
-		unsigned __int16 m_magic;
-		unsigned int m_size;
-		bool m_aligned;
-		bdMemoryChainElement* m_prev;
-		bdMemoryChainElement* m_next;
-	};
-
+    struct bdMemoryChainElement
+    {
+        bdUInt16 m_magic;
+        bdUWord m_size;
+        bdBool m_aligned;
+        bdMemoryChainElement* m_prev;
+        bdMemoryChainElement* m_next;
+    };
 protected:
-	bdMutex m_mutex;
-	bdMemoryChainElement* m_memoryChain;
-	unsigned int m_allocatedBytes;
-	unsigned int m_numAllocations;
+    static bdMutex m_mutex;
+    static bdMemoryChainElement* m_memoryChain;
+    static bdUInt m_allocatedBytes;
+    static bdUInt m_numAllocations;
 public:
-	bdMemoryChainElement* recordMemory(bdMemoryChainElement* link, unsigned int size, bool aligned);
-	void eraseMemory(bdMemoryChainElement* link);
-	bdMemoryChainElement* allocate(unsigned int size);
-	bdMemoryChainElement* reallocate(void* p, unsigned int size);
-	bdMemoryChainElement* alignedAllocate(unsigned int size, unsigned int align);
-	void deallocate(void* p);
-	bdMemoryChainElement* alignedReallocate(void* p, unsigned int size, unsigned int align);
+    static void* recordMemory(bdMemoryChainElement* link, const bdUWord size, const bdBool aligned);
+    static void eraseMemory(bdMemoryChainElement* link);
+    static void* allocate(const bdUWord size);
+    static void* alignedAllocate(const bdUWord size, const bdUWord align);
+    static void* alignedReallocate(void* p, const bdUWord size, const bdUWord align);
+    static void* reallocate(void* p, const bdUWord size);
+    static void deallocate(void* p);
+    static void alignedDeallocate(void* p);
+    static void releaseAllMemory();
 };

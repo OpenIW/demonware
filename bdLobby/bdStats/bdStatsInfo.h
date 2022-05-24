@@ -14,6 +14,7 @@ public:
 
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
+    void* operator new(bdUWord nbytes, void* p);
     bdStatsInfo();
     ~bdStatsInfo();
     virtual bdBool deserialize(bdByteBufferRef buffer);

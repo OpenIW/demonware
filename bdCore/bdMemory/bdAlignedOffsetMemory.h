@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-void* bdAlignedOffsetMalloc(unsigned int size, unsigned int align, unsigned int offset);
+void* bdAlignedOffsetMalloc(const bdUWord size, const bdUWord align, const bdUWord offset);
 void bdAlignedOffsetFree(void* p);
-void* bdAlignedOffsetRealloc(void* p, unsigned int origSize, unsigned int size, unsigned int align, unsigned int offset);
+void* bdAlignedOffsetRealloc(void* p, const bdUWord origSize, const bdUWord size, const bdUWord align, const bdUWord offset);

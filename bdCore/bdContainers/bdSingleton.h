@@ -9,8 +9,6 @@ protected:
     bdFastArray<void(*)()> m_destroyFunctions;
     bdBool m_cleaningUp;
 public:
-    void operator delete(void* p);
-    void* operator new(bdUWord nbytes);
     bdSingletonRegistryImpl();
     virtual ~bdSingletonRegistryImpl();
     bdBool add(const bdSingletonDestroyFunction destroyFunction);

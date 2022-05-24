@@ -4,6 +4,21 @@
 
 bdUInt bdAddr::serializedSize = 0;
 
+void* bdAddr::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
+void bdAddr::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdAddr::operator new(bdUWord nbytes, void* p)
+{
+    return p;
+}
+
 bdAddr::bdAddr()
 {
     m_address = bdInetAddr();

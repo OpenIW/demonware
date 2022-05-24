@@ -10,6 +10,7 @@ inline bdArray<T>::bdArray(const bdUInt capacity)
 {
     m_data = NULL;
     m_capacity = capacity;
+    m_size = capacity;
     if (m_capacity)
     {
         m_data = bdAllocate<T>(m_capacity);
@@ -99,15 +100,12 @@ void bdArray<T>::clear()
 template<typename T>
 void bdArray<T>::pushBack(const T* value)
 {
-    if (this->m_size == this->m_capacity)
+    if (m_size == m_capacity)
     {
         increaseCapacity(1);
     }
-    if (&this->m_data[this->m_size])
-    {
-        copyConstructObjectObject(&this->m_data[this->m_size], value);
-    }
-    ++this->m_size;
+    copyConstructObjectObject(&m_data[m_size], value);
+    ++m_size;
 }
 
 template<typename T>
@@ -134,7 +132,7 @@ inline void bdArray<T>::popBack()
 template<typename T>
 void bdArray<T>::copyConstructObjectObject(T* dest, const T* src)
 {
-    dest = new T(src);
+    dest = new(dest) T(src);
 }
 
 template<typename T>
@@ -160,7 +158,7 @@ void bdArray<T>::destruct(T* src, bdUInt n)
 {
     for (bdUInt i = 0; i < n; ++i)
     {
-        delete &src[i];
+        src[i].~T();
     }
 }
 

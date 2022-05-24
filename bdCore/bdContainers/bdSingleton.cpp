@@ -1,16 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdCore/bdCore.h"
 
-void bdSingletonRegistryImpl::operator delete(void* p)
-{
-    bdMemory::deallocate(p);
-}
-
-void* bdSingletonRegistryImpl::operator new(bdUWord nbytes)
-{
-    return bdMemory::allocate(nbytes);
-}
-
 bdSingletonRegistryImpl::bdSingletonRegistryImpl()
     : m_destroyFunctions(0u), m_cleaningUp(false)
 {

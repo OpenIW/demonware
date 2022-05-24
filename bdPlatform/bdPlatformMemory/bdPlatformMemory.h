@@ -17,3 +17,9 @@ inline bdInt bdMemcmp(const void* const s1, const void* const s2, const bdUWord 
 {
     return memcmp(s1, s2, len);
 }
+
+inline void* bdMemmove(void* const dest, const void* const src, const bdUWord len)
+{
+    memmove(dest, src, len);
+    return dest;
+}

@@ -6,6 +6,9 @@ class bdInetAddr
 protected:
 	bdInAddr m_addr;
 public:
+    void* operator new(const bdUWord nbytes);
+    void operator delete(void* p);
+    void* operator new(const bdUWord nbytes, void* p);
 	bdBool operator==(const bdInetAddr* other);
 	static bdInetAddr Broadcast();
 	static bdInetAddr All();

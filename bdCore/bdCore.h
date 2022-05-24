@@ -68,3 +68,11 @@
 #include "bdSocket/bdEndpoint.h"
 #include "bdSocket/bdSocket.h"
 #include "bdSocket/bdStreamSocket.h"
+
+class bdCore
+{
+public:
+    static bdBool m_initialized;
+    static void init(const bdBool defaultMemoryFunctions);
+    static void quit();
+};

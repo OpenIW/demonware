@@ -2,6 +2,21 @@
 
 #include "bdLobby/bdLobby.h"
 
+void* bdFileMetaData::operator new(const bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
+void bdFileMetaData::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdFileMetaData::operator new(const bdUWord nbytes, void* p)
+{
+    return p;
+}
+
 bdFileMetaData::bdFileMetaData()
     : bdTaskResult(), m_fileID(0), m_createTime(0), m_modifedTime(0), m_fileSize(0), m_ownerID(0), m_fileSlot(0), m_numTags(0), m_metaDataSize(0), m_summaryFileSize(0)
 {

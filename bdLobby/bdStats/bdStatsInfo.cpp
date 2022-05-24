@@ -12,6 +12,11 @@ void* bdStatsInfo::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
+void* bdStatsInfo::operator new(bdUWord nbytes, void* p)
+{
+    return p;
+}
+
 bdStatsInfo::bdStatsInfo()
     : bdTaskResult(), m_leaderboardID(0), m_entityID(0), m_writeType(bdStats::STAT_WRITE_ADD), m_rating(0), m_rank(0), m_secondsSinceUpdate(0)
 {
