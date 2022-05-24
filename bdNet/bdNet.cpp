@@ -111,7 +111,7 @@ bdBool bdNetImpl::start(const bdNetStartParams* params)
         bdLogWarn("bdNet/net", "bdNet can only be started when in the uninitialized state. Call stop() to reset");
         return false;
     }
-    m_params = params;
+    m_params = *params;
     bdAddr addr;
     if (!getBindAddr(&addr))
     {

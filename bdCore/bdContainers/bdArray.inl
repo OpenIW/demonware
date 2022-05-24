@@ -265,32 +265,32 @@ void bdArray<T>::operator=(bdArray<T>* a)
         return;
     }
     newSize = a->getSize();
-    if (newSize > this->m_capacity)
+    if (newSize > m_capacity)
     {
         clear();
-        this->m_data = uninitializedCopy(a);
-        this->m_capacity = a->m_capacity;
-        this->m_size = newSize;
+        m_data = uninitializedCopy(a);
+        m_capacity = a->m_capacity;
+        m_size = newSize;
         return;
     }
 
-    if (newSize <= this->m_size)
+    if (newSize <= m_size)
     {
         for (bdUInt i = 0; i < newSize; ++i)
         {
-            &this->m_data[i] = a[i];
+            &m_data[i] = a[i];
         }
-        destruct(&this->m_data[newSize], this->m_size - newSize);
-        this->m_size = newSize;
+        destruct(&m_data[newSize], m_size - newSize);
+        m_size = newSize;
         decreaseCapacity(0);
     }
     else
     {
-        for (bdUInt i = 0; i < this->m_size; ++i)
+        for (bdUInt i = 0; i < m_size; ++i)
         {
-            &this->m_data[i] = a[i];
+            &m_data[i] = a[i];
         }
-        copyConstructArrayArray(&this->m_data[this->m_size], &a->m_data[this->m_size], newSize - this->m_size);
-        this->m_size = newSize;
+        copyConstructArrayArray(&m_data[m_size], &a->m_data[m_size], newSize - m_size);
+        m_size = newSize;
     }
 }
