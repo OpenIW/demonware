@@ -16,16 +16,16 @@ public:
     bdReference<bdCommonAddr> m_remote;
     bdNATTravListener* m_listener;
     bdNATTravListener* m_secondaryListener;
-    unsigned int m_tries;
+    bdUInt m_tries;
     bdStopwatch m_lastSent;
-    bool m_throttled;
+    bdBool m_throttled;
     bdStopwatch m_age;
 
     bdNATTravClientData();
-    bdNATTravClientData(const bdNATTravClientData* other);
+    bdNATTravClientData(const bdNATTravClientData& other);
     bdNATTravClientData(bdCommonAddrRef local, bdCommonAddrRef remote, bdNATTravListener* listener);
     ~bdNATTravClientData();
-    void callOnNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr* realAddr);
+    void callOnNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAddr);
     void callOnNATAddrDiscoveryFailed(bdCommonAddrRef remote);
-    bdNATTravClientData* operator=(bdNATTravClientData* other);
+    bdNATTravClientData& operator=(bdNATTravClientData& other);
 };

@@ -25,7 +25,7 @@ public:
     ~bdIPDiscoveryClient();
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
-    bdBool init(bdSocket* socket, const bdAddr* server, bdIPDiscoveryConfig config);
+    bdBool init(bdSocket* socket, const bdAddr& server, bdIPDiscoveryConfig config);
     bdBool sendIPDiscoveryPacket();
     const bdAddr* getPublicAddress();
     void pump(bdAddr fromAddr, bdUByte8* data, bdUInt dataSize);

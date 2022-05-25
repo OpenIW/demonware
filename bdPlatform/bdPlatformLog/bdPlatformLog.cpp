@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 bdLogSubscriber* g_logSubscriberList;
 
-void bdLogMessage(bdLogMessageType type, const char* baseChannel, const char* channel, const char* file, const char* function, unsigned int line, const char* format, ...)
+void bdLogMessage(bdLogMessageType type, const bdNChar8* baseChannel, const bdNChar8* channel, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* format, ...)
 {
     va_list ap;
     bdLogSubscriber* i;
-    char channelNameBuffer[256];
-    char message[256];
+    bdNChar8 channelNameBuffer[256];
+    bdNChar8 message[256];
 
     va_start(ap, format);
     if (g_logSubscriberList)
@@ -17,13 +18,13 @@ void bdLogMessage(bdLogMessageType type, const char* baseChannel, const char* ch
         vsnprintf_s(message, 0x100u, 0xFFFFFFFF, format, ap);
         if (_vscprintf(format, ap) >= 256)
         {
-            bdLogMessage(BD_LOG_WARNING, "warn/", "bdPlatformLog", __FILE__, __FUNCTION__, __LINE__, "Message truncated.", 0);
+            bdLogWarn("bdPlatformLog", "Messaged truncated.");
         }
         if (baseChannel && channel)
         {
             if (bdSnprintf(channelNameBuffer, 0x100u, "%s%s", baseChannel, channel) >= 256)
             {
-                bdLogMessage(BD_LOG_WARNING, "warn/", "bdPlatformLog", __FILE__, __FUNCTION__, __LINE__, "Channel name truncated: %s%s", baseChannel, channel);
+                bdLogWarn("bdPlatformLog", "Channel name truncated: %s%s", baseChannel, channel);
             }
             baseChannel = channelNameBuffer;
         }
@@ -39,12 +40,11 @@ bdLogSubscriber::bdLogSubscriber()
     memset(m_channels, 0, sizeof(m_channels));
 }
 
-bool bdLogSubscriber::addChannel(const char* channel)
+bool bdLogSubscriber::addChannel(const bdNChar8* channel)
 {
-    unsigned int i;
-    bool found = false;
+    bdBool found = false;
 
-    for (i = 0; !found && i < BD_MAX_CHANNELS; ++i)
+    for (bdUInt i = 0; !found && i < BD_MAX_CHANNELS; ++i)
     {
         if (!m_channels[i])
         {
@@ -59,11 +59,9 @@ bool bdLogSubscriber::addChannel(const char* channel)
     return found;
 }
 
-void bdLogSubscriber::logMessage(bdLogMessageType type, const char* channelName, const char* file, const char* function, unsigned int line, const char* msg)
+void bdLogSubscriber::logMessage(bdLogMessageType type, const bdNChar8* channelName, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* msg)
 {
-    unsigned int i;
-
-    for (i = 0; i < BD_MAX_CHANNELS; ++i)
+    for (bdUInt i = 0; i < BD_MAX_CHANNELS; ++i)
     {
         if (m_channels[i])
         {
@@ -75,10 +73,10 @@ void bdLogSubscriber::logMessage(bdLogMessageType type, const char* channelName,
     }
 }
 
-void bdLogSubscriber::publish(bdLogMessageType type, const char* channelName, const char* file, const char* function, unsigned int line, const char* msg)
+void bdLogSubscriber::publish(bdLogMessageType type, const bdNChar8* channelName, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* msg)
 {
-    const char* logType;
-    const char* fileName;
+    const bdNChar8* logType;
+    const bdNChar8* fileName;
 
     switch (type)
     {

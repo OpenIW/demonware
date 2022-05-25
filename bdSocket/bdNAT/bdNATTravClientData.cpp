@@ -7,7 +7,7 @@ bdNATTravClientData::bdNATTravClientData()
 {
 }
 
-bdNATTravClientData::bdNATTravClientData(const bdNATTravClientData* other) : m_state(other->m_state), m_local(other->m_local), m_remote(other->m_remote), m_listener(other->m_listener)
+bdNATTravClientData::bdNATTravClientData(const bdNATTravClientData& other) : m_state(other.m_state), m_local(other.m_local), m_remote(other.m_remote), m_listener(other.m_listener)
 {
 }
 
@@ -20,7 +20,7 @@ bdNATTravClientData::~bdNATTravClientData()
 {
 }
 
-void bdNATTravClientData::callOnNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr* realAddr)
+void bdNATTravClientData::callOnNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAddr)
 {
     m_listener->onNATAddrDiscovery(remote.m_ptr, realAddr);
     if (m_secondaryListener)
@@ -38,11 +38,11 @@ void bdNATTravClientData::callOnNATAddrDiscoveryFailed(bdCommonAddrRef remote)
     }
 }
 
-bdNATTravClientData* bdNATTravClientData::operator=(bdNATTravClientData* other)
+bdNATTravClientData& bdNATTravClientData::operator=(bdNATTravClientData& other)
 {
-    m_state = other->m_state;
-    m_local = other->m_local;
-    m_remote = other->m_remote;
-    bdMemcpy(&m_listener, &other->m_listener, sizeof(m_listener));
-    return this;
+    m_state = other.m_state;
+    m_local = other.m_local;
+    m_remote = other.m_remote;
+    bdMemcpy(&m_listener, other.m_listener, sizeof(m_listener));
+    return *this;
 }

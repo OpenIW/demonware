@@ -11,10 +11,10 @@ public:
     bdSocket();
     virtual ~bdSocket();
     virtual bdBool create(const bdBool blocking, const bdBool broadcast);
-    virtual bdSocketStatusCode bind(bdAddr* addr);
+    virtual bdSocketStatusCode bind(bdAddr& addr);
     virtual bdSocketStatusCode bind(const bdPort port);
-    virtual bdInt sendTo(bdAddr* addr, const void* data, const bdUInt length);
-    virtual bdInt receiveFrom(bdAddr* addr, void* data, const bdUInt size);
+    virtual bdInt sendTo(bdAddr& addr, const void* data, const bdUInt length);
+    virtual bdInt receiveFrom(bdAddr& addr, void* data, const bdUInt size);
     virtual bdBool close();
     bdInt getHandle();
 };

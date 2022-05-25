@@ -61,7 +61,7 @@ const bdUInt bdByteBuffer::getReadSize() const
     return (bdInt32)m_readPtr - (bdInt32)m_data;
 }
 
-bdBool bdByteBuffer::getStringLength(bdUInt* length)
+bdBool bdByteBuffer::getStringLength(bdUInt& length)
 {
     return bdBool();
 }
@@ -217,7 +217,7 @@ bdBool bdByteBuffer::read(void* data, bdUInt size)
     return ok;
 }
 
-bdBool bdByteBuffer::readArrayStart(bdUByte8 expectedType, bdUInt32* numElements)
+bdBool bdByteBuffer::readArrayStart(bdUByte8 expectedType, bdUInt32& numElements)
 {
     bdUInt32 ignoredArrayLength;
     bdUByte8 ignore;
@@ -227,7 +227,7 @@ bdBool bdByteBuffer::readArrayStart(bdUByte8 expectedType, bdUInt32* numElements
     type = 0;
     m_typeCheckedCopy = m_typeChecked;
     m_typeChecked = 0;
-    ok = readUByte8(&type);
+    ok = readUByte8(type);
     if (!ok)
     {
         bdLogWarn("core/bytebuffer", "readArrayStart: No array\n");
@@ -239,8 +239,8 @@ bdBool bdByteBuffer::readArrayStart(bdUByte8 expectedType, bdUInt32* numElements
         return false;
     }
     m_typeChecked = 0;
-    ok = ok && readUByte8(&ignore);
-    ok = ok && readUInt32(&ignoredArrayLength);
+    ok = ok && readUByte8(ignore);
+    ok = ok && readUInt32(ignoredArrayLength);
     ok = ok && readUInt32(numElements);
     return ok;
 }
@@ -250,7 +250,7 @@ void bdByteBuffer::readArrayEnd()
     m_typeChecked = m_typeCheckedCopy;
 }
 
-bdBool bdByteBuffer::readUByte8(bdUByte8* b)
+bdBool bdByteBuffer::readUByte8(bdUByte8& b)
 {
     if (readDataType(BD_BB_UNSIGNED_CHAR8_TYPE))
     {
@@ -259,7 +259,7 @@ bdBool bdByteBuffer::readUByte8(bdUByte8* b)
     return false;
 }
 
-bdBool bdByteBuffer::readUInt32(bdUInt* u)
+bdBool bdByteBuffer::readUInt32(bdUInt& u)
 {
     if (readDataType(BD_BB_UNSIGNED_INTEGER32_TYPE))
     {
@@ -268,7 +268,7 @@ bdBool bdByteBuffer::readUInt32(bdUInt* u)
     return false;
 }
 
-bdBool bdByteBuffer::readBool(bdBool* b)
+bdBool bdByteBuffer::readBool(bdBool& b)
 {
     bdBool ok = false;
     bdUByte8 byte = 0;
@@ -279,7 +279,7 @@ bdBool bdByteBuffer::readBool(bdBool* b)
         ok = read(&byte, sizeof(bdUByte8));
         if (ok)
         {
-            *b = byte ? true : false;
+            b = byte ? true : false;
         }
     }
     return ok;
@@ -315,7 +315,7 @@ bdBool bdByteBuffer::readDataType(const bdBitBufferDataType expectedDataType)
     return ok;
 }
 
-bdBool bdByteBuffer::readNChar8(bdNChar8* c)
+bdBool bdByteBuffer::readNChar8(bdNChar8& c)
 {
     if (readDataType(BD_BB_SIGNED_CHAR8_TYPE))
     {
@@ -324,7 +324,7 @@ bdBool bdByteBuffer::readNChar8(bdNChar8* c)
     return false;
 }
 
-bdBool bdByteBuffer::readByte8(bdByte8* b)
+bdBool bdByteBuffer::readByte8(bdByte8& b)
 {
     if (readDataType(BD_BB_SIGNED_CHAR8_TYPE))
     {
@@ -333,7 +333,7 @@ bdBool bdByteBuffer::readByte8(bdByte8* b)
     return false;
 }
 
-bdBool bdByteBuffer::readInt16(bdInt16* i)
+bdBool bdByteBuffer::readInt16(bdInt16& i)
 {
     if (readDataType(BD_BB_SIGNED_INTEGER16_TYPE))
     {
@@ -342,7 +342,7 @@ bdBool bdByteBuffer::readInt16(bdInt16* i)
     return false;
 }
 
-bdBool bdByteBuffer::readUInt16(bdUInt16* u)
+bdBool bdByteBuffer::readUInt16(bdUInt16& u)
 {
     if (readDataType(BD_BB_UNSIGNED_INTEGER16_TYPE))
     {
@@ -351,7 +351,7 @@ bdBool bdByteBuffer::readUInt16(bdUInt16* u)
     return false;
 }
 
-bdBool bdByteBuffer::readInt32(bdInt* i)
+bdBool bdByteBuffer::readInt32(bdInt& i)
 {
     if (readDataType(BD_BB_SIGNED_INTEGER32_TYPE))
     {
@@ -360,7 +360,7 @@ bdBool bdByteBuffer::readInt32(bdInt* i)
     return false;
 }
 
-bdBool bdByteBuffer::readInt64(bdInt64* i)
+bdBool bdByteBuffer::readInt64(bdInt64& i)
 {
     if (readDataType(BD_BB_SIGNED_INTEGER64_TYPE))
     {
@@ -369,7 +369,7 @@ bdBool bdByteBuffer::readInt64(bdInt64* i)
     return false;
 }
 
-bdBool bdByteBuffer::readUInt64(bdUInt64* u)
+bdBool bdByteBuffer::readUInt64(bdUInt64& u)
 {
     if (readDataType(BD_BB_UNSIGNED_INTEGER64_TYPE))
     {
@@ -378,7 +378,7 @@ bdBool bdByteBuffer::readUInt64(bdUInt64* u)
     return false;
 }
 
-bdBool bdByteBuffer::readFloat32(bdFloat32* f)
+bdBool bdByteBuffer::readFloat32(bdFloat32& f)
 {
     if (readDataType(BD_BB_FLOAT32_TYPE))
     {
@@ -387,7 +387,7 @@ bdBool bdByteBuffer::readFloat32(bdFloat32* f)
     return false;
 }
 
-bdBool bdByteBuffer::readFloat64(bdFloat64* f)
+bdBool bdByteBuffer::readFloat64(bdFloat64& f)
 {
     if (readDataType(BD_BB_FLOAT64_TYPE))
     {
@@ -427,7 +427,7 @@ bdBool bdByteBuffer::readString(bdNChar8* const s, const bdUWord maxLen)
     return ok;
 }
 
-bdBool bdByteBuffer::readBlob(bdUByte8* const blob, bdUInt32* length)
+bdBool bdByteBuffer::readBlob(bdUByte8* const blob, bdUInt32& length)
 {
     bdBool ok;
     bdUInt32 tempLength;
@@ -439,20 +439,20 @@ bdBool bdByteBuffer::readBlob(bdUByte8* const blob, bdUInt32* length)
         return ok;
     }
     tempLength = 0;
-    ok = readUInt32(&tempLength);
+    ok = readUInt32(tempLength);
     if (ok && blob)
     {
-        ok = read(blob, (*length >= tempLength ? tempLength : *length));
-        if (tempLength > *length)
+        ok = read(blob, (length >= tempLength ? tempLength : length));
+        if (tempLength > length)
         {
-            bdLogWarn("core/bytebuffer", "Reading BLOB (%u bytes) buffer too small (%u bytes).", tempLength, *length);
+            bdLogWarn("core/bytebuffer", "Reading BLOB (%u bytes) buffer too small (%u bytes).", tempLength, length);
         }
     }
-    *length = tempLength;
+    length = tempLength;
     return ok;
 }
 
-bdBool bdByteBuffer::readAndAllocateBlob(bdUByte8** blob, bdUInt32* length)
+bdBool bdByteBuffer::readAndAllocateBlob(bdUByte8*& blob, bdUInt32& length)
 {
     bdUByte8* tmpBlob;
     bdUInt32 tmpLength;
@@ -463,7 +463,7 @@ bdBool bdByteBuffer::readAndAllocateBlob(bdUByte8** blob, bdUInt32* length)
     ok = readDataType(BD_BB_BLOB_TYPE);
     if (ok)
     {
-        ok = readUInt32(&tmpLength);
+        ok = readUInt32(tmpLength);
         if (ok)
         {
             tmpBlob = bdAllocate<bdUByte8>(tmpLength);
@@ -475,8 +475,8 @@ bdBool bdByteBuffer::readAndAllocateBlob(bdUByte8** blob, bdUInt32* length)
     }
     if (ok)
     {
-        *blob = tmpBlob;
-        *length = tmpLength;
+        blob = tmpBlob;
+        length = tmpLength;
     }
     else
     {
@@ -486,7 +486,7 @@ bdBool bdByteBuffer::readAndAllocateBlob(bdUByte8** blob, bdUInt32* length)
 }
 
 // NOT USED IN BO1
-bdBool bdByteBuffer::readAndAllocateCompressedMsg(bdUByte8** msg, bdUInt32* length, bdUInt32* compressedLength)
+bdBool bdByteBuffer::readAndAllocateCompressedMsg(bdUByte8*& msg, bdUInt32& length, bdUInt32& compressedLength)
 {
     return bdBool();
 }

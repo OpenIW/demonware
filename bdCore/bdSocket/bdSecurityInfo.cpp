@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 bdUInt bdSecurityInfo::bufferToString(const bdUByte8* buffer, const bdUInt bufferLen, bdNChar8* outBuffer, const bdUInt outBufferLen)
@@ -24,12 +25,12 @@ bdUInt bdSecurityInfo::bufferToString(const bdUByte8* buffer, const bdUInt buffe
     return (bdUInt)cur - (bdUInt)outBuffer;
 }
 
-bdUInt bdSecurityInfo::toString(const bdSecurityID* id, bdNChar8* buffer, bdUInt len)
+bdUInt bdSecurityInfo::toString(const bdSecurityID& id, bdNChar8* buffer, bdUInt len)
 {
-    return bufferToString(reinterpret_cast<const bdUByte8*>(id), sizeof(bdSecurityID), buffer, len);
+    return bufferToString(reinterpret_cast<const bdUByte8*>(id.ab), sizeof(bdSecurityID), buffer, len);
 }
 
-bdUInt bdSecurityInfo::toString(const bdSecurityKey* key, bdNChar8* buffer, bdUInt len)
+bdUInt bdSecurityInfo::toString(const bdSecurityKey& key, bdNChar8* buffer, bdUInt len)
 {
-    return bufferToString(reinterpret_cast<const bdUByte8*>(key), sizeof(bdSecurityKey), buffer, len);
+    return bufferToString(reinterpret_cast<const bdUByte8*>(key.ab), sizeof(bdSecurityKey), buffer, len);
 }

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 HCRYPTPROV phProv;
@@ -28,7 +29,7 @@ void bdTrulyRandomImpl::getRandomUByte8(bdUByte8* pbBuffer, bdUWord dwLen)
 
 bdTrulyRandomImpl s_randomInit = bdTrulyRandomImpl();
 
-void bdGetRandomUChar8(unsigned char* in, int length)
+void bdGetRandomUChar8(bdUByte8* in, bdUInt32 length)
 {
     CryptGenRandom(phProv, length, in);
 }

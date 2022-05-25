@@ -18,7 +18,7 @@ inline bdHashMap<keyType, dataType, hashClass>::Node::Node()
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType* key, dataType* value, Node* const next) : m_data(*value), m_key(*key)
+inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType const& key, dataType const& value, Node* const next) : m_data(value), m_key(key)
 {
     m_next = next;
 }
@@ -60,24 +60,24 @@ inline void bdHashMap<keyType, dataType, hashClass>::releaseIterator(Iterator it
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline dataType* bdHashMap<keyType, dataType, hashClass>::getValue(Iterator iterator)
+inline dataType& bdHashMap<keyType, dataType, hashClass>::getValue(Iterator iterator)
 {
-    return &reinterpret_cast<Node*>(iterator)->m_data;
+    return reinterpret_cast<Node*>(iterator)->m_data;
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline keyType* bdHashMap<keyType, dataType, hashClass>::getKey(Iterator iterator)
+inline keyType& bdHashMap<keyType, dataType, hashClass>::getKey(Iterator iterator)
 {
-    return &reinterpret_cast<Node*>(iterator)->m_key;
+    return reinterpret_cast<Node*>(iterator)->m_key;
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator* iterator)
+inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator& iterator)
 {
     bdUInt hash;
     Node* n;
 
-    n = reinterpret_cast<Node*>(*iterator);
+    n = reinterpret_cast<Node*>(iterator);
 
     if (n->m_next)
     {
@@ -100,7 +100,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator* iterator)
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType& key)
 {
     Node* prevNode;
     Node* n;
@@ -139,7 +139,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key, dataType* value)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType& key, dataType& value)
 {
     bdUInt hash = m_hashClass.getHash(key);
     bdUInt i = getHashIndex(hash);
@@ -152,7 +152,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
         {
             return false;
         }
-        if (*key == n->m_key)
+        if (key == n->m_key)
         {
             break;
         }
@@ -173,19 +173,19 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType* key
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(Iterator* iterator)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(Iterator& iterator)
 {
     Iterator iter;
     Node* n;
 
     bdAssert(m_numIterators == 1, "bdHashMap::remove, more than one iterator held  while removing from hashmap");
-    iter = *iterator;
-    next(&iter);
-    n = reinterpret_cast<Node*>(*iterator);
+    iter = iterator;
+    next(iter);
+    n = reinterpret_cast<Node*>(iterator);
     *iterator = iter;
     bdUInt numIterators = m_numIterators;
     m_numIterators = 0;
-    bdBool result = remove(&n->m_key);
+    bdBool result = remove(n->m_key);
     m_numIterators = numIterators;
     return result;
 }
@@ -253,7 +253,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::resize(const bdUInt newSize
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType* key, const dataType* value)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType& key, const dataType& value)
 {
     Iterator iterator = getIterator(key);
     if (!iterator)
@@ -266,7 +266,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType* key, c
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType* key, const dataType* value)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType& key, const dataType& value)
 {
     Node* n;
     bdUInt i;
@@ -289,7 +289,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType* key, c
         i = getHashIndex(hash);
     }
     ++m_size;
-    m_map[i] = new Node(const_cast<keyType*>(key), const_cast<dataType*>(value), m_map[i]);
+    m_map[i] = new Node(key, value, m_map[i]);
     return true;
 }
 
@@ -315,7 +315,7 @@ inline bdInt bdHashMap<keyType, dataType, hashClass>::getSize()
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::containsKey(const keyType* key)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::containsKey(const keyType& key)
 {
     Iterator iterator = getIterator(key);
     releaseIterator(iterator);

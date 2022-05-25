@@ -51,12 +51,12 @@ inline const bdUInt bdArray<T>::getSize() const
 }
 
 template<typename T>
-inline bdBool bdArray<T>::get(const bdUInt i, T* value)
+inline bdBool bdArray<T>::get(const bdUInt i, T& value)
 {
     bdBool inRange = rangeCheck(i);
     if (inRange)
     {
-        bdMemcpy(value, &m_data[i], sizeof(T));
+        bdMemcpy(value, m_data[i], sizeof(T));
     }
     return inRange;
 }
@@ -76,13 +76,13 @@ inline bdBool bdArray<T>::findFirst(const T* value, bdUInt* i) const
 }
 
 template<typename T>
-T* bdArray<T>::uninitializedCopy(const bdArray<T>* a)
+T* bdArray<T>::uninitializedCopy(const bdArray<T>& a)
 {
     T* data = NULL;
-    if (a->m_capacity)
+    if (a.getCapacity())
     {
-        data = bdAllocate<T>(a->m_capacity);
-        copyConstructArrayArray(data, a->m_data, a->m_size);
+        data = bdAllocate<T>(a.getCapacity());
+        copyConstructArrayArray(data, a.m_data, a.getSize());
     }
     return data;
 }
@@ -98,7 +98,7 @@ void bdArray<T>::clear()
 }
 
 template<typename T>
-void bdArray<T>::pushBack(const T* value)
+void bdArray<T>::pushBack(const T& value)
 {
     if (m_size == m_capacity)
     {
@@ -130,7 +130,7 @@ inline void bdArray<T>::popBack()
 }
 
 template<typename T>
-void bdArray<T>::copyConstructObjectObject(T* dest, const T* src)
+void bdArray<T>::copyConstructObjectObject(T* dest, const T& src)
 {
     dest = new(dest) T(src);
 }
@@ -145,7 +145,7 @@ void bdArray<T>::copyConstructArrayArray(T* dest, const T* src, unsigned int n)
 }
 
 template<typename T>
-inline void bdArray<T>::copyConstructArrayObject(T* dest, const T* src, bdUInt n)
+inline void bdArray<T>::copyConstructArrayObject(T* dest, const T& src, bdUInt n)
 {
     for (bdUInt i = 0; i < n; ++i)
     {
@@ -244,19 +244,19 @@ inline bdBool bdArray<T>::isEmpty()
 }
 
 template<typename T>
-inline const T* bdArray<T>::operator[](const bdUInt i) const
+inline const T& bdArray<T>::operator[](const bdUInt i) const
 {
-    return &this->m_data[i];
+    return m_data[i];
 }
 
 template<typename T>
-inline T* bdArray<T>::operator[](const bdUInt i)
+inline T& bdArray<T>::operator[](const bdUInt i)
 {
-    return &this->m_data[i];
+    return m_data[i];
 }
 
 template<typename T>
-void bdArray<T>::operator=(bdArray<T>* a)
+void bdArray<T>::operator=(const bdArray<T>& a)
 {
     bdUInt newSize;
 
@@ -264,12 +264,12 @@ void bdArray<T>::operator=(bdArray<T>* a)
     {
         return;
     }
-    newSize = a->getSize();
+    newSize = a.getSize();
     if (newSize > m_capacity)
     {
         clear();
         m_data = uninitializedCopy(a);
-        m_capacity = a->m_capacity;
+        m_capacity = a.getCapacity();
         m_size = newSize;
         return;
     }
@@ -290,7 +290,7 @@ void bdArray<T>::operator=(bdArray<T>* a)
         {
             &m_data[i] = a[i];
         }
-        copyConstructArrayArray(&m_data[m_size], &a->m_data[m_size], newSize - m_size);
+        copyConstructArrayArray(&m_data[m_size], &a.m_data[m_size], newSize - m_size);
         m_size = newSize;
     }
 }

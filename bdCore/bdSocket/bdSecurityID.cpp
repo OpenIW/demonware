@@ -1,28 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 bdSecurityID::bdSecurityID()
 {
-	bdMemset(this, 1, sizeof(bdSecurityID));
+    bdMemset(ab, 1, sizeof(ab));
 }
 
-bdSecurityID::bdSecurityID(const bdSecurityID* other)
+bdSecurityID::bdSecurityID(const bdSecurityID& other)
 {
-	*this = *other;
+   bdMemcpy(ab, other.ab, sizeof(ab));
 }
 
-bdBool bdSecurityID::operator==(const bdSecurityID* other)
+bdBool bdSecurityID::operator==(const bdSecurityID& other) const
 {
-	return bdMemcmp(this, other, sizeof(bdSecurityID)) == 0;
+    return bdMemcmp(ab, other.ab, sizeof(bdSecurityID)) == 0;
 }
 
-bdSecurityID* bdSecurityID::operator=(const bdSecurityID* other)
+bdBool bdSecurityID::operator!=(const bdSecurityID& other) const
 {
-	bdMemcpy(ab, other->ab, sizeof(ab));
-	return this;
-}
-
-bdBool bdSecurityID::operator!=(const bdSecurityID* other)
-{
-	return !(this == other);
+    return !(this->ab == other.ab);
 }

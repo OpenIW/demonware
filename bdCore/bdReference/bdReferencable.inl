@@ -2,34 +2,35 @@
 
 inline bdReferencable::~bdReferencable()
 {
-	delete this;
+    delete this;
 }
 
-inline bdReferencable* bdReferencable::operator=(bdReferencable* a)
+inline bdReferencable& bdReferencable::operator=(bdReferencable& a)
 {
-	return this;
+    return *this;
 }
 
 inline bdInt bdReferencable::releaseRef()
 {
-	return InterlockedDecrement((volatile LONG*)&this->m_refCount) - 1;
+    return InterlockedDecrement((volatile LONG*)&m_refCount) - 1;
 }
 
 inline bdInt bdReferencable::addRef()
 {
-	return InterlockedIncrement((volatile LONG*)&this->m_refCount) + 1;
+    return InterlockedIncrement((volatile LONG*)&m_refCount) + 1;
 }
 
 inline bdInt bdReferencable::getRefCount()
 {
-	return this->m_refCount;
+    return m_refCount;
 }
 
 inline bdReferencable::bdReferencable()
 {
-	this->m_refCount = 0;
+    m_refCount = 0;
 }
 
 inline void bdReferencable::operator delete(void* p)
 {
+    bdMemory::deallocate(p);
 }

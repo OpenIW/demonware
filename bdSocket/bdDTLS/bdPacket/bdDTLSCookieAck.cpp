@@ -23,32 +23,32 @@ bdDTLSCookieAck::~bdDTLSCookieAck()
     delete this;
 }
 
-bdBool bdDTLSCookieAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSCookieAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdDTLSHeader::serialize(data, size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset, m_ECCKey, sizeof(m_ECCKey));
-    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(m_secID));
+    newOffset = offset;
+    ok = bdDTLSHeader::serialize(data, size, newOffset, newOffset);
+    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, m_ECCKey, sizeof(m_ECCKey));
+    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(m_secID));
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }
 
-bdBool bdDTLSCookieAck::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSCookieAck::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdDTLSHeader::deserialize(data, size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset, m_ECCKey, sizeof(m_ECCKey));
-    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(m_secID));
+    newOffset = offset;
+    ok = bdDTLSHeader::deserialize(data, size, newOffset, newOffset);
+    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, m_ECCKey, sizeof(m_ECCKey));
+    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(m_secID));
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }
@@ -58,7 +58,7 @@ bdUByte8* bdDTLSCookieAck::getECCKey()
     return m_ECCKey;
 }
 
-void bdDTLSCookieAck::getSecID(bdSecurityID* secID)
+void bdDTLSCookieAck::getSecID(bdSecurityID& secID)
 {
-    *secID = m_secID;
+    secID = m_secID;
 }

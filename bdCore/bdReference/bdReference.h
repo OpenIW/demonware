@@ -18,8 +18,8 @@ public:
     const T* operator->() const;
     bdBool operator!() const;
     void operator=(T* p);
-    bdReference<T>* operator=(const bdReference<T>* other);
-    bdBool operator==(const bdReference<T>* other);
+    bdReference<T>& operator=(const bdReference<T>& other);
+    bdBool operator==(const bdReference<T>& other);
     T* operator*() const;
 };
 

@@ -25,7 +25,7 @@ void bdIPDiscoveryClient::operator delete(void* p)
     bdMemory::deallocate(p);
 }
 
-bdBool bdIPDiscoveryClient::init(bdSocket* socket, const bdAddr* server, bdIPDiscoveryConfig config)
+bdBool bdIPDiscoveryClient::init(bdSocket* socket, const bdAddr& server, bdIPDiscoveryConfig config)
 {
     if (m_status)
     {
@@ -35,7 +35,7 @@ bdBool bdIPDiscoveryClient::init(bdSocket* socket, const bdAddr* server, bdIPDis
     if (socket)
     {
         m_socket = socket;
-        bdMemcpy(&m_serverAddr, server, sizeof(m_serverAddr));
+        bdMemcpy(&m_serverAddr, &server, sizeof(m_serverAddr));
         m_retries = 0;
         config.sanityCheckConfig();
         m_config = config;
@@ -65,9 +65,9 @@ void bdIPDiscoveryClient::pump(bdAddr fromAddr, bdUByte8* data, bdUInt dataSize)
     if (dataSize > 0)
     {
         bdIPDiscoveryPacketReply packet;
-        if (&fromAddr == &m_serverAddr && packet.deserialize(data, dataSize, 0, &tmpUInt))
+        if (&fromAddr == &m_serverAddr && packet.deserialize(data, dataSize, 0, tmpUInt))
         {
-            bdMemcpy(&m_publicAddr, packet.getAddr(), sizeof(m_publicAddr));
+            bdMemcpy(&m_publicAddr, &packet.getAddr(), sizeof(m_publicAddr));
             m_status = BD_IP_DISC_SUCCESS;
             m_publicAddr.toString(addrBuffer, sizeof(addrBuffer));
             bdLogInfo("bdSocket/nat", "Public IP discovered: %s", addrBuffer);
@@ -128,13 +128,13 @@ bdBool bdIPDiscoveryClient::sendIPDiscoveryPacket()
     bdIPDiscoveryPacket packet;
     bdMemset(buffer, 0, sizeof(buffer));
     bdUInt len = 0;
-    if (!packet.serialize(buffer, sizeof(buffer), 0, &len))
+    if (!packet.serialize(buffer, sizeof(buffer), 0, len))
     {
         bdLogError("bdSocket/nat", "Failed to serialize IP Discovery packet.");
         m_status = BD_IP_DISC_ERROR;
         return false;
     }
-    sendResult = m_socket->sendTo(&m_serverAddr, buffer, len);
+    sendResult = m_socket->sendTo(m_serverAddr, buffer, len);
     if (sendResult <= 0 || sendResult != len)
     {
         bdLogError("bdSocket/nat", "Failed to send IP discovery packet.");

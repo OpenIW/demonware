@@ -6,17 +6,17 @@ class bdInAddr
 public:
     bdInAddr();
     bdInAddr(const bdNChar8* addr);
-    void fromString(const char* addr);
-    const bdUInt toString(char* str, unsigned int size) const;
+    void fromString(const bdNChar8* addr);
+    const bdUInt toString(bdNChar8* str, unsigned int size) const;
     union
     {
         struct
         {
-            char m_b1;
-            char m_b2;
-            char m_b3;
-            char m_b4;
+            bdUByte8 m_b1;
+            bdUByte8 m_b2;
+            bdUByte8 m_b3;
+            bdUByte8 m_b4;
         } m_caddr;
-        unsigned int m_iaddr;
+        bdUInt m_iaddr;
     } inUn;
 };

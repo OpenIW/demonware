@@ -8,7 +8,7 @@ public:
 
     virtual ~bdRunnable();
     virtual void stop();
-    virtual bdUInt run(void* args) { return 0; };
+    virtual bdUInt run(void* args);
     bdRunnable();
     void start();
 };

@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
+
+void bdHash::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdHash::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
 
 bdHash::bdHash()
 {
@@ -16,9 +27,4 @@ bdHash::bdHash(bdHashAlgorithms type, bdUInt digestSize)
 bdHash::~bdHash()
 {
     delete this;
-}
-
-void bdHash::operator delete(void* p)
-{
-    bdMemory::deallocate(p);
 }

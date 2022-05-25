@@ -4,11 +4,10 @@
 class bdSecurityID
 {
 public:
-	bdUByte8 ab[8];
+    bdUByte8 ab[8];
 
-	bdSecurityID();
-	bdSecurityID(const bdSecurityID* other);
-	bdBool operator==(const bdSecurityID* other);
-	bdSecurityID* operator=(const bdSecurityID* other);
-	bdBool operator!=(const bdSecurityID* other);
+    bdSecurityID();
+    bdSecurityID(const bdSecurityID& other);
+    bdBool operator==(const bdSecurityID& other) const;
+    bdBool operator!=(const bdSecurityID& other) const;
 };

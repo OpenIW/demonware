@@ -30,10 +30,10 @@ private:
     static bdInt64 m_totalBytesRecvd;
     static bdInt64 m_totalPacketsRecvd;
 public:
-    static SOCKET create(bool blocking, bool broadcast);
-    static bdSocketStatusCode bind(int* handle, class bdInAddr addr, unsigned short port);
-    static bdInt sendTo(SOCKET handle, class bdInAddr addr, unsigned short port, const void* data, unsigned int len);
-    static bdInt receiveFrom(SOCKET handle, class bdInAddr* addr, unsigned short* port, void* data, unsigned int len);
-    static bdBool close(int* handle);
-    static bdUInt getHostByName(const char* name, class bdInAddr* addresses, int numAddresses);
+    static bdInt create(bdBool blocking, bdBool broadcast);
+    static bdSocketStatusCode bind(bdInt& handle, class bdInAddr addr, bdUInt16 port);
+    static bdInt sendTo(bdInt handle, class bdInAddr addr, bdUInt16 port, const void* data, bdUInt len);
+    static bdInt receiveFrom(bdInt handle, class bdInAddr& addr, bdUInt16& port, void* data, bdUInt len);
+    static bdBool close(bdInt& handle);
+    static bdUInt getHostByName(const char* name, class bdInAddr* addresses, bdInt numAddresses);
 };

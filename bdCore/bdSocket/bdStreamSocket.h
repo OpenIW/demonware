@@ -10,10 +10,10 @@ public:
     ~bdStreamSocket();
     bdBool create(bdBool blocking);
     bdSocketStatusCode bind(const bdPort port);
-    bdSocketStatusCode bind(bdAddr* addr);
-    bdSocketStatusCode connect(bdAddr* addr);
+    bdSocketStatusCode bind(bdAddr addr);
+    bdSocketStatusCode connect(bdAddr addr);
     bdBool isConnected();
-    bdBool isWritable(bdSocketStatusCode* error);
+    bdBool isWritable(bdSocketStatusCode& error);
     bdInt send(const void* data, const bdUInt length);
     bdInt recv(void* data, const bdUInt size);
     void close();

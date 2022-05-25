@@ -18,8 +18,8 @@ protected:
     bdNATTypeDiscoveryPacketRequest m_request;
 public:
     bdNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacketRequest request);
-    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     bdUByte8 getType();
     bdNATTypeDiscoveryPacketRequest getRequest();
     bdUInt16 getProtocolVersion();

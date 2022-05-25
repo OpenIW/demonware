@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 LARGE_INTEGER bdPlatformTiming::getHiResTimeStamp()
@@ -9,7 +10,7 @@ LARGE_INTEGER bdPlatformTiming::getHiResTimeStamp()
     return time;
 }
 
-float bdPlatformTiming::getElapsedTime(bdUInt64 time1, bdUInt64 time2)
+bdFloat32 bdPlatformTiming::getElapsedTime(bdUInt64 time1, bdUInt64 time2)
 {
     LARGE_INTEGER frequency;
 
@@ -17,12 +18,12 @@ float bdPlatformTiming::getElapsedTime(bdUInt64 time1, bdUInt64 time2)
     return (time2 - time1) / frequency.QuadPart;
 }
 
-void bdPlatformTiming::sleep(unsigned int timeInMs)
+void bdPlatformTiming::sleep(bdUInt timeInMs)
 {
     Sleep(timeInMs);
 }
 
-unsigned int bdPlatformTiming::getLoResElapsedTime(unsigned int time1, unsigned int time2)
+bdUInt bdPlatformTiming::getLoResElapsedTime(bdUInt time1, bdUInt time2)
 {
     if ( time2 < time1 )
     {

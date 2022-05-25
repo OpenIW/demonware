@@ -26,14 +26,14 @@ protected:
 public:
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
-    bdBool operator==(bdCommonAddr* other);
-    bdBool operator!=(bdCommonAddr* other);
-    bdBool operator<(bdCommonAddr* other);
+    bdBool operator==(bdCommonAddr& other);
+    bdBool operator!=(bdCommonAddr& other);
+    bdBool operator<(bdCommonAddr& other);
 
     bdCommonAddr();
-    bdCommonAddr(const bdAddr* publicAddr);
-    bdCommonAddr(const bdArray<bdAddr>* localAddrs, const bdAddr* publicAddr, const bdNATType natType);
-    bdCommonAddr(bdCommonAddrRef me, const bdArray<bdAddr>* localAddrs, const bdAddr* publicAddr, const bdNATType natType);
+    bdCommonAddr(const bdAddr& publicAddr);
+    bdCommonAddr(const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType);
+    bdCommonAddr(bdCommonAddrRef me, const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType);
     ~bdCommonAddr();
 
     void calculateHash();
@@ -44,9 +44,9 @@ public:
     void setNATType(const bdNATType natType);
 
     const bdUInt getHash() const;
-    const bdAddr* getLocalAddrByIndex(const bdUInt index) const;
-    const bdArray<bdAddr>* getLocalAddrs() const;
+    const bdAddr& getLocalAddrByIndex(const bdUInt index) const;
+    const bdArray<bdAddr>& getLocalAddrs() const;
     const bdNATType getNATType() const;
-    const bdAddr* getPublicAddr() const;
+    const bdAddr& getPublicAddr() const;
     const bdBool isLoopback() const;
 };

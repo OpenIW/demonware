@@ -7,6 +7,6 @@ public:
     bdUByte8 ab[16];
 
     bdSecurityKey();
-    bdSecurityKey(const bdSecurityKey* other);
-    bdBool operator==(const bdSecurityKey* other);
+    bdSecurityKey(const bdSecurityKey& other);
+    bdBool operator==(const bdSecurityKey& other);
 };

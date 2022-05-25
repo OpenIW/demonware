@@ -10,7 +10,7 @@ bdSecurityKeyMap::~bdSecurityKeyMap()
 {
 }
 
-bdBool bdSecurityKeyMap::registerKey(const bdSecurityID* id, const bdSecurityKey* key)
+bdBool bdSecurityKeyMap::registerKey(const bdSecurityID& id, const bdSecurityKey& key)
 {
     bdNChar8 tmp[36];
     bdBool added;
@@ -27,7 +27,7 @@ bdBool bdSecurityKeyMap::registerKey(const bdSecurityID* id, const bdSecurityKey
     return added;
 }
 
-bdBool bdSecurityKeyMap::unregisterKey(const bdSecurityID* id)
+bdBool bdSecurityKeyMap::unregisterKey(const bdSecurityID& id)
 {
     bdBool removed;
     bdNChar8 tmp[36];
@@ -49,7 +49,7 @@ bdBool bdSecurityKeyMap::unregisterKey(const bdSecurityID* id)
     return removed;
 }
 
-bdBool bdSecurityKeyMap::get(const bdSecurityID* id, bdSecurityKey* key)
+bdBool bdSecurityKeyMap::get(const bdSecurityID& id, bdSecurityKey& key)
 {
     bdBool found;
     bdNChar8 tmp[36];
@@ -69,7 +69,7 @@ bdBool bdSecurityKeyMap::get(const bdSecurityID* id, bdSecurityKey* key)
     return found;
 }
 
-bdBool bdSecurityKeyMap::contains(const bdSecurityID* id)
+bdBool bdSecurityKeyMap::contains(const bdSecurityID& id)
 {
     bdBool found;
     bdNChar8 tmp[36];
@@ -93,7 +93,7 @@ void bdSecurityKeyMap::clear()
 
     if (m_listener)
     {
-        for (it = m_map.getIterator(); it; m_map.next(&it))
+        for (it = m_map.getIterator(); it; m_map.next(it))
         {
             m_listener->onSecurityKeyRemove(m_map.getKey(it));
         }
@@ -112,12 +112,12 @@ void bdSecurityKeyMap::unregisterListener()
     m_listener = NULL;
 }
 
-bdBool bdSecurityKeyMap::initKey(bdSecurityID* id, bdSecurityKey* key)
+bdBool bdSecurityKeyMap::initKey(bdSecurityID& id, bdSecurityKey& key)
 {
     bdNChar8 tmp[36];
 
-    bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(reinterpret_cast<byte*>(id), sizeof(bdSecurityID));
-    bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(key->ab, sizeof(key->ab));
+    bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(id.ab, sizeof(id.ab));
+    bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(key.ab, sizeof(key.ab));
     bdSecurityInfo::toString(id, tmp, sizeof(tmp));
     bdLogInfo("bdSocket/bdSecurityKeyMap", "Created bdSecurityID: %s", tmp);
     bdSecurityInfo::toString(key, tmp, sizeof(tmp));

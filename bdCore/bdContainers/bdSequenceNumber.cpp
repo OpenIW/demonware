@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdCore/bdCore.h"
 
-bdSequenceNumber::bdSequenceNumber(const bdSequenceNumber* last, const bdUInt seqNumber, const bdUInt bits)
+bdSequenceNumber::bdSequenceNumber(const bdSequenceNumber& last, const bdUInt seqNumber, const bdUInt bits)
 {
     m_seqNum = -1;
     set(last, seqNumber, bits);
@@ -17,16 +17,16 @@ bdSequenceNumber::bdSequenceNumber()
     m_seqNum = 0;
 }
 
-bdBool bdSequenceNumber::operator!=(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator!=(const bdSequenceNumber& other)
 {
-    return (bdBool)(m_seqNum != other->m_seqNum);
+    return (bdBool)(m_seqNum != other.m_seqNum);
 }
 
-bdSequenceNumber bdSequenceNumber::operator+(const bdSequenceNumber* other)
+bdSequenceNumber bdSequenceNumber::operator+(const bdSequenceNumber& other)
 {
     bdSequenceNumber seqNum(m_seqNum);
 
-    seqNum.m_seqNum += other->m_seqNum;
+    seqNum.m_seqNum += other.m_seqNum;
     return seqNum;
 }
 
@@ -36,43 +36,43 @@ bdSequenceNumber* bdSequenceNumber::operator++()
     return this;
 }
 
-bdSequenceNumber* bdSequenceNumber::operator+=(const bdSequenceNumber* other)
+bdSequenceNumber* bdSequenceNumber::operator+=(const bdSequenceNumber& other)
 {
-    m_seqNum += other->m_seqNum;
+    m_seqNum += other.m_seqNum;
     return this;
 }
 
-bdSequenceNumber bdSequenceNumber::operator-(const bdSequenceNumber* other)
+bdSequenceNumber bdSequenceNumber::operator-(const bdSequenceNumber& other) const
 {
     bdSequenceNumber seqNum(m_seqNum);
 
-    seqNum.m_seqNum -= other->m_seqNum;
+    seqNum.m_seqNum -= other.m_seqNum;
     return seqNum;
 }
 
-bdBool bdSequenceNumber::operator<(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator<(const bdSequenceNumber& other) const
 {
-    return (bdBool)(this->m_seqNum < other->m_seqNum);
+    return m_seqNum < other.m_seqNum;
 }
 
-bdBool bdSequenceNumber::operator<=(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator<=(const bdSequenceNumber& other) const
 {
-    return (bdBool)(this->m_seqNum <= other->m_seqNum);
+    return m_seqNum <= other.m_seqNum;
 }
 
-bdBool bdSequenceNumber::operator==(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator==(const bdSequenceNumber& other) const
 {
-    return (bdBool)(this->m_seqNum == other->m_seqNum);
+    return m_seqNum == other.m_seqNum;
 }
 
-bdBool bdSequenceNumber::operator>(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator>(const bdSequenceNumber& other) const
 {
-    return (bdBool)(other->m_seqNum < this->m_seqNum);
+    return other.m_seqNum < m_seqNum;
 }
 
-bdBool bdSequenceNumber::operator>=(const bdSequenceNumber* other)
+bdBool bdSequenceNumber::operator>=(const bdSequenceNumber& other) const
 {
-    return (bdBool)(other->m_seqNum <= this->m_seqNum);
+    return other.m_seqNum <= m_seqNum;
 }
 
 bdInt32 bdSequenceNumber::getValue()
@@ -80,7 +80,7 @@ bdInt32 bdSequenceNumber::getValue()
     return m_seqNum;
 }
 
-void bdSequenceNumber::set(const bdSequenceNumber* last, const bdUInt seqNumber, const bdUInt bits)
+void bdSequenceNumber::set(const bdSequenceNumber& last, const bdUInt seqNumber, const bdUInt bits)
 {
     bdBool lastLess, lastGreater;
     bdInt rangeChange;
@@ -90,15 +90,15 @@ void bdSequenceNumber::set(const bdSequenceNumber* last, const bdUInt seqNumber,
     bdInt range;
 
     range = 2 << (bits - 1);
-    lastSeq = last->m_seqNum % range;
-    lastRangeBase = last->m_seqNum - lastSeq;
-    curSeq = static_cast<bdInt>(seqNumber) % range;
-    //bdAssertMsg(static_cast<bdInt>(seqNumber) < rang, "Sequence number given outside the range.");
+    lastSeq = last.m_seqNum % range;
+    lastRangeBase = last.m_seqNum - lastSeq;
+    curSeq = seqNumber % range;
+    bdAssert(static_cast<bdInt>(seqNumber) < range, "Sequence number given outside the range.");
     if (lastSeq >= 0)
     {
         if (lastSeq == curSeq)
         {
-            this->m_seqNum = last->m_seqNum;
+            m_seqNum = last.m_seqNum;
         }
         else
         {
@@ -121,14 +121,7 @@ void bdSequenceNumber::set(const bdSequenceNumber* last, const bdUInt seqNumber,
             rangeChange = 0;
             if (!lastLess && !lastGreater)
             {
-                bdLogMessage(
-                    BD_LOG_WARNING,
-                    "warn/",
-                    "bdCore/bdContainers/sequenceNumber",
-                    __FILE__,
-                    "set",
-                    __LINE__,
-                    "Sequence numbers are too far away and cannot be compared.");
+                bdLogWarn("bdCore/bdContainers/sequenceNumber", "Sequence numbers are too far away and cannot be compared.");
             }
             if (!lastLess || lastSeq <= curSeq)
             {
@@ -141,11 +134,11 @@ void bdSequenceNumber::set(const bdSequenceNumber* last, const bdUInt seqNumber,
                     rangeChange = 1;
                 }
             }
-            this->m_seqNum = curSeq + rangeChange * range + lastRangeBase;
+            m_seqNum = curSeq + rangeChange * range + lastRangeBase;
         }
     }
     else
     {
-        this->m_seqNum = seqNumber;
+        m_seqNum = seqNumber;
     }
 }

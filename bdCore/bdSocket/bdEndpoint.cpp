@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 bdEndpoint::bdEndpoint()
 {
 }
 
-bdEndpoint::bdEndpoint(const bdEndpoint* other)
+bdEndpoint::bdEndpoint(const bdEndpoint& other)
 {
-    m_ca = bdReference<bdCommonAddr>(other->m_ca);
-    m_secID = bdSecurityID(other->m_secID);
+    m_ca = bdCommonAddrRef(other.m_ca);
+    m_secID = bdSecurityID(other.m_secID);
 }
 
-bdEndpoint::bdEndpoint(const bdCommonAddrRef addr, const bdSecurityID* secID)
+bdEndpoint::bdEndpoint(const bdCommonAddrRef addr, const bdSecurityID& secID)
 {
-    m_ca = bdReference<bdCommonAddr>(addr.m_ptr);
+    m_ca = bdCommonAddrRef(*addr);
     m_secID = bdSecurityID(secID);
 }
 
@@ -21,17 +22,17 @@ bdEndpoint::~bdEndpoint()
 {
 }
 
-bdBool bdEndpoint::operator==(bdEndpoint* other)
+bdBool bdEndpoint::operator==(const bdEndpoint& other) const
 {
-    if (m_ca.notNull() && other->m_ca.notNull())
+    if (m_ca.notNull() && other.m_ca.notNull())
     {
-        if (m_ca->getHash() == other->m_ca->getHash())
+        if (m_ca->getHash() == other.m_ca->getHash())
         {
-            return m_secID == &other->m_secID;
+            return m_secID == other.m_secID;
         }
         return false;
     }
-    else if (m_ca.isNull() && other->m_ca.isNull())
+    else if (m_ca.isNull() && other.m_ca.isNull())
     {
         return true;
     }
@@ -40,12 +41,12 @@ bdBool bdEndpoint::operator==(bdEndpoint* other)
 
 bdCommonAddrRef bdEndpoint::getCommonAddr() const
 {
-    return bdCommonAddrRef(&m_ca);
+    return bdCommonAddrRef(m_ca);
 }
 
-const bdSecurityID* bdEndpoint::getSecID() const
+const bdSecurityID& bdEndpoint::getSecID() const
 {
-    return &m_secID;
+    return m_secID;
 }
 
 const bdUInt bdEndpoint::getHash() const
@@ -66,50 +67,47 @@ bdUInt bdEndpoint::getSerializedLength() const
     return BD_ENDPOINT_SERIALIZED_SIZE;
 }
 
-bdBool bdEndpoint::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdEndpoint::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
-    *newOffset = offset;
+    newOffset = offset;
     bdAssert(offset <= size, "Offset is past the end of the destination buffer.");
     if (getSerializedLength() > size - offset)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
-    m_ca->serialize((bdUByte8*)data + *newOffset);
-    *newOffset += (sizeof(bdCommonAddr) + 1);
-    bdMemcpy((bdUByte8*)data + *newOffset, &m_secID, sizeof(m_secID));
-    *newOffset += sizeof(m_secID);
+    m_ca->serialize((bdUByte8*)data + newOffset);
+    newOffset += (sizeof(bdCommonAddr) + 1);
+    bdMemcpy((bdUByte8*)data + newOffset, m_secID.ab, sizeof(m_secID.ab));
+    newOffset += sizeof(m_secID.ab);
     return true;
 }
 
-bdBool bdEndpoint::deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdEndpoint::deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
-    bdCommonAddr* p;
+    newOffset = offset;
 
-    *newOffset = offset;
-
-    if (*newOffset + (sizeof(bdCommonAddr) + 1) > size)
+    if (newOffset + (sizeof(bdCommonAddr) + 1) > size)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
     if (m_ca.isNull())
     {
-        p = new bdCommonAddr();
-        m_ca = p;
+        m_ca = new bdCommonAddr();
     }
-    m_ca->deserialize(me.m_ptr, (const bdUByte8*)data + *newOffset);
-    *newOffset += (sizeof(bdCommonAddr) + 1);
-    if (*newOffset + sizeof(bdSecurityID) > size)
+    m_ca->deserialize(*me, (const bdUByte8*)data + newOffset);
+    newOffset += (sizeof(bdCommonAddr) + 1);
+    if (newOffset + sizeof(bdSecurityID) > size)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
-    bdMemcpy(&m_secID, (bdUByte8*)data + *newOffset, sizeof(m_secID));
+    bdMemcpy(m_secID.ab, (bdUByte8*)data + newOffset, sizeof(m_secID.ab));
     return true;
 }
 
-bdUInt bdEndpointHashingClass::getHash(const bdEndpoint* other)
+bdUInt bdEndpointHashingClass::getHash(const bdEndpoint& other)
 {
-    return other->getHash();
+    return other.getHash();
 }

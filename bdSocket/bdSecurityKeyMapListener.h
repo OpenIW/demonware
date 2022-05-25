@@ -5,5 +5,5 @@ class bdSecurityKeyMapListener
 {
 public:
     virtual ~bdSecurityKeyMapListener() {};
-    virtual void onSecurityKeyRemove(const bdSecurityID* secID) {};
+    virtual void onSecurityKeyRemove(const bdSecurityID& secID) {};
 };

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 bdCustomAssertHandler g_CustomAssertHandler;
@@ -24,15 +25,15 @@ void bdHandleAssert(const bdBool expr, const bdNChar8* const exprString, const b
         bdMemset(message, 0, sizeof(message));
         if (bdVsnprintf(message, sizeof(message), format, &args) >= sizeof(message))
         {
-            //bdLogWarn("Assert Message truncated");
+            bdLogWarn("bdPlatformError", "Assert Message truncated");
         }
         if (exprString)
         {
-            bdLogMessage(BD_LOG_ERROR, "err/", 0LL, file, function, line, "BD_ASSERT(%s) failed. \"%s\"", exprString, message);
+            bdLogError(NULL, "BD_ASSERT(%s) failed. \"%s\"", exprString, message);
         }
         else
         {
-            bdLogMessage(BD_LOG_ERROR, "err/", 0LL, file, function, line, "BD_ASSERT failed. \"%s\"", message);
+            bdLogError(NULL, "BD_ASSERT failed. \"%s\"", message);
         }
     }
 }

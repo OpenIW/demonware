@@ -4,12 +4,12 @@
 class bdBitOperations
 {
 public:
-	static unsigned int nextPowerOf2(const unsigned int v);
-	static unsigned int highBitNumber(unsigned int v);
+    static bdUInt nextPowerOf2(const bdUInt v);
+    static bdUInt highBitNumber(bdUInt v);
 
-	template<typename T>
-    static void endianSwap(const T* src, T* dest)
+    template<typename T>
+    static void endianSwap(const T& src, T& dest)
     {
-        *dest = *src;
+        dest = src;
     };
 };

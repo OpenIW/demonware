@@ -15,7 +15,7 @@ public:
     bdECCKey();
     ~bdECCKey();
     bdBool init();
-    bdBool exportKey(bdUByte8* const pubKey, bdUInt* keyLen);
+    bdBool exportKey(bdUByte8* const pubKey, bdUInt& keyLen);
     bdBool generateSharedSecret(const bdUByte8* const publicKey, const bdUInt publicKeyLen, bdUByte8* secretBuffer, const bdUInt secretBufferLen);
     bdECCKeyStatus getStatus();
 };

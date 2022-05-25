@@ -15,10 +15,10 @@ protected:
 public:
     void operator delete(void* p);
     bdDTLSError();
-    bdDTLSError(bdUInt16 vtag, bdDTLSErrorType etype, const bdSecurityID* secID);
+    bdDTLSError(bdUInt16 vtag, bdDTLSErrorType etype, const bdSecurityID& secID);
     virtual ~bdDTLSError();
-    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     bdInt getEtype();
-    void getSecID(bdSecurityID* secID);
+    void getSecID(bdSecurityID& secID);
 };

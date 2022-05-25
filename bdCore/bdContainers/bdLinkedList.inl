@@ -20,29 +20,29 @@ inline void bdLinkedList<T>::clear()
     Node* p;
     Node* next;
 
-    while (this->m_head)
+    while (m_head)
     {
         next = m_head->m_next;
-        p = this->m_head;
-        if (this->m_head)
+        p = m_head;
+        if (m_head)
         {
             delete p;
         }
-        this->m_head = next;
+        m_head = next;
     }
-    this->m_tail = NULL;
-    this->m_size = 0;
+    m_tail = NULL;
+    m_size = 0;
 }
 
 template<typename T>
-inline T* bdLinkedList<T>::forward(Position* position)
+inline T& bdLinkedList<T>::forward(Position& position)
 {
-    *position = reinterpret_cast<Node*>(*position)->m_next;
-    return &reinterpret_cast<Node*>(position)->m_data;
+    position = reinterpret_cast<Node*>(position)->m_next;
+    return reinterpret_cast<Node*>(position)->m_data;
 }
 
 template<typename T>
-inline void bdLinkedList<T>::addTail(const T* value)
+inline void bdLinkedList<T>::addTail(const T& value)
 {
     Position position;
 
@@ -51,9 +51,9 @@ inline void bdLinkedList<T>::addTail(const T* value)
 }
 
 template<typename T>
-inline T* bdLinkedList<T>::getHead()
+inline T& bdLinkedList<T>::getHead()
 {
-    return &this->m_head->m_data;
+    return this->m_head->m_data;
 }
 
 template<typename T>
@@ -75,15 +75,9 @@ inline Position bdLinkedList<T>::getTailPosition()
 }
 
 template<typename T>
-inline T* bdLinkedList<T>::getAt(const Position position)
+inline void bdLinkedList<T>::insertAfter(const Position position, const T& value)
 {
-    return reinterpret_cast<T*>(position);
-}
-
-template<typename T>
-inline void bdLinkedList<T>::insertAfter(const Position position, const T* value)
-{
-    Node* node = new Node((T*)value);
+    Node* node = new Node(value);
 
     if (position)
     {
@@ -123,11 +117,11 @@ inline const bdBool bdLinkedList<T>::isEmpty() const
 }
 
 template<typename T>
-inline void bdLinkedList<T>::removeAt(Position* position)
+inline void bdLinkedList<T>::removeAt(Position& position)
 {
     Node* node;
 
-    node = reinterpret_cast<Node*>(*position);
+    node = reinterpret_cast<Node*>(position);
     if (node)
     {
         forward(position);

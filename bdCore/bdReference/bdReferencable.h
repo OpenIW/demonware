@@ -4,15 +4,15 @@
 class bdReferencable
 {
 public:
-	volatile int m_refCount;
+    volatile int m_refCount;
 
-	~bdReferencable();
-	bdReferencable* operator=(bdReferencable* a);
-	bdInt releaseRef();
-	bdInt addRef();
-	bdInt getRefCount();
-	bdReferencable();
-	void operator delete(void* p);
+    void operator delete(void* p);
+    ~bdReferencable();
+    bdReferencable& operator=(bdReferencable& a);
+    bdInt releaseRef();
+    bdInt addRef();
+    bdInt getRefCount();
+    bdReferencable();
 };
 
 #include "bdReferencable.inl"

@@ -6,7 +6,7 @@ class bdSingletonRegistryImpl
 public:
     typedef void (*bdSingletonDestroyFunction)(void);
 protected:
-    bdFastArray<void(*)()> m_destroyFunctions;
+    bdFastArray<bdSingletonDestroyFunction> m_destroyFunctions;
     bdBool m_cleaningUp;
 public:
     bdSingletonRegistryImpl();

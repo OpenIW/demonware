@@ -45,32 +45,32 @@ protected:
     bdAddressMap* m_addrMap;
     bdFloat32 m_receiveTimeout;
 public:
-    bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, const bdAddr* addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap, bdFloat32 receiveTimeout);
+    bdDTLSAssociation(bdSocket* socket, bdSecurityKeyMap* keyMap, bdECCKey* ECCKey, const bdAddr& addr, bdAddrHandleRef addrHandle, bdCommonAddrRef localCommonAddr, bdAddressMap* addrMap, bdFloat32 receiveTimeout);
     ~bdDTLSAssociation();
     void connect();
     void pump();
     void reset();
-    bdBool verify(bdDTLSData* dataPacket);
-    bdBool calculateSharedKey(const bdUByte8* const pubKey, const bdUInt keylen, const bdSecurityID* secID);
-    bdBool checkCookieValidity(const bdAddr* peerAddr, const bdDTLSCookieEcho* cookiePacket);
-    bdInt sendTo(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID);
-    bdInt receiveFrom(bdAddr* addr, const void* data, const bdUInt size, bdAddrHandleRef* addrHandle, void* buffer, const bdUInt bufferSize);
+    bdBool verify(bdDTLSData& dataPacket);
+    bdBool calculateSharedKey(const bdUByte8* const pubKey, const bdUInt keylen, const bdSecurityID& secID);
+    bdBool checkCookieValidity(const bdAddr& peerAddr, const bdDTLSCookieEcho& cookiePacket);
+    bdInt sendTo(bdAddr& const addr, const void* data, const bdUInt length, const bdSecurityID& secID);
+    bdInt receiveFrom(bdAddr& addr, const void* data, const bdUInt size, bdAddrHandleRef& addrHandle, void* buffer, const bdUInt bufferSize);
 
-    bdInt handleInit(const bdAddr* addr, const void* data, const bdUInt size);
-    bdInt handleInitAck(const bdAddr* addr, const void* data, const bdUInt size);
-    bdInt handleCookieEcho(const bdAddr* addr, const void* data, const bdUInt size);
+    bdInt handleInit(bdAddr& const addr, const void* data, const bdUInt size);
+    bdInt handleInitAck(bdAddr& const addr, const void* data, const bdUInt size);
+    bdInt handleCookieEcho(bdAddr& const addr, const void* data, const bdUInt size);
     bdInt handleCookieAck(const void* data, const bdUInt size);
-    bdInt handleError(const bdAddr* addr, const void* data, const bdUInt size);
-    bdInt handleData(bdAddr* addr, const bdUByte8* data, const bdUInt size, bdAddrHandleRef* addrHandle, bdUByte8* buffer, const bdUInt bufferSize);
+    bdInt handleError(bdAddr& const addr, const void* data, const bdUInt size);
+    bdInt handleData(bdAddr& addr, const bdUByte8* data, const bdUInt size, bdAddrHandleRef& addrHandle, bdUByte8* buffer, const bdUInt bufferSize);
 
     void sendInit();
-    void sendInitAck(const bdAddr* addr, const bdDTLSInit* init);
-    void sendCookieEcho(const bdAddr* addr);
-    void sendCookieAck(const bdAddr* addr, const bdDTLSCookieEcho* cookie);
-    void sendError(const bdAddr* addr, const bdSecurityID* secID, const bdDTLSError::bdDTLSErrorType* type);
-    bdInt sendData(const bdAddr* addr, const void* data, const bdUInt length, const bdSecurityID* secID);
+    void sendInitAck(bdAddr& const addr, const bdDTLSInit& init);
+    void sendCookieEcho(bdAddr& const addr);
+    void sendCookieAck(bdAddr& const addr, const bdDTLSCookieEcho& cookie);
+    void sendError(bdAddr& const addr, const bdSecurityID& secID, const bdDTLSError::bdDTLSErrorType& type);
+    bdInt sendData(bdAddr& const addr, const void* data, const bdUInt length, const bdSecurityID& secID);
 
     const bdInt getStatus() const;
     const bdAddrHandleRef getAddrHandle() const;
-    const bdSecurityID* getLocalSecurityId() const;
+    const bdSecurityID& getLocalSecurityId() const;
 };

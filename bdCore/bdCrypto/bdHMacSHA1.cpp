@@ -55,24 +55,24 @@ bdBool bdHMacSHA1::process(const bdUByte8* const data, const bdUInt length)
     return false;
 }
 
-bdBool bdHMacSHA1::getData(bdUByte8* dst, bdUInt* length)
+bdBool bdHMacSHA1::getData(bdUByte8* dst, bdUInt& length)
 {
     bdULong tmpLength;
     bdInt status;
 
-    if (*length > 20)
+    if (length > 20)
     {
         bdLogError("bdHMacSHA1", "Hmac result buffer of invalid size.");
         return false;
     }
 
-    tmpLength = *length;
+    tmpLength = length;
     status = hmac_done(&m_state, dst, &tmpLength);
     if (status)
     {
         bdLogError("bdHMacSHA1", "Error getting HMAC-SHA1 data: [%s]", error_to_string(status));
         return false;
     }
-    *length = tmpLength;
+    length = tmpLength;
     return true;
 }

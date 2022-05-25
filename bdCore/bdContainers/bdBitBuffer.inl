@@ -4,12 +4,12 @@ inline bdBitBuffer::bdBitBuffer(const bdUInt capacityBits, const bdBool typeChec
 {
     bdUByte8 byte;
 
-    this->m_writePosition = 0;
-    this->m_maxWritePosition = 0;
-    this->m_readPosition = 0;
-    this->m_failedRead = 0;
-    this->m_typeChecked = typeChecked;
-    if (this->m_typeChecked)
+    m_writePosition = 0;
+    m_maxWritePosition = 0;
+    m_readPosition = 0;
+    m_failedRead = 0;
+    m_typeChecked = typeChecked;
+    if (m_typeChecked)
     {
         byte = -1;
         writeBits(&byte, 1u);
@@ -27,24 +27,24 @@ inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, cons
 {
     bdUByte8 byte;
 
-    this->m_writePosition = 0;
-    this->m_maxWritePosition = 0;
-    this->m_readPosition = 0;
-    this->m_failedRead = 0;
-    this->m_typeChecked = 0;
+    m_writePosition = 0;
+    m_maxWritePosition = 0;
+    m_readPosition = 0;
+    m_failedRead = 0;
+    m_typeChecked = 0;
     if (dataHasTypeCheckedBit && numBits)
     {
         m_data.pushBack((bdUByte8*)bits, ((numBits & 7) != 0) + (numBits >> 3));
-        this->m_writePosition = numBits;
-        this->m_maxWritePosition = numBits;
-        readBits(&this->m_typeChecked, 1u);
+        m_writePosition = numBits;
+        m_maxWritePosition = numBits;
+        readBits(&m_typeChecked, 1u);
     }
     else
     {
         byte = 0;
         writeBits(&byte, 1u);
         writeBits(bits, numBits);
-        this->m_readPosition = 1;
+        m_readPosition = 1;
     }
 }
 
@@ -79,7 +79,7 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
     if (!m_data.rangeCheck(lastByteIndex))
     {
         bdUByte8 value = 0;
-        m_data.setGrow(lastByteIndex, &value);
+        m_data.setGrow(lastByteIndex, value);
     }
     bitsToWrite = numBits;
     while (bitsToWrite)
@@ -91,7 +91,7 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
         }
         mask = (255 >> (8 - upShift)) | (255 << (upShift + bitsToWrite));
         nextDestByteIndex = m_writePosition / 8;
-        maskedDest = mask & *m_data[nextDestByteIndex];
+        maskedDest = mask & m_data[nextDestByteIndex];
         currentSrcByteIndex = (numBits - bitsToWrite) / 8;
         nextSrcByte = 0;
         if ((numBits - 1) / 8 > currentSrcByteIndex)
@@ -99,7 +99,7 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
             nextSrcByte = ((bdUByte8*)bits)[currentSrcByteIndex + 1];
         }
         currentSrcByte = ((bdUByte8*)bits)[((numBits - bitsToWrite) / 8)];
-        *m_data[nextDestByteIndex] = ~mask & ((bdUByte8)((nextSrcByte << (8 - ((numBits - bitsToWrite) & 7))) | ((bdInt)currentSrcByte >> ((numBits - bitsToWrite) & 7))) << upShift) | maskedDest;
+        m_data[nextDestByteIndex] = ~mask & ((bdUByte8)((nextSrcByte << (8 - ((numBits - bitsToWrite) & 7))) | ((bdInt)currentSrcByte >> ((numBits - bitsToWrite) & 7))) << upShift) | maskedDest;
         m_writePosition += bitsToWrite;
         bitsToWrite -= bitsToWrite;
         if (m_maxWritePosition <= m_writePosition)
@@ -135,7 +135,7 @@ inline void bdBitBuffer::writeUInt32(const bdUInt32 u)
     bdUInt nu;
 
     writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
-    bdBitOperations::endianSwap<bdUInt>(&u, &nu);
+    bdBitOperations::endianSwap<bdUInt>(u, nu);
     writeBits(&nu, 32u);
 }
 
@@ -144,7 +144,7 @@ inline void bdBitBuffer::writeInt32(const bdInt32 i)
     bdInt ni;
 
     writeDataType(BD_BB_SIGNED_INTEGER32_TYPE);
-    bdBitOperations::endianSwap<bdInt32>(&i, &ni);
+    bdBitOperations::endianSwap<bdInt32>(i, ni);
     writeBits(&ni, 32u);
 }
 
@@ -153,7 +153,7 @@ inline void bdBitBuffer::writeFloat32(const bdFloat32 f)
     bdFloat32 nf;
 
     writeDataType(BD_BB_FLOAT32_TYPE);
-    bdBitOperations::endianSwap<bdFloat32>(&f, &nf);
+    bdBitOperations::endianSwap<bdFloat32>(f, nf);
     writeBits(&nf, 32);
 }
 
@@ -163,7 +163,7 @@ inline void bdBitBuffer::writeRangedUInt32(const bdUInt u, const bdUInt begin, c
     bdUInt newEnd;
     bdUInt norm, newNorm;
 
-    //bdAssertMsg(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
+    bdAssert(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
     if (typeChecked)
     {
         writeDataType(BD_BB_RANGED_UNSIGNED_INTEGER32_TYPE);
@@ -194,7 +194,7 @@ inline void bdBitBuffer::writeRangedUInt32(const bdUInt u, const bdUInt begin, c
         newEnd = end;
     }
     norm = newEnd - begin;
-    bdBitOperations::endianSwap<bdUInt>(&norm, &newNorm);
+    bdBitOperations::endianSwap<bdUInt>(norm, newNorm);
     writeBits(&newNorm, rangeBits);
 }
 
@@ -213,7 +213,7 @@ inline void bdBitBuffer::writeRangedInt32(const bdInt i, const bdInt begin, cons
     bdInt norm, newNorm;
 
     writeDataType(BD_BB_RANGED_SIGNED_INTEGER32_TYPE);
-    if (this->m_typeChecked)
+    if (m_typeChecked)
     {
         writeInt32(begin);
         writeInt32(end);
@@ -239,7 +239,7 @@ inline void bdBitBuffer::writeRangedInt32(const bdInt i, const bdInt begin, cons
         newEnd = end;
     }
     norm = newEnd - begin;
-    bdBitOperations::endianSwap<bdInt>(&norm, &newNorm);
+    bdBitOperations::endianSwap<bdInt>(norm, newNorm);
     writeBits(&newNorm, rangeBits);
 }
 
@@ -253,8 +253,10 @@ inline void bdBitBuffer::writeRangedFloat32(const bdFloat32 f, const bdFloat32 b
     bdUInt i;
     bdUInt ni;
 
+    bdAssert(end >= begin, "bdBitBuffer::writeRangedFloat32, end of range is less then the begining.");
+    bdAssert(precision > 0.0, "bdBitBuffer::writeRangedFloat32, precision must be positive.");
     writeDataType(BD_BB_RANGED_FLOAT32_TYPE);
-    if (this->m_typeChecked)
+    if (m_typeChecked)
     {
         writeFloat32(begin);
         writeFloat32(end);
@@ -272,14 +274,7 @@ inline void bdBitBuffer::writeRangedFloat32(const bdFloat32 f, const bdFloat32 b
     range = (end - begin) / newPrecision;
     if (range > 4294967300.0f)
     {
-        bdLogMessage(
-            BD_LOG_WARNING,
-            "warn/",
-            "bdCore/bitBuffer",
-            __FILE__,
-            __FUNCTION__,
-            __LINE__,
-            "The numerical space defined by range/precision combination is too large. No compression performed.");
+        bdLogWarn("bdCore/bitBuffer", "The numerical space defined by range/precision combination is too large. No compression performed.");
         writeFloat32(f);
         return;
     }
@@ -309,7 +304,7 @@ inline void bdBitBuffer::writeRangedFloat32(const bdFloat32 f, const bdFloat32 b
         newVal = (end - begin) / newPrecision;
     }
     i = newVal;
-    bdBitOperations::endianSwap<bdUInt>(&i, &ni);
+    bdBitOperations::endianSwap<bdUInt>(i, ni);
     writeBits(&ni, rangeBits);
 }
 
@@ -342,8 +337,8 @@ inline bdBool bdBitBuffer::readBits(void* bits, bdUInt numBits)
         {
             numBits = 8;
         }
-        byte0 = *m_data[++nextByteIndex];
-        downShift = this->m_readPosition & 7;
+        byte0 = m_data[++nextByteIndex];
+        downShift = m_readPosition & 7;
         if (numBits + downShift <= 8)
         {
             dest = reinterpret_cast<bdUByte8*>(bits);
@@ -354,21 +349,21 @@ inline bdBool bdBitBuffer::readBits(void* bits, bdUInt numBits)
         {
             if (!m_data.rangeCheck(nextByteIndex))
             {
-                this->m_failedRead = 1;
+                m_failedRead = 1;
                 return false;
             }
-            value = (255 >> (8 - numBits)) & ((*m_data[nextByteIndex] << (8 - downShift)) | (byte0 >> downShift));
+            value = (255 >> (8 - numBits)) & ((m_data[nextByteIndex] << (8 - downShift)) | (byte0 >> downShift));
             dest = reinterpret_cast<bdUByte8*>(bits);
             bits = (char*)bits + 1;
             *dest = value;
         }
-        this->m_readPosition += numBits;
+        m_readPosition += numBits;
         numBits -= numBits;
     }
     return true;
 }
 
-inline bdBool bdBitBuffer::readUInt32(bdUInt* u)
+inline bdBool bdBitBuffer::readUInt32(bdUInt& u)
 {
     bdBool ok = false;
     bdUInt nu;
@@ -379,12 +374,12 @@ inline bdBool bdBitBuffer::readUInt32(bdUInt* u)
     }
     if (ok)
     {
-        bdBitOperations::endianSwap<bdUInt>(&nu, u);
+        bdBitOperations::endianSwap<bdUInt>(nu, u);
     }
     return ok;
 }
 
-inline bdBool bdBitBuffer::readInt32(bdInt32* i)
+inline bdBool bdBitBuffer::readInt32(bdInt32& i)
 {
     bdBool ok = false;
     bdInt32 ni;
@@ -395,12 +390,12 @@ inline bdBool bdBitBuffer::readInt32(bdInt32* i)
     }
     if (ok)
     {
-        bdBitOperations::endianSwap<bdInt32>(&ni, i);
+        bdBitOperations::endianSwap<bdInt32>(ni, i);
     }
     return ok;
 }
 
-inline bdBool bdBitBuffer::readFloat32(bdFloat32* f)
+inline bdBool bdBitBuffer::readFloat32(bdFloat32& f)
 {
     bdBool ok = false;
     bdFloat32 nf;
@@ -411,12 +406,12 @@ inline bdBool bdBitBuffer::readFloat32(bdFloat32* f)
     }
     if (ok)
     {
-        bdBitOperations::endianSwap<bdFloat32>(&nf, f);
+        bdBitOperations::endianSwap<bdFloat32>(nf, f);
     }
     return ok;
 }
 
-inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const bdUInt end, const bdBool typeChecked)
+inline bdBool bdBitBuffer::readRangedUInt32(bdUInt& u, const bdUInt begin, const bdUInt end, const bdBool typeChecked)
 {
     bdUInt32 bufEnd;
     bdUInt32 bufBegin;
@@ -426,33 +421,26 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const
     bdUInt nu;
     bdBool ok;
 
-    //bdAssertMsg(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
+    bdAssert(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
     ok = true;
     if (typeChecked)
     {
         ok = readDataType(BD_BB_RANGED_UNSIGNED_INTEGER32_TYPE);
-        if (this->m_typeChecked)
+        if (m_typeChecked)
         {
             bufBegin = 0;
             bufEnd = 0;
             if (ok)
             {
-                ok = readUInt32(&bufBegin);
+                ok = readUInt32(bufBegin);
             }
             if (ok)
             {
-                ok = readUInt32(&bufEnd);
+                ok = readUInt32(bufEnd);
             }
             if (ok && (begin != bufBegin || end != bufEnd))
             {
-                bdLogMessage(
-                    BD_LOG_ERROR,
-                    "err/",
-                    "bdCore/bitBuffer",
-                    __FILE__,
-                    __FUNCTION__,
-                    __LINE__,
-                    "Range error. Expected: (%u,%u), read: (%u,%u)");
+                bdLogError("bdCore/bitBuffer", "Range error. Expected: (%u,%u), read: (%u,%u)", begin, end, bufBegin, bufEnd);
             }
         }
     }
@@ -471,14 +459,14 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const
         }
         if (ok)
         {
-            bdBitOperations::endianSwap<bdUInt>(&nu, u);
-            *u += begin;
-            bdAssert(*u >= begin && *u <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
-            if (*u <= end)
+            bdBitOperations::endianSwap<bdUInt>(nu, u);
+            u += begin;
+            bdAssert(u >= begin && u <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
+            if (u <= end)
             {
-                if (*u >= begin)
+                if (u >= begin)
                 {
-                    newBegin = *u;
+                    newBegin = u;
                 }
                 else
                 {
@@ -489,7 +477,7 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt* u, const bdUInt begin, const
             {
                 newBegin = end;
             }
-            *u = newBegin;
+            u = newBegin;
         }
     }
     return ok;
@@ -507,7 +495,7 @@ inline bdBool bdBitBuffer::readDataType(const bdBitBufferDataType expectedDataTy
         return ok;
     }
     dataType32 = 0;
-    ok = readRangedUInt32(&dataType32, 0, 31u, false);
+    ok = readRangedUInt32(dataType32, 0, 31u, false);
     if (ok)
     {
         ok = dataType32 == expectedDataType;
@@ -517,7 +505,7 @@ inline bdBool bdBitBuffer::readDataType(const bdBitBufferDataType expectedDataTy
     return ok;
 }
 
-inline bdBool bdBitBuffer::readRangedInt32(bdInt* i, const bdInt begin, const bdInt end)
+inline bdBool bdBitBuffer::readRangedInt32(bdInt& i, const bdInt begin, const bdInt end)
 {
     bdInt32 bufEnd;
     bdInt32 bufBegin;
@@ -536,11 +524,11 @@ inline bdBool bdBitBuffer::readRangedInt32(bdInt* i, const bdInt begin, const bd
         bufEnd = 0;
         if (ok)
         {
-            ok = readInt32(&bufBegin);
+            ok = readInt32(bufBegin);
         }
         if (ok)
         {
-            ok = readInt32(&bufEnd);
+            ok = readInt32(bufEnd);
         }
         if (ok && (begin != bufBegin || end != bufEnd))
         {
@@ -569,14 +557,14 @@ inline bdBool bdBitBuffer::readRangedInt32(bdInt* i, const bdInt begin, const bd
         }
         if (ok)
         {
-            bdBitOperations::endianSwap<bdInt>(&ni, i);
-            *i += begin;
-            //bdHandleAssert(u >= begin && u <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
-            if (*i <= end)
+            bdBitOperations::endianSwap<bdInt>(ni, i);
+            i += begin;
+            bdAssert(i >= begin && i <= end, "bdBitBuffer::readRangedUInt32, read error u is out of range.");
+            if (i <= end)
             {
-                if (*i >= begin)
+                if (i >= begin)
                 {
-                    newBegin = *i;
+                    newBegin = i;
                 }
                 else
                 {
@@ -587,13 +575,13 @@ inline bdBool bdBitBuffer::readRangedInt32(bdInt* i, const bdInt begin, const bd
             {
                 newBegin = end;
             }
-            *i = newBegin;
+            i = newBegin;
         }
     }
     return ok;
 }
 
-inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32* f, const bdFloat32 begin, const bdFloat32 end, const bdFloat32 precision)
+inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32& f, const bdFloat32 begin, const bdFloat32 end, const bdFloat32 precision)
 {
     bdUInt rangeBits;
     float range;
@@ -606,37 +594,30 @@ inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32* f, const bdFloat32 begin
     bdFloat32 bufBegin;
     bdFloat32 newBegin;
 
-    //bdAssertMsg(end >= begin, "bdBitBuffer::writeRangedFloat32, end of range is less then the begining.");
-    //bdAssertMsg(precision > 0, "bdBitBuffer::writeRangedFloat32, precision must be positive.");
+    bdAssert(end >= begin, "bdBitBuffer::writeRangedFloat32, end of range is less then the begining.");
+    bdAssert(precision > 0, "bdBitBuffer::writeRangedFloat32, precision must be positive.");
 
     ok = readDataType(BD_BB_RANGED_FLOAT32_TYPE);
-    if (this->m_typeChecked)
+    if (m_typeChecked)
     {
         bufBegin = 0.0;
         bufEnd = 0.0;
         bufPrecision = 0.0;
         if (ok)
         {
-            ok = readFloat32(&bufBegin);
+            ok = readFloat32(bufBegin);
         }
         if (ok)
         {
-            ok = readFloat32(&bufEnd);
+            ok = readFloat32(bufEnd);
         }
         if (ok)
         {
-            ok = readFloat32(&bufPrecision);
+            ok = readFloat32(bufPrecision);
         }
         if (ok && (begin != bufBegin || end != bufEnd || precision != bufPrecision))
         {
-            bdLogMessage(
-                BD_LOG_ERROR,
-                "err/",
-                "bdCore/bitBuffer",
-                __FILE__,
-                __FUNCTION__,
-                __LINE__,
-                "Range error. Expected: (%f,%f,%f), read: (%f,%f,%f)");
+            bdLogError("bdCore/bitBuffer", "Range error. Expected: (%f,%f,%f), read: (%f,%f,%f)", begin, end, precision, bufBegin, bufEnd, bufPrecision);
         }
     }
     if (ok)
@@ -662,31 +643,24 @@ inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32* f, const bdFloat32 begin
             ok = readBits(&ni, rangeBits);
             if (ok)
             {
-                bdBitOperations::endianSwap<bdUInt>(&ni, &i);
-                *f = begin + ((bdFloat32)i * newPrecision);
+                bdBitOperations::endianSwap<bdUInt>(ni, i);
+                f = begin + ((bdFloat32)i * newPrecision);
             }
         }
         else
         {
-            bdLogMessage(
-                BD_LOG_WARNING,
-                "warn/",
-                "bdCore/bitBuffer",
-                __FILE__,
-                __FUNCTION__,
-                __LINE__,
-                "The numerical space defined by range/precision combination is too large. No compression performed.");
+            bdLogWarn("bdCore/bitBuffer", "The numerical space defined by range/precision combination is too large. No compression performed.");
             ok = readFloat32(f);
         }
 
         if (ok)
         {
-            //bdAssetMsg(f >= begin && f <= end, "bdBitBuffer::readRangedFloat32, read error f is out of range.");
-            if (*f <= end)
+            bdAssert(f >= begin && f <= end, "bdBitBuffer::readRangedFloat32, read error f is out of range.");
+            if (f <= end)
             {
-                if (begin <= *f)
+                if (begin <= f)
                 {
-                    newBegin = *f;
+                    newBegin = f;
                 }
                 else
                 {
@@ -697,7 +671,7 @@ inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32* f, const bdFloat32 begin
             {
                 newBegin = end;
             }
-            *f = newBegin;
+            f = newBegin;
         }
     }
     return ok;
@@ -705,17 +679,17 @@ inline bdBool bdBitBuffer::readRangedFloat32(bdFloat32* f, const bdFloat32 begin
 
 inline void bdBitBuffer::setTypeCheck(const bdBool flag)
 {
-    this->m_typeChecked = (bdBool)(flag & 1);
+    m_typeChecked = flag;
 }
 
 inline bdBool bdBitBuffer::getTypeCheck()
 {
-    return (bdBool)(this->m_typeChecked & 1);
+    return m_typeChecked;
 }
 
 inline bdUByte8* bdBitBuffer::getData()
 {
-    return this->m_data.begin();
+    return m_data.begin();
 }
 
 inline void bdBitBuffer::typeToString(const bdBitBufferDataType type, bdNChar8* const strBuffer, const bdUWord strLength)
@@ -737,72 +711,66 @@ inline bdBitBufferDataType bdBitBuffer::readDataType()
     bdBool ok;
     bdUInt32 dataType32 = 0;
 
-    ok = readRangedUInt32(&dataType32, 0, 31u, 0);
+    ok = readRangedUInt32(dataType32, 0, 31u, 0);
     
     return static_cast<bdBitBufferDataType>(dataType32);
 
 }
 
-inline bdBool bdBitBuffer::append(bdBitBuffer* other)
+inline bdBool bdBitBuffer::append(bdBitBuffer& other)
 {
     bdUInt numBits;
     void* tempData;
     bdUInt oldReadPos;
 
-    bdBool ok = this->m_typeChecked == other->m_typeChecked;
+    bdBool ok = m_typeChecked == other.m_typeChecked;
     if (ok)
     {
-        oldReadPos = other->getReadPosition();
-        other->resetReadPosition();
-        tempData = bdMemory::allocate(other->getDataSize());
-        numBits = other->getNumBitsWritten();
+        oldReadPos = other.getReadPosition();
+        other.resetReadPosition();
+        tempData = bdMemory::allocate(other.getDataSize());
+        numBits = other.getNumBitsWritten();
         if (tempData)
         {
-            ok = other->readBits(tempData, numBits);
+            ok = other.readBits(tempData, numBits);
         }
         if (ok)
         {
-            this->writeBits(tempData, numBits);
+            writeBits(tempData, numBits);
         }
         bdMemory::deallocate(tempData);
-        other->setReadPosition(oldReadPos);
+        other.setReadPosition(oldReadPos);
     }
     else
     {
-        bdLogMessage(
-            BD_LOG_ERROR,
-            "err/",
-            "bdCore/bitBuffer",
-            __FILE__,
-            __FUNCTION__,
-            __LINE__,
-            "Attempt made to append a bdBitBuffer that %s to a bdBitBuffer that %s.");
+        bdLogError("bdCore/bitBuffer", "Attempt made to append a bdBitBuffer that %s to a bdBitBuffer that %s.",
+            (!m_typeChecked ? "is type checked" : "is not type checked"), (!other.m_typeChecked ? "is type checked" : "is not type checked"));
     }
     return ok;
 }
 
 inline void bdBitBuffer::resetReadPosition()
 {
-    this->m_readPosition = 1;
+    m_readPosition = 1;
 }
 
 inline bdUInt bdBitBuffer::getReadPosition()
 {
-    return this->m_readPosition;
+    return m_readPosition;
 }
 
 inline bdUInt bdBitBuffer::getDataSize()
 {
-    return this->m_data.getSize();
+    return m_data.getSize();
 }
 
 inline bdUInt bdBitBuffer::getNumBitsWritten()
 {
     bdUInt numBitsWritten = 0;
 
-    if (this->m_writePosition == 0)
+    if (m_writePosition == 0)
         return numBitsWritten;
-    numBitsWritten = this->m_maxWritePosition - 1;
+    numBitsWritten = m_maxWritePosition - 1;
     return numBitsWritten;
 }
 
@@ -812,5 +780,5 @@ inline void bdBitBuffer::setReadPosition(const bdUInt bitPosition)
 
     if (newBitPosition < 2)
         newBitPosition = 1;
-    this->m_readPosition = newBitPosition;
+    m_readPosition = newBitPosition;
 }

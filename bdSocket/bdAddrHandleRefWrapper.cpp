@@ -7,8 +7,8 @@ bdAddrHandleRefWrapper::bdAddrHandleRefWrapper()
 {
 }
 
-bdAddrHandleRefWrapper::bdAddrHandleRefWrapper(const bdAddrHandleRefWrapper* other)
-    : m_handle(other->m_handle)
+bdAddrHandleRefWrapper::bdAddrHandleRefWrapper(const bdAddrHandleRefWrapper& other)
+    : m_handle(other.m_handle)
 {
 }
 
@@ -21,19 +21,19 @@ bdAddrHandleRefWrapper::~bdAddrHandleRefWrapper()
 {
 }
 
-bdBool bdAddrHandleRefWrapper::operator==(const bdAddrHandleRefWrapper* other) const
+bdBool bdAddrHandleRefWrapper::operator==(const bdAddrHandleRefWrapper& other) const
 {
-    if (m_handle.notNull() && other->m_handle.notNull())
+    if (m_handle.notNull() && other.m_handle.notNull())
     {
-        return m_handle.m_ptr == other->m_handle.m_ptr;
+        return m_handle.m_ptr == other.m_handle.m_ptr;
     }
     bdLogWarn("bdSocket/bdAddrHandle", "Unexpected Null addrHandle.");
     return false;
 }
 
-bdUInt bdAddrHandleRefWrapper::getHash(const bdAddrHandleRefWrapper* addr) const
+bdUInt bdAddrHandleRefWrapper::getHash(const bdAddrHandleRefWrapper& addr) const
 {
-    return addr->m_handle->m_endpoint.getHash();
+    return addr.m_handle->m_endpoint.getHash();
 }
 
 bdAddrHandleRef bdAddrHandleRefWrapper::getHandle() const

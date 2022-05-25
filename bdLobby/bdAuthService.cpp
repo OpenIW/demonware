@@ -324,7 +324,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 {
     bdUInt errorCode;
 
-    if (!reply->readUInt32(&errorCode))
+    if (!reply->readUInt32(errorCode))
     {
         bdLogError("auth service", "Could not read error code from authentication server response.");
         return BD_NO_ERROR;
@@ -350,7 +350,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 
     case 11:
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (!reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -371,7 +371,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 
     case 13:
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (!reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -392,7 +392,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 
     case 15:
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -408,7 +408,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 
     case 17:
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (!reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -429,7 +429,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
     case 21:
         resultCount = 0;
         m_usernamesForLicenseResult.clear();
-        ok = reply->readUInt32(&resultCount);
+        ok = reply->readUInt32(resultCount);
         if (!ok)
         {
             bdLogWarn("auth service", "Failed to read result count from reply");
@@ -440,7 +440,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
         for (bdUInt i = 0; i < resultCount && ok; ++i)
         {
             ok = reply->readBits(username, sizeof(username) * CHAR_BIT);
-            m_usernamesForLicenseResult.pushBack(&username);
+            m_usernamesForLicenseResult.pushBack(username);
         }
         if (!ok)
         {
@@ -452,7 +452,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
 
     case 25:
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (!reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -476,7 +476,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
             m_cdKey[i] ^= cdkeyObfus[i];
         }
         m_cdKeyTimeToLiveSecs = 0;
-        if (!reply->readInt32(&m_cdKeyTimeToLiveSecs))
+        if (!reply->readInt32(m_cdKeyTimeToLiveSecs))
         {
             bdLogWarn("auth service", "Failed to read LSG ticket.\n");
             break;
@@ -496,7 +496,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
     case 27:
     {
         ivseed = 0;
-        reply->readUInt32(&ivseed);
+        reply->readUInt32(ivseed);
         bdCryptoUtils::calculateInitialVector(ivseed, iv);
         if (!reply->readBits(cypherText, sizeof(cypherText) * CHAR_BIT))
         {
@@ -518,7 +518,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
         bdMemset(m_cdKey, 0, sizeof(m_cdKey));
         m_RSAKey.decrypt(encCDKey, &encCDKeySize, reinterpret_cast<bdUByte8*>(m_cdKey), &outSize);
         m_cdKeyTimeToLiveSecs = 0;
-        if (!reply->readInt32(&m_cdKeyTimeToLiveSecs))
+        if (!reply->readInt32(m_cdKeyTimeToLiveSecs))
         {
             bdLogWarn("auth service", "Failed to read LSG ticket.\n");
             break;
@@ -605,7 +605,7 @@ bdBool bdAuthService::handleSteamReply(bdBitBufferRef buffer)
     bdUByte8 recvdAuthTicket[128];
 
     bdUInt ivseed;
-    bdBool ok = buffer->readUInt32(&ivseed);
+    bdBool ok = buffer->readUInt32(ivseed);
     bdCryptoUtils::calculateInitialVector(ivseed, iv);
     ok = ok == buffer->readBits(recvdAuthTicket, sizeof(recvdAuthTicket) * CHAR_BIT);
     bdCryptoUtils::decrypt(m_steamCookieKey, iv, recvdAuthTicket, recvdAuthTicket, sizeof(recvdAuthTicket));

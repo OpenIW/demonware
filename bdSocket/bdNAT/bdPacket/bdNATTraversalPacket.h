@@ -16,18 +16,18 @@ protected:
     bdAddr m_addrDest;
 public:
     bdNATTraversalPacket();
-    bdNATTraversalPacket(const bdUByte8* m_type, const bdUInt ident, const bdAddr* addrSrc, const bdAddr* addrDest);
+    bdNATTraversalPacket(const bdUByte8& m_type, const bdUInt ident, const bdAddr& addrSrc, const bdAddr& addrDest);
     ~bdNATTraversalPacket();
-    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
 
     bdUByte8 getType();
     bdUInt16 getProtocolVersion();
     bdUByte8* getHMAC();
     bdUInt getIdentifier();
     bdUInt getSize();
-    const bdAddr* getAddrSrc();
-    const bdAddr* getAddrDest();
+    const bdAddr& getAddrSrc();
+    const bdAddr& getAddrDest();
 
     void setType(bdUByte8 type);
     void setHMAC(const bdUByte8* hmac, const bdUInt size);

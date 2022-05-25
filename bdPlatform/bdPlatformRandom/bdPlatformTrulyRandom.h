@@ -10,4 +10,4 @@ public:
     void getRandomUByte8(bdUByte8* pbBuffer, bdUWord dwLen);
 };
 
-void bdGetRandomUChar8(unsigned char* in, int length);
+void bdGetRandomUChar8(bdUByte8* in, bdUInt32 length);

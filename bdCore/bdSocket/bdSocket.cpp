@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 void* bdSocket::operator new(bdUWord nbytes)
@@ -39,25 +40,25 @@ bdBool bdSocket::create(const bdBool blocking, const bdBool broadcast)
     return false;
 }
 
-bdSocketStatusCode bdSocket::bind(bdAddr* addr)
+bdSocketStatusCode bdSocket::bind(bdAddr& addr)
 {
-    return bdPlatformSocket::bind(&m_handle, addr->getAddress()->getInAddr(), addr->getPort());
+    return bdPlatformSocket::bind(&m_handle, addr.getAddress().getInAddr(), addr.getPort());
 }
 
 bdSocketStatusCode bdSocket::bind(const bdPort port)
 {
     bdInetAddr iaddr = bdInetAddr::Any();
-    bdAddr address(&iaddr, port);
+    bdAddr address(iaddr, port);
 
-    return bdSocket::bind(&address);
+    return bdSocket::bind(address);
 }
 
-bdInt bdSocket::sendTo(bdAddr* addr, const void* data, const bdUInt length)
+bdInt bdSocket::sendTo(bdAddr& addr, const void* data, const bdUInt length)
 {
-    return bdPlatformSocket::sendTo(m_handle, addr->getAddress()->getInAddr(), addr->getPort(), data, length);
+    return bdPlatformSocket::sendTo(m_handle, addr.getAddress().getInAddr(), addr.getPort(), data, length);
 }
 
-bdInt bdSocket::receiveFrom(bdAddr* addr, void* data, const bdUInt size)
+bdInt bdSocket::receiveFrom(bdAddr& addr, void* data, const bdUInt size)
 {
     bdInt status;
     bdInAddr inaddr;
@@ -68,8 +69,8 @@ bdInt bdSocket::receiveFrom(bdAddr* addr, void* data, const bdUInt size)
     {
         return status;
     }
-    bdInetAddr* address = &bdInetAddr(inaddr);
-    addr->set(address, port);
+    bdInetAddr address = bdInetAddr(inaddr);
+    addr.set(address, port);
     return status;
 }
 

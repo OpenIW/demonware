@@ -10,17 +10,17 @@ enum bdLogMessageType
     BD_LOG_ERROR = 0x2,
 };
 
-void bdLogMessage(bdLogMessageType type, const char* baseChannel, const char* channel, const char* file, const char* function, unsigned int line, const char* format, ...);
+void bdLogMessage(bdLogMessageType type, const bdNChar8* baseChannel, const bdNChar8* channel, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* format, ...);
 
 class bdLogSubscriber : public bdLinkable
 {
 public:
-    const char* m_channels[BD_MAX_CHANNELS];
+    const bdNChar8* m_channels[BD_MAX_CHANNELS];
 
     bdLogSubscriber();
-    bool addChannel(const char* channel);
-    void logMessage(bdLogMessageType type, const char* channelName, const char* file, const char* function, unsigned int line, const char* msg);
-    virtual void publish(bdLogMessageType type, const char* channelName, const char* file, const char* function, unsigned int line, const char* msg);
+    bool addChannel(const bdNChar8* channel);
+    void logMessage(bdLogMessageType type, const bdNChar8* channelName, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* msg);
+    virtual void publish(bdLogMessageType type, const bdNChar8* channelName, const bdNChar8* file, const bdNChar8* function, bdUInt line, const bdNChar8* msg);
 };
 
 #define bdLogError(channel, Msg, ...) bdLogMessage(BD_LOG_ERROR, "err/", channel, __FILE__, __FUNCTION__, __LINE__, Msg, ##__VA_ARGS__)

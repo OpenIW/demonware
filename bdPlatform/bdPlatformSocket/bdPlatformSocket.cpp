@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdPlatform/bdPlatform.h"
 
-__int64 bdPlatformSocket::m_totalBytesSent = 0;
-__int64 bdPlatformSocket::m_totalPacketsSent = 0;
-__int64 bdPlatformSocket::m_totalBytesRecvd = 0;
-__int64 bdPlatformSocket::m_totalPacketsRecvd = 0;
+bdInt64 bdPlatformSocket::m_totalBytesSent = 0;
+bdInt64 bdPlatformSocket::m_totalPacketsSent = 0;
+bdInt64 bdPlatformSocket::m_totalBytesRecvd = 0;
+bdInt64 bdPlatformSocket::m_totalPacketsRecvd = 0;
 
-SOCKET bdPlatformSocket::create(bool blocking, bool broadcast)
+bdInt bdPlatformSocket::create(bdBool blocking, bdBool broadcast)
 {
-    SOCKET sockBroadcast;
+    bdInt sockBroadcast;
     u_long nonblocking;
 
     sockBroadcast = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -28,11 +28,11 @@ SOCKET bdPlatformSocket::create(bool blocking, bool broadcast)
     return sockBroadcast;
 }
 
-bdSocketStatusCode bdPlatformSocket::bind(int* handle, bdInAddr addr, unsigned short port)
+bdSocketStatusCode bdPlatformSocket::bind(bdInt& handle, bdInAddr addr, bdUInt16 port)
 {
     sockaddr_in localAddr;
 
-    if (*handle == -1)
+    if (handle == -1)
     {
         return BD_NET_INVALID_HANDLE;
     }
@@ -41,12 +41,12 @@ bdSocketStatusCode bdPlatformSocket::bind(int* handle, bdInAddr addr, unsigned s
     localAddr.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
     localAddr.sin_port = htons(port);
 
-    if (::bind(*handle, (sockaddr*)&localAddr, sizeof(localAddr)))
+    if (::bind(handle, (sockaddr*)&localAddr, sizeof(localAddr)))
     {
         return BD_NET_SUCCESS;
     }
     bdLogMessage(BD_LOG_WARNING, "warn/", "platform/socket", __FILE__, __FUNCTION__, __LINE__, "Call to bind() failed, WSAGetLastError: %d", WSAGetLastError());
-    closesocket(*handle);
+    closesocket(handle);
     if (WSAGetLastError() == 10013 || 10047 || 10049)
     {
         return BD_NET_ADDRESS_IN_USE;
@@ -54,7 +54,7 @@ bdSocketStatusCode bdPlatformSocket::bind(int* handle, bdInAddr addr, unsigned s
     return BD_NET_ERROR;
 }
 
-bdInt bdPlatformSocket::sendTo(SOCKET handle, bdInAddr addr, unsigned short port, const void* data, unsigned int len)
+bdInt bdPlatformSocket::sendTo(bdInt handle, bdInAddr addr, bdUInt16 port, const void* data, bdUInt len)
 {
     sockaddr_in recpt;
 
@@ -62,12 +62,12 @@ bdInt bdPlatformSocket::sendTo(SOCKET handle, bdInAddr addr, unsigned short port
     {
         return BD_NET_INVALID_HANDLE;
     }
-    memset(&recpt, 0, sizeof(recpt));
+    bdMemset(&recpt, 0, sizeof(recpt));
     recpt.sin_family = 2;
     recpt.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
     recpt.sin_port = htons(port);
 
-    int bytesSent = sendto(handle, reinterpret_cast<const char*>(data), len, 0, (sockaddr*)&recpt, sizeof(recpt));
+    bdInt bytesSent = sendto(handle, reinterpret_cast<const char*>(data), len, 0, (sockaddr*)&recpt, sizeof(recpt));
     if (bytesSent < 0)
     {
         switch (WSAGetLastError())
@@ -92,7 +92,7 @@ bdInt bdPlatformSocket::sendTo(SOCKET handle, bdInAddr addr, unsigned short port
     return bytesSent;
 }
 
-bdInt bdPlatformSocket::receiveFrom(SOCKET handle, bdInAddr* addr, unsigned short* port, void* data, unsigned int len)
+bdInt bdPlatformSocket::receiveFrom(bdInt handle, bdInAddr& addr, bdUInt16& port, void* data, bdUInt len)
 {
     bdInt remoteAddrLen;
     sockaddr_in remoteAddr;
@@ -119,36 +119,36 @@ bdInt bdPlatformSocket::receiveFrom(SOCKET handle, bdInAddr* addr, unsigned shor
             return BD_NET_MSG_SIZE;
         case WSAEHOSTUNREACH:
             bdLogMessage(BD_LOG_INFO, "info/", "platform/socket", __FILE__, __FUNCTION__, __LINE__, "recv: Received connection reset : %i", BD_NET_CONNECTION_RESET);
-            *port = ntohs(remoteAddr.sin_port);
-            addr->inUn.m_iaddr = remoteAddr.sin_addr.S_un.S_addr;
+            port = ntohs(remoteAddr.sin_port);
+            addr.inUn.m_iaddr = remoteAddr.sin_addr.S_un.S_addr;
             return BD_NET_CONNECTION_RESET;
         default:
             return BD_NET_ERROR;
         }
     }
-    *port = ntohs(remoteAddr.sin_port);
-    addr->inUn.m_iaddr = remoteAddr.sin_addr.S_un.S_addr;
+    port = ntohs(remoteAddr.sin_port);
+    addr.inUn.m_iaddr = remoteAddr.sin_addr.S_un.S_addr;
     m_totalBytesRecvd += bytesRecvd + 28;
     ++m_totalPacketsRecvd;
     return bytesRecvd;
 }
 
-bdBool bdPlatformSocket::close(int* handle)
+bdBool bdPlatformSocket::close(bdInt& handle)
 {
     bool result;
 
-    result = *handle == -1;
-    if (*handle != -1)
+    result = handle == -1;
+    if (handle != -1)
     {
-        result = closesocket(*handle) == 0;
-        *handle = -1;
+        result = closesocket(handle) == 0;
+        handle = -1;
     }
     return result;
 }
 
 const char* magicCase = "255.255.255.255";
 
-bdUInt bdPlatformSocket::getHostByName(const char* name, bdInAddr* addresses, int numAddresses)
+bdUInt bdPlatformSocket::getHostByName(const char* name, bdInAddr* addresses, bdInt numAddresses)
 {
     char dst[4];
     int i;

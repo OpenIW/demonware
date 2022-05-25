@@ -13,5 +13,5 @@ public:
     void* operator new(bdUWord __needed, void* p);
     void operator delete(void* p);
     bdBool process(const bdUByte8* const data, const bdUInt length);
-    bdBool getData(bdUByte8* dst, bdUInt* length);
+    bdBool getData(bdUByte8* dst, bdUInt& length);
 };

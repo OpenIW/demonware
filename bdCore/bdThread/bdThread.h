@@ -27,5 +27,4 @@ public:
     void setThreadName(const char* name);
     static int threadProc(bdThreadArgs* args);
     bdBool start(const void* args, const bdUWord size);
-
 };

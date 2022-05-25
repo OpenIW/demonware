@@ -25,13 +25,14 @@ protected:
     bdNATTypeDiscoveryConfig m_config;
 public:
     bdNATTypeDiscoveryClient();
+    bdNATTypeDiscoveryClient(bdNATTypeDiscoveryClient& other);
     ~bdNATTypeDiscoveryClient();
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
     bdNATType getNATType();
     bdNATTypeDiscoveryClientState getStatus();
     bdBool isRunning();
-    bdBool init(bdSocket* socket, const bdAddr* serverAddr, bdNATTypeDiscoveryConfig config);
+    bdBool init(bdSocket* socket, const bdAddr& serverAddr, bdNATTypeDiscoveryConfig config);
     void pump(bdAddr fromAddr, const void* data, bdInt dataSize);
     void pumpActiveTest();
     bdBool quit();
@@ -39,6 +40,6 @@ public:
     bdBool sendForTest1();
     bdBool sendForTest2();
     bdBool sendForTest3();
-    bdBool sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, const bdAddr* serverAddr);
-    void handleResponse(const bdAddr* addr, const bdNATTypeDiscoveryPacketReply* reply);
+    bdBool sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& const serverAddr);
+    void handleResponse(const bdAddr& addr, const bdNATTypeDiscoveryPacketReply& reply);
 };

@@ -4,20 +4,20 @@
 class bdBytePacker
 {
 public:
-    static bdBool appendBuffer(bdUByte8* dest, bdUInt destSize, bdUInt offset, bdUInt* newOffset, const void* src, bdUInt writeSize);
-    static bdBool appendEncodedUInt16(bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt16 value);
-    static bdBool removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt offset, bdUInt* newOffset, void* const dest, bdUInt readSize);
-    static bdBool removeEncodedUInt16(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt16* value);
-    static bdBool skipBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt bytes);
-    static bdBool rewindBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, bdUInt bytes);
+    static bdBool appendBuffer(bdUByte8* dest, bdUInt destSize, bdUInt offset, bdUInt& newOffset, const void* src, bdUInt writeSize);
+    static bdBool appendEncodedUInt16(bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt16 value);
+    static bdBool removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt offset, bdUInt& newOffset, void* const dest, bdUInt readSize);
+    static bdBool removeEncodedUInt16(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt16& value);
+    static bdBool skipBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt bytes);
+    static bdBool rewindBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt bytes);
     template <typename varType>
-    static bdBool removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var);
+    static bdBool removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType* var);
     template <typename varType>
-    static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var);
+    static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType* var);
 };
 
 template<typename varType>
-bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, varType* var)
+bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType* var)
 {
     bdBool read;
     varType nvar;
@@ -32,7 +32,7 @@ bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize
 }
 
 template<typename varType>
-bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt* newOffset, const varType* var)
+bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType* var)
 {
     varType nvar;
 

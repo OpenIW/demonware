@@ -12,33 +12,33 @@ bdDTLSInitAck::bdDTLSInitAck()
 {
 }
 
-bdDTLSInitAck::bdDTLSInitAck(bdUInt16 vtag, bdUInt16 initTag, bdUInt16 localTag, bdUInt16 peerTag, bdUInt16 localTieTag, bdUInt16 peerTieTag, bdUInt32 timestamp, const bdAddr* peerAddr, bdSecurityID secID)
+bdDTLSInitAck::bdDTLSInitAck(bdUInt16 vtag, bdUInt16 initTag, bdUInt16 localTag, bdUInt16 peerTag, bdUInt16 localTieTag, bdUInt16 peerTieTag, bdUInt32 timestamp, const bdAddr& peerAddr, bdSecurityID secID)
     : bdDTLSHeader(BD_DTLS_INIT_ACK, vtag, 0), m_timestamp(timestamp), m_signature(0), m_initTag(initTag), m_localTag(localTag), m_peerTag(peerTag), m_localTieTag(localTieTag), m_peerTieTag(peerTieTag),
     m_peerAddr(peerAddr), m_secID(secID)
 {
 }
 
-bdDTLSInitAck::bdDTLSInitAck(const bdDTLSInitAck* other)
-    : bdDTLSHeader(static_cast<bdDTLSPacketTypes>(other->m_type), other->m_vtag, other->m_counter), m_timestamp(other->m_timestamp), m_signature(other->m_signature), m_initTag(other->m_initTag),
-    m_localTag(other->m_localTag), m_peerTag(other->m_peerTag), m_localTieTag(other->m_localTieTag), m_peerTieTag(other->m_peerTieTag), m_peerAddr(other->m_peerAddr), m_secID(other->m_secID)
+bdDTLSInitAck::bdDTLSInitAck(const bdDTLSInitAck& other)
+    : bdDTLSHeader(static_cast<bdDTLSPacketTypes>(other.m_type), other.m_vtag, other.m_counter), m_timestamp(other.m_timestamp), m_signature(other.m_signature), m_initTag(other.m_initTag),
+    m_localTag(other.m_localTag), m_peerTag(other.m_peerTag), m_localTieTag(other.m_localTieTag), m_peerTieTag(other.m_peerTieTag), m_peerAddr(other.m_peerAddr), m_secID(other.m_secID)
 {
 }
 
-bdDTLSInitAck* bdDTLSInitAck::operator=(bdDTLSInitAck* other)
+bdDTLSInitAck* bdDTLSInitAck::operator=(bdDTLSInitAck& other)
 {
-    m_type = other->m_type;
-    m_version = other->m_version;
-    m_vtag = other->m_vtag;
-    m_counter = other->m_counter;
-    m_timestamp = other->m_timestamp;
-    m_signature = other->m_signature;
-    m_initTag = other->m_initTag;
-    m_localTag = other->m_localTag;
-    m_peerTag = other->m_peerTag;
-    m_localTieTag = other->m_localTieTag;
-    m_peerTieTag = other->m_peerTieTag;
-    m_peerAddr = other->m_peerAddr;
-    m_secID = other->m_secID;
+    m_type = other.m_type;
+    m_version = other.m_version;
+    m_vtag = other.m_vtag;
+    m_counter = other.m_counter;
+    m_timestamp = other.m_timestamp;
+    m_signature = other.m_signature;
+    m_initTag = other.m_initTag;
+    m_localTag = other.m_localTag;
+    m_peerTag = other.m_peerTag;
+    m_localTieTag = other.m_localTieTag;
+    m_peerTieTag = other.m_peerTieTag;
+    m_peerAddr = other.m_peerAddr;
+    m_secID = other.m_secID;
     return this;
 }
 
@@ -47,51 +47,51 @@ bdDTLSInitAck::~bdDTLSInitAck()
     delete this;
 }
 
-bdBool bdDTLSInitAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSInitAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdDTLSHeader::serialize(data, size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_signature);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_initTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_localTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_peerTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_localTieTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_peerTieTag);
-    ok = ok == m_peerAddr.serialize(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    newOffset = offset;
+    ok = bdDTLSHeader::serialize(data, size, newOffset, newOffset);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_timestamp);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_signature);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTieTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTieTag);
+    ok = ok == m_peerAddr.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
+    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }
 
-bdBool bdDTLSInitAck::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSInitAck::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdDTLSHeader::deserialize(data, size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_signature);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_initTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_localTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_peerTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_localTieTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_peerTieTag);
-    ok = ok == m_peerAddr.deserialize(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    newOffset = offset;
+    ok = bdDTLSHeader::deserialize(data, size, newOffset, newOffset);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_timestamp);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_signature);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTieTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTieTag);
+    ok = ok == m_peerAddr.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
+    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }
 
-void bdDTLSInitAck::sign(bdHMacSHA1* hmac)
+void bdDTLSInitAck::sign(bdHMacSHA1& hmac)
 {
     bdUInt tmpAddrBufferUsedSize;
     bdUByte8 tmpAddrBuffer[sizeof(bdAddr)];
@@ -99,19 +99,19 @@ void bdDTLSInitAck::sign(bdHMacSHA1* hmac)
 
     m_signature = 0;
     sigsize = sizeof(m_signature);
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_timestamp), sizeof(m_timestamp));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_initTag), sizeof(m_initTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_localTag), sizeof(m_localTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_peerTag), sizeof(m_peerTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_localTieTag), sizeof(m_localTieTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_peerTieTag), sizeof(m_peerTieTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_timestamp), sizeof(m_timestamp));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_initTag), sizeof(m_initTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_localTag), sizeof(m_localTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_peerTag), sizeof(m_peerTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_localTieTag), sizeof(m_localTieTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_peerTieTag), sizeof(m_peerTieTag));
     tmpAddrBufferUsedSize = 0;
-    m_peerAddr.serialize(tmpAddrBuffer, sizeof(bdAddr), 0, &tmpAddrBufferUsedSize);
-    hmac->process(tmpAddrBuffer, tmpAddrBufferUsedSize);
-    hmac->getData(reinterpret_cast<bdUByte8*>(&m_signature), &sigsize);
+    m_peerAddr.serialize(tmpAddrBuffer, sizeof(bdAddr), 0, tmpAddrBufferUsedSize);
+    hmac.process(tmpAddrBuffer, tmpAddrBufferUsedSize);
+    hmac.getData(reinterpret_cast<bdUByte8*>(&m_signature), sigsize);
 }
 
-bdBool bdDTLSInitAck::verify(bdHMacSHA1* hmac)
+bdBool bdDTLSInitAck::verify(bdHMacSHA1& hmac)
 {
     bdUInt tmpAddrBufferUsedSize;
     bdUByte8 tmpAddrBuffer[sizeof(bdAddr)];
@@ -119,16 +119,16 @@ bdBool bdDTLSInitAck::verify(bdHMacSHA1* hmac)
     bdUInt sigsize;
 
     sigsize = sizeof(psign);
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_timestamp), sizeof(m_timestamp));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_initTag), sizeof(m_initTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_localTag), sizeof(m_localTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_peerTag), sizeof(m_peerTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_localTieTag), sizeof(m_localTieTag));
-    hmac->process(reinterpret_cast<bdUByte8*>(&m_peerTieTag), sizeof(m_peerTieTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_timestamp), sizeof(m_timestamp));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_initTag), sizeof(m_initTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_localTag), sizeof(m_localTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_peerTag), sizeof(m_peerTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_localTieTag), sizeof(m_localTieTag));
+    hmac.process(reinterpret_cast<bdUByte8*>(&m_peerTieTag), sizeof(m_peerTieTag));
     tmpAddrBufferUsedSize = 0;
-    m_peerAddr.serialize(tmpAddrBuffer, sizeof(bdAddr), 0, &tmpAddrBufferUsedSize);
-    hmac->process(tmpAddrBuffer, tmpAddrBufferUsedSize);
-    hmac->getData(reinterpret_cast<bdUByte8*>(&psign), &sigsize);
+    m_peerAddr.serialize(tmpAddrBuffer, sizeof(bdAddr), 0, tmpAddrBufferUsedSize);
+    hmac.process(tmpAddrBuffer, tmpAddrBufferUsedSize);
+    hmac.getData(reinterpret_cast<bdUByte8*>(&psign), sigsize);
     return m_signature == psign;
 }
 
@@ -157,9 +157,9 @@ const bdUInt16 bdDTLSInitAck::getInitTag() const
     return m_initTag;
 }
 
-const bdAddr* bdDTLSInitAck::getPeerAddr() const
+const bdAddr& bdDTLSInitAck::getPeerAddr() const
 {
-    return &m_peerAddr;
+    return m_peerAddr;
 }
 
 const bdUInt bdDTLSInitAck::getTimestamp() const
@@ -167,7 +167,7 @@ const bdUInt bdDTLSInitAck::getTimestamp() const
     return m_timestamp;
 }
 
-void bdDTLSInitAck::getSecID(bdSecurityID* secID) const
+void bdDTLSInitAck::getSecID(bdSecurityID& secID) const
 {
-    *secID = m_secID;
+    secID = m_secID;
 }

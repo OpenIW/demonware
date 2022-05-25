@@ -10,11 +10,11 @@ protected:
     bdAddr m_secAddr;
 public:
     bdNATTypeDiscoveryPacketReply();
-    bdNATTypeDiscoveryPacketReply(const bdAddr* mappedAddr, const bdAddr* secAddr, const bdUInt16 protocolVersion);
-    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    bdUByte8 getType();
-    bdUInt16 getVersion();
-    bdAddr* getMappedAddr();
-    bdAddr* getSecAddr();
+    bdNATTypeDiscoveryPacketReply(const bdAddr& mappedAddr, const bdAddr& secAddr, const bdUInt16 protocolVersion);
+    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    bdUByte8 getType() const;
+    bdUInt16 getVersion() const;
+    const bdAddr& getMappedAddr() const;
+    const bdAddr& getSecAddr() const;
 };

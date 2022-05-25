@@ -52,35 +52,35 @@ bdUInt16 bdDTLSHeader::getCounter()
     return m_counter;
 }
 
-bdBool bdDTLSHeader::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSHeader::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_version);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_vtag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_counter);
+    newOffset = offset;
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_version);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_vtag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_counter);
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 
 }
 
-bdBool bdDTLSHeader::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdDTLSHeader::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_version);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_vtag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_counter);
+    newOffset = offset;
+    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_version);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_vtag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_counter);
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }

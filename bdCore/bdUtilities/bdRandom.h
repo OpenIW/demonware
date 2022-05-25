@@ -4,10 +4,10 @@
 class bdRandom
 {
 protected:
-	unsigned int m_val;
+    bdUInt m_val;
 public:
-	bdRandom();
-	unsigned int nextUInt();
-	void nextUBytes(unsigned char* in, int length);
-	void setSeed(unsigned int seed);
+    bdRandom();
+    bdUInt nextUInt();
+    void nextUBytes(bdUByte8* in, const bdInt length);
+    void setSeed(bdUInt seed);
 };

@@ -25,13 +25,13 @@ bdAddr::bdAddr()
     m_port = 0;
 }
 
-bdAddr::bdAddr(const bdAddr* other)
+bdAddr::bdAddr(const bdAddr& other)
 {
-    m_address = bdInetAddr(other->m_address);
-    m_port = other->m_port;
+    m_address = bdInetAddr(other.m_address);
+    m_port = other.m_port;
 }
 
-bdAddr::bdAddr(const bdInetAddr* address, const bdPort port)
+bdAddr::bdAddr(const bdInetAddr& address, const bdPort port)
 {
     m_address = bdInetAddr(address);
     m_port = port;
@@ -43,13 +43,22 @@ bdAddr::bdAddr(const bdNChar8* socketAddress)
     set(socketAddress);
 }
 
-bdBool bdAddr::operator==(const bdAddr* other)
+bdBool bdAddr::operator==(const bdAddr& other) const
 {
-    if (m_port == other->m_port)
+    if (m_port == other.m_port)
     {
-        return m_address == &other->m_address;
+        return m_address == other.m_address;
     }
     return false;
+}
+
+bdBool bdAddr::operator!=(const bdAddr& other) const
+{
+    if (m_port == other.m_port)
+    {
+        return m_address == other.m_address;
+    }
+    return true;
 }
 
 void bdAddr::set(const bdNChar8* socketAddress)
@@ -88,11 +97,11 @@ void bdAddr::set(const bdNChar8* socketAddress)
     }
     else
     {
-        set(&bdInetAddr(socketAddress), 0);
+        set(bdInetAddr(socketAddress), 0);
     }
 }
 
-void bdAddr::set(const bdInetAddr* address, const bdPort port)
+void bdAddr::set(const bdInetAddr& address, const bdPort port)
 {
     m_address.set(address);
     m_port = port;
@@ -109,7 +118,7 @@ bdUInt bdAddr::getHash()
     bdNChar8 val[1288];
     bdUInt len;
 
-    serialize(reinterpret_cast<bdUByte8*>(val), sizeof(val), 0, &len);
+    serialize(reinterpret_cast<bdUByte8*>(val), sizeof(val), 0, len);
     for (bdUInt i = 0; i < len; ++i)
     {
         hash = val[i] ^ (0x1000193 * hash);
@@ -117,9 +126,9 @@ bdUInt bdAddr::getHash()
     return hash;
 }
 
-const bdInetAddr* bdAddr::getAddress() const
+const bdInetAddr& bdAddr::getAddress() const
 {
-    return &m_address;
+    return m_address;
 }
 
 const bdPort bdAddr::getPort() const
@@ -131,7 +140,7 @@ bdUInt bdAddr::getSerializedSize()
 {
     if (!serializedSize)
     {
-        serialize(NULL, 65535, 0, &serializedSize);
+        serialize(NULL, 65535, 0, serializedSize);
     }
     return serializedSize;
 }
@@ -144,34 +153,34 @@ const bdUWord bdAddr::toString(bdNChar8* const str, const bdUWord size) const
     return bdSnprintf(&str[strLength], (strLength <= size ? size - strLength : 0), ":%u") + strLength;
 }
 
-bdBool bdAddr::serialize(bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdAddr::serialize(bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset) const
 {
     bdBool ok;
 
-    *newOffset = offset;
-    if (m_address.serialize(data, size, *newOffset, newOffset))
+    newOffset = offset;
+    if (m_address.serialize(data, size, newOffset, newOffset))
     {
-        ok = bdBytePacker::appendBasicType<bdPort>(data, size, *newOffset, newOffset, &m_port);
+        ok = bdBytePacker::appendBasicType<bdPort>(data, size, newOffset, newOffset, &m_port);
     }
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }
 
-bdBool bdAddr::deserialize(const bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdAddr::deserialize(const bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool ok;
 
-    *newOffset = offset;
-    if (m_address.deserialize(data, size, *newOffset, newOffset))
+    newOffset = offset;
+    if (m_address.deserialize(data, size, newOffset, newOffset))
     {
-        ok = bdBytePacker::removeBasicType<bdPort>(data, size, *newOffset, newOffset, &m_port);
+        ok = bdBytePacker::removeBasicType<bdPort>(data, size, newOffset, newOffset, &m_port);
     }
     if (!ok)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return ok;
 }

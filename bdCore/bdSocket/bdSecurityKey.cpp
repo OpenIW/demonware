@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 bdSecurityKey::bdSecurityKey()
 {
-    bdMemset(this, 1, sizeof(bdSecurityKey));
+    bdMemset(ab, 1, sizeof(bdSecurityKey));
 }
 
-bdSecurityKey::bdSecurityKey(const bdSecurityKey* other)
+bdSecurityKey::bdSecurityKey(const bdSecurityKey& other)
 {
-    bdMemcpy(this, other, sizeof(bdSecurityKey));
+    bdMemcpy(ab, other.ab, sizeof(bdSecurityKey));
 }
 
-bdBool bdSecurityKey::operator==(const bdSecurityKey* other)
+bdBool bdSecurityKey::operator==(const bdSecurityKey& other)
 {
-    return bdMemcmp(this, other, sizeof(bdSecurityKey)) == 0;
+    return bdMemcmp(ab, other.ab, sizeof(bdSecurityKey)) == 0;
 }

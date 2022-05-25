@@ -18,10 +18,11 @@ protected:
     bdHashAlgorithms m_type;
     bdUInt32 m_digestSize;
 public:
+    void operator delete(void* p);
+    void* operator new(bdUWord nbytes);
     bdHash();
     bdHash(bdHashAlgorithms type, bdUInt digestSize);
     ~bdHash();
-    void operator delete(void* p);
 };
 
 class bdHashTiger192 : bdHash
@@ -32,5 +33,5 @@ public:
     void* operator new(bdUWord nbytes);
     void* operator new(bdUWord __needed, void* p);
     void operator delete(void* p);
-    bdBool hash(const bdUByte8* data, const bdUInt dataSize, bdUByte8* result, bdUInt* resultSize);
+    bdBool hash(const bdUByte8* data, const bdUInt dataSize, bdUByte8* result, bdUInt& resultSize);
 };

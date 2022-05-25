@@ -22,15 +22,15 @@ bdSocketStatusCode bdStreamSocket::bind(const bdPort port)
     return BD_NET_SUCCESS;
 }
 
-bdSocketStatusCode bdStreamSocket::bind(bdAddr* addr)
+bdSocketStatusCode bdStreamSocket::bind(bdAddr addr)
 {
     // Not used
     return BD_NET_SUCCESS;
 }
 
-bdSocketStatusCode bdStreamSocket::connect(bdAddr* addr)
+bdSocketStatusCode bdStreamSocket::connect(bdAddr addr)
 {
-    return bdPlatformStreamSocket::connect(m_handle, addr->getAddress()->getInAddr(), addr->getPort());
+    return bdPlatformStreamSocket::connect(m_handle, addr.getAddress().getInAddr(), addr.getPort());
 }
 
 bdBool bdStreamSocket::isConnected()
@@ -38,9 +38,9 @@ bdBool bdStreamSocket::isConnected()
     return bdPlatformStreamSocket::isWritable(m_handle);
 }
 
-bdBool bdStreamSocket::isWritable(bdSocketStatusCode* error)
+bdBool bdStreamSocket::isWritable(bdSocketStatusCode& error)
 {
-    *error = BD_NET_SUCCESS;
+    error = BD_NET_SUCCESS;
     return bdPlatformStreamSocket::isWritable(m_handle, error);
 }
 

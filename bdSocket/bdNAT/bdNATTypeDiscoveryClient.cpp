@@ -46,7 +46,7 @@ bdBool bdNATTypeDiscoveryClient::isRunning()
     return false;
 }
 
-bdBool bdNATTypeDiscoveryClient::init(bdSocket* socket, const bdAddr* serverAddr, bdNATTypeDiscoveryConfig config)
+bdBool bdNATTypeDiscoveryClient::init(bdSocket* socket, const bdAddr& serverAddr, bdNATTypeDiscoveryConfig config)
 {
     if (m_state)
     {
@@ -57,7 +57,7 @@ bdBool bdNATTypeDiscoveryClient::init(bdSocket* socket, const bdAddr* serverAddr
     {
         m_socket = socket;
         bdLogInfo("bdSocket/nat", "NAT discovery client initialized");
-        bdMemcpy(&m_serverAddr1, serverAddr, sizeof(bdAddr));
+        bdMemcpy(&m_serverAddr1, &serverAddr, sizeof(bdAddr));
         m_config = config;
         m_config.sanityCheckConfig();
         if (sendForTest1())
@@ -81,7 +81,7 @@ void bdNATTypeDiscoveryClient::pump(bdAddr fromAddr, const void* data, bdInt dat
 {
     if (isRunning())
     {
-        receiveReplies(bdAddr(&fromAddr), data, dataSize);
+        receiveReplies(bdAddr(fromAddr), data, dataSize);
         pumpActiveTest();
     }
     else
@@ -175,16 +175,16 @@ void bdNATTypeDiscoveryClient::receiveReplies(bdAddr fromAddr, const void* data,
     if (dataSize > 0)
     {
         bdNATTypeDiscoveryPacketReply reply;
-        if (reply.deserialize(data, dataSize, 0, &tmpUInt) && reply.getType() == 21)
+        if (reply.deserialize(data, dataSize, 0, tmpUInt) && reply.getType() == 21)
         {
-            handleResponse(&fromAddr, &reply);
+            handleResponse(fromAddr, reply);
         }
     }
 }
 
 bdBool bdNATTypeDiscoveryClient::sendForTest1()
 {
-    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_SAME_ADDR, &m_serverAddr1))
+    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_SAME_ADDR, m_serverAddr1))
     {
         bdLogInfo("bdSocket/nat", "Sent packet for NTDC test 1");
         return true;
@@ -194,7 +194,7 @@ bdBool bdNATTypeDiscoveryClient::sendForTest1()
 
 bdBool bdNATTypeDiscoveryClient::sendForTest2()
 {
-    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_DIFF_PORT_IP, &m_serverAddr1))
+    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_DIFF_PORT_IP, m_serverAddr1))
     {
         bdLogInfo("bdSocket/nat", "Sent packet for NTDC test 2");
         return true;
@@ -204,7 +204,7 @@ bdBool bdNATTypeDiscoveryClient::sendForTest2()
 
 bdBool bdNATTypeDiscoveryClient::sendForTest3()
 {
-    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_DIFF_IP, &m_serverAddr2))
+    if (sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::BD_NTDP_DIFF_IP, m_serverAddr2))
     {
         bdLogInfo("bdSocket/nat", "Sent packet for NTDC test 3");
         return true;
@@ -212,16 +212,16 @@ bdBool bdNATTypeDiscoveryClient::sendForTest3()
     return false;
 }
 
-bdBool bdNATTypeDiscoveryClient::sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, const bdAddr* serverAddr)
+bdBool bdNATTypeDiscoveryClient::sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& const serverAddr)
 {
     bdInt lenDataSent;
     bdUByte8 buffer[1288];
     bdNATTypeDiscoveryPacket packet(packetType);
     bdUInt len = 0;
 
-    if (packet.serialize(buffer, sizeof(buffer), 0, &len))
+    if (packet.serialize(buffer, sizeof(buffer), 0, len))
     {
-        lenDataSent = m_socket->sendTo(const_cast<bdAddr*>(serverAddr), buffer, len);
+        lenDataSent = m_socket->sendTo(serverAddr, buffer, len);
         if (lenDataSent <= 0)
         {
             bdLogError("bdSocket/nat", "Failed to send NTDC packet");
@@ -238,7 +238,7 @@ bdBool bdNATTypeDiscoveryClient::sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPa
     return false;
 }
 
-void bdNATTypeDiscoveryClient::handleResponse(const bdAddr* addr, const bdNATTypeDiscoveryPacketReply* reply)
+void bdNATTypeDiscoveryClient::handleResponse(const bdAddr& addr, const bdNATTypeDiscoveryPacketReply& reply)
 {
     bdBool portMatch;
     bdBool addressMatch;
@@ -248,7 +248,7 @@ void bdNATTypeDiscoveryClient::handleResponse(const bdAddr* addr, const bdNATTyp
     switch (m_state)
     {
     case BD_NTDCS_RUN_TEST_3:
-        if (&m_mappedAddr == const_cast<bdNATTypeDiscoveryPacketReply*>(reply)->getMappedAddr())
+        if (m_mappedAddr == reply.getMappedAddr())
         {
             bdLogInfo("bdSocket/nat", "Reply for test 3. Moderate NAT.");
             m_state = BD_NTDCS_FINI;
@@ -262,13 +262,13 @@ void bdNATTypeDiscoveryClient::handleResponse(const bdAddr* addr, const bdNATTyp
         }
         break;
     case BD_NTDCS_RUN_TEST_2:
-        addressMatch = const_cast<bdAddr*>(addr)->getAddress() == m_serverAddr2.getAddress();
-        portMatch = const_cast<bdAddr*>(addr)->getPort() == m_serverAddr2.getPort();
+        addressMatch = addr.getAddress() == m_serverAddr2.getAddress();
+        portMatch = addr.getPort() == m_serverAddr2.getPort();
         if (!addressMatch || portMatch)
         {
             if (!addressMatch)
             {
-                const_cast<bdAddr*>(addr)->toString(receivedAddrString, sizeof(receivedAddrString));
+                addr.toString(receivedAddrString, sizeof(receivedAddrString));
                 m_serverAddr2.toString(expectedAddrString, sizeof(expectedAddrString));
                 bdLogWarn("bdSocket/nat", "Received test 2 response from unexpected address \n received from : %s \n expected from :%s ", receivedAddrString, expectedAddrString);
             }
@@ -285,8 +285,8 @@ void bdNATTypeDiscoveryClient::handleResponse(const bdAddr* addr, const bdNATTyp
         }
         break;
     case BD_NTDCS_RUN_TEST_1:
-        bdMemcpy(&m_serverAddr2, const_cast<bdNATTypeDiscoveryPacketReply*>(reply)->getSecAddr(), sizeof(m_serverAddr2));
-        bdMemcpy(&m_mappedAddr, const_cast<bdNATTypeDiscoveryPacketReply*>(reply)->getMappedAddr(), sizeof(m_mappedAddr));
+        bdMemcpy(&m_serverAddr2, &reply.getSecAddr(), sizeof(m_serverAddr2));
+        bdMemcpy(&m_mappedAddr, &reply.getMappedAddr(), sizeof(m_mappedAddr));
         bdLogInfo("bdSocket/nat", "Reply for test 1. Start test 2.");
         if (sendForTest2())
         {

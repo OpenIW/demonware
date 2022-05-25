@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 bdUInt bdCommonAddrInfo::getInfo(bdCommonAddrRef addr, bdNChar8* buf, const bdUInt length)
@@ -10,14 +11,14 @@ bdUInt bdCommonAddrInfo::getInfo(bdCommonAddrRef addr, bdNChar8* buf, const bdUI
     return 0;
 }
 
-bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr* addr, bdNChar8* buf, const bdUInt length)
+bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr& addr, bdNChar8* buf, const bdUInt length)
 {
     bdNChar8* start;
     bdInt written;
     bdNChar8 addrString[22];
 
     bdNChar8* end = &buf[length];
-    switch (addr->getNATType())
+    switch (addr.getNATType())
     {
     case BD_NAT_STRICT:
         written = bdSnprintf(buf, end - buf, "NAT Type: %s\n", "BD_NAT_STRICT");
@@ -44,7 +45,7 @@ bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr* addr, bdNChar8* buf, const 
     {
         buf += written;
     }
-    written = bdSnprintf(buf, (end - buf), "%u Local Addrs Found: \n", addr->getLocalAddrs()->getSize());
+    written = bdSnprintf(buf, (end - buf), "%u Local Addrs Found: \n", addr.getLocalAddrs().getSize());
     if (written <= 0 || written > end - buf)
     {
         buf = end - 1;
@@ -58,9 +59,9 @@ bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr* addr, bdNChar8* buf, const 
         buf += written;
     }
 
-    for (bdUInt i = 0; i < addr->getLocalAddrs()->getSize(); ++i)
+    for (bdUInt i = 0; i < addr.getLocalAddrs().getSize(); ++i)
     {
-        addr->getLocalAddrByIndex(i)->toString(addrString, sizeof(addrString));
+        addr.getLocalAddrByIndex(i).toString(addrString, sizeof(addrString));
         written = bdSnprintf(buf, (end - buf), "Local Addr %u :  %s \n", i, addrString);
         if (written <= 0 || written > end - buf)
         {
@@ -75,7 +76,7 @@ bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr* addr, bdNChar8* buf, const 
             buf += written;
         }
     }
-    addr->getPublicAddr()->toString(addrString, sizeof(addrString));
+    addr.getPublicAddr().toString(addrString, sizeof(addrString));
     written = bdSnprintf(buf, (end - buf), "Public Addr :  %s \n", addrString);
     if (written <= 0 || written > end - buf)
     {
@@ -90,7 +91,7 @@ bdUInt bdCommonAddrInfo::getInfo(const bdCommonAddr* addr, bdNChar8* buf, const 
         buf += written;
     }
 
-    written = bdSnprintf(buf, (end - buf), "Addr is loopback : %s  -- Addr Hash : %u \n", addr->isLoopback() ? "TRUE" : "FALSE", addr->getHash());
+    written = bdSnprintf(buf, (end - buf), "Addr is loopback : %s  -- Addr Hash : %u \n", addr.isLoopback() ? "TRUE" : "FALSE", addr.getHash());
     if (written <= 0 || written > end - buf)
     {
         buf = end - 1;
@@ -115,7 +116,7 @@ bdUInt bdCommonAddrInfo::getBriefInfo(const bdCommonAddrRef addr, bdNChar8* buf,
     return 0;
 }
 
-bdUInt bdCommonAddrInfo::getBriefInfo(const bdCommonAddr* addr, bdNChar8* buf, const bdUInt length)
+bdUInt bdCommonAddrInfo::getBriefInfo(const bdCommonAddr& addr, bdNChar8* buf, const bdUInt length)
 {
     bdNChar8* start;
     bdInt written;
@@ -123,20 +124,20 @@ bdUInt bdCommonAddrInfo::getBriefInfo(const bdCommonAddr* addr, bdNChar8* buf, c
     bdNChar8 addrString[22];
 
     bdNChar8* end = &buf[length];
-    if (addr->getPublicAddr()->getAddress()->isValid())
+    if (addr.getPublicAddr().getAddress().isValid())
     {
-        addr->getPublicAddr()->toString(addrString, sizeof(addrString));
+        addr.getPublicAddr().toString(addrString, sizeof(addrString));
         written = bdSnprintf(buf, length, "Public Addr: %s\n", addrString);
     }
     else
     {
-        if (addr->getLocalAddrs()->getSize())
+        if (addr.getLocalAddrs().getSize())
         {
             start = addrsString;
-            bdAssert(addr->getLocalAddrs()->getSize() <= BD_MAX_LOCAL_ADDRS, "bdCommonAddr invalid.");
-            for (bdUInt i = 0; i < addr->getLocalAddrs()->getSize(); ++i)
+            bdAssert(addr.getLocalAddrs().getSize() <= BD_MAX_LOCAL_ADDRS, "bdCommonAddr invalid.");
+            for (bdUInt i = 0; i < addr.getLocalAddrs().getSize(); ++i)
             {
-                start += addr->getLocalAddrByIndex(i)->toString(start, 120 - (start - addrsString));
+                start += addr.getLocalAddrByIndex(i).toString(start, 120 - (start - addrsString));
                 start += bdSnprintf(start, 120 - (start - addrsString), ", ");
             }
             *(start - 2) = 0;

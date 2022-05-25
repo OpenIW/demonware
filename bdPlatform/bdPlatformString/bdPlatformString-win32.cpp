@@ -61,7 +61,7 @@ bdNChar8* bdStrlwr(bdNChar8* const s)
     return s;
 }
 
-int bdSnprintf(char* buf, unsigned int maxlen, const char* format, ...)
+bdInt bdSnprintf(bdNChar8* buf, bdUInt maxlen, const bdNChar8* format, ...)
 {
     bdInt ret;
     va_list va;
@@ -77,7 +77,7 @@ bdInt bdVsnprintf(bdNChar8* buf, const bdUWord maxlen, const bdNChar8* format, v
     return vsnprintf(buf, maxlen, format, *argPtr);
 }
 
-int bdPrintf(const char* format, ...)
+bdInt bdPrintf(const bdNChar8* format, ...)
 {
     va_list va;
 
@@ -85,10 +85,10 @@ int bdPrintf(const char* format, ...)
     return vfprintf(stdout + 1, format, va);
 }
 
-unsigned int bdStrGetToken(const char* str, const char* delimeters, char* tokenBuffer, unsigned int tokenBufferSize, const char** end)
+bdUInt bdStrGetToken(const bdNChar8* str, const bdNChar8* delimeters, bdNChar8* tokenBuffer, bdUInt tokenBufferSize, const bdNChar8** end)
 {
-    int tokenSize;
-    int offset = 0;
+    bdInt tokenSize;
+    bdInt offset = 0;
 
     if (str)
     {
@@ -111,12 +111,12 @@ unsigned int bdStrGetToken(const char* str, const char* delimeters, char* tokenB
     return offset;
 }
 
-bool bdDelimSubstr(const char* str, const char* substr, const char* delimeters)
+bdBool bdDelimSubstr(const bdNChar8* str, const bdNChar8* substr, const bdNChar8* delimeters)
 {
-    bool isSubStr = true;
-    char subStrToken[68];
-    char strToken[68];
-    unsigned int token;
+    bdBool isSubStr = true;
+    bdNChar8 subStrToken[68];
+    bdNChar8 strToken[68];
+    bdUInt token;
 
     while (isSubStr)
     {

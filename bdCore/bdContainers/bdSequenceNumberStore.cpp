@@ -7,37 +7,37 @@ bdSequenceNumberStore::bdSequenceNumberStore()
     m_lastSeq.m_seqNum = 0;
 }
 
-bdSequenceNumberStore::bdSequenceNumberStore(const bdSequenceNumber* initial)
+bdSequenceNumberStore::bdSequenceNumberStore(const bdSequenceNumber& initial)
 {
     m_bitmap = 0;
-    m_lastSeq.m_seqNum = initial->m_seqNum;
+    m_lastSeq.m_seqNum = initial.m_seqNum;
 }
 
-bdSequenceNumberStore::bdSequenceStatus bdSequenceNumberStore::check(const bdSequenceNumber* thisSeq)
+bdSequenceNumberStore::bdSequenceStatus bdSequenceNumberStore::check(const bdSequenceNumber& thisSeq)
 {
     bdUInt diff;
     bdSequenceNumber sdiff;
 
-    if (thisSeq > &m_lastSeq)
+    if (thisSeq > m_lastSeq)
     {
-        sdiff = thisSeq - &m_lastSeq;
+        sdiff = thisSeq - m_lastSeq;
         diff = sdiff.getValue();
         if (diff >= 32)
         {
-            m_lastSeq = *thisSeq;
+            m_lastSeq = thisSeq;
             m_bitmap = 1;
             return BD_SN_VALID_MUCH_LARGER;
         }
         else
         {
             m_bitmap = (m_bitmap << diff) | 1;
-            m_lastSeq = *thisSeq;
+            m_lastSeq = thisSeq;
             return BD_SN_VALID_LARGER;
         }
     }
     else
     {
-        sdiff = &m_lastSeq - thisSeq;
+        sdiff = m_lastSeq - thisSeq;
         diff = sdiff.getValue();
         if (diff < 0x20)
         {
@@ -58,13 +58,13 @@ bdSequenceNumberStore::bdSequenceStatus bdSequenceNumberStore::check(const bdSeq
     }
 }
 
-bdSequenceNumber* bdSequenceNumberStore::getLastSequenceNumber()
+bdSequenceNumber& bdSequenceNumberStore::getLastSequenceNumber()
 {
-    return &m_lastSeq;
+    return m_lastSeq;
 }
 
-void bdSequenceNumberStore::reset(const bdSequenceNumber* initial)
+void bdSequenceNumberStore::reset(const bdSequenceNumber& initial)
 {
     m_bitmap = 0;
-    m_lastSeq.m_seqNum = initial->m_seqNum;
+    m_lastSeq.m_seqNum = initial.m_seqNum;
 }

@@ -11,8 +11,8 @@ public:
     bdDTLSCookieAck();
     bdDTLSCookieAck(bdUInt16 vtag, const bdUByte8* key, const bdSecurityID secID);
     virtual ~bdDTLSCookieAck();
-    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     bdUByte8* getECCKey();
-    void getSecID(bdSecurityID* secID);
+    void getSecID(bdSecurityID& secID);
 };

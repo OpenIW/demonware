@@ -10,20 +10,20 @@ public:
     bdSecurityID m_secID;
 
     bdEndpoint();
-    bdEndpoint(const bdEndpoint* other);
-    bdEndpoint(const bdCommonAddrRef addr, const bdSecurityID* secID);
+    bdEndpoint(const bdEndpoint& other);
+    bdEndpoint(const bdCommonAddrRef addr, const bdSecurityID& secID);
     ~bdEndpoint();
-    bdBool operator==(bdEndpoint* other);
+    bdBool operator==(const bdEndpoint& other) const;
     bdCommonAddrRef getCommonAddr() const;
-    const bdSecurityID* getSecID() const;
+    const bdSecurityID& getSecID() const;
     const bdUInt getHash() const;
     bdUInt getSerializedLength() const;
-    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    bdBool deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    bdBool deserialize(bdCommonAddrRef me, const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
 };
 
 class bdEndpointHashingClass
 {
 public:
-    bdUInt getHash(const bdEndpoint* other);
+    bdUInt getHash(const bdEndpoint& other);
 };

@@ -17,8 +17,8 @@ protected:
     bdSequenceNumber m_lastSeq;
 public:
     bdSequenceNumberStore();
-    bdSequenceNumberStore(const bdSequenceNumber* initial);
-    bdSequenceStatus check(const bdSequenceNumber* thisSeq);
-    bdSequenceNumber* getLastSequenceNumber();
-    void reset(const bdSequenceNumber* initial);
+    bdSequenceNumberStore(const bdSequenceNumber& initial);
+    bdSequenceStatus check(const bdSequenceNumber& thisSeq);
+    bdSequenceNumber& getLastSequenceNumber();
+    void reset(const bdSequenceNumber& initial);
 };

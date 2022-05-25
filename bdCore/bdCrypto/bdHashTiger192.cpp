@@ -29,17 +29,17 @@ void bdHashTiger192::operator delete(void* p)
     bdMemory::deallocate(p);
 }
 
-bdBool bdHashTiger192::hash(const bdUByte8* data, const bdUInt dataSize, bdUByte8* result, bdUInt* resultSize)
+bdBool bdHashTiger192::hash(const bdUByte8* data, const bdUInt dataSize, bdUByte8* result, bdUInt& resultSize)
 {
     bdInt hash;
     bdInt error;
-    unsigned long resultSz;
+    bdULong resultSz;
 
-    if (*resultSize > 24)
+    if (resultSize > 24)
     {
-        //bdLog(BD_LOG_WARNING, "Tiger hash only requires result buffer of 24 bytes");
+        bdLogWarn("hashtiger192", "Tiger hash only requires result buffer of 24 bytes");
     }
-    resultSz = *resultSize;
+    resultSz = resultSize;
     hash = find_hash("tiger");
     error = hash_memory(hash, data, dataSize, result, &resultSz);
 
@@ -50,9 +50,9 @@ bdBool bdHashTiger192::hash(const bdUByte8* data, const bdUInt dataSize, bdUByte
     }
     else if (error)
     {
-        //bdLog(BD_LOG_ERROR, "Unable to create hash.");
+        bdLogError("hashtiger192", "Unable to create hash.");
         return false;
     }
-    *resultSize = resultSz;
+    resultSize = resultSz;
     return true;
 }

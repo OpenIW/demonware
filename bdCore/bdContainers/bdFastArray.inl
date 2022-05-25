@@ -27,7 +27,7 @@ inline bdFastArray<T>::bdFastArray(const bdUInt capacity)
 }
 
 template<typename T>
-inline bdFastArray<T>::bdFastArray(const bdUInt capacity, const T* value)
+inline bdFastArray<T>::bdFastArray(const bdUInt capacity, const T& value)
     : m_data(NULL), m_capacity(capacity), m_size(capacity)
 {
     if (m_capacity)
@@ -38,19 +38,19 @@ inline bdFastArray<T>::bdFastArray(const bdUInt capacity, const T* value)
 }
 
 template<typename T>
-inline bdFastArray<T>::bdFastArray(const bdFastArray<T>* a)
-    : m_capacity(a->getCapacity()), m_size(a->getSize()), m_data(uninitializedCopy(a))
+inline bdFastArray<T>::bdFastArray(const bdFastArray<T>& a)
+    : m_capacity(a.getCapacity()), m_size(a.getSize()), m_data(uninitializedCopy(a))
 {
 }
 
 template<typename T>
-inline T* bdFastArray<T>::uninitializedCopy(const bdFastArray<T>* a)
+inline T* bdFastArray<T>::uninitializedCopy(const bdFastArray<T>& a)
 {
     T* data = NULL;
     if (a->getCapacity())
     {
-        data = bdAllocate<T>(a->getCapacity());
-        copyArrayArray(data, a->getData(), a->getSize());
+        data = bdAllocate<T>(a.getCapacity());
+        copyArrayArray(data, a.getData(), a.getSize());
     }
     return data;
 }
@@ -65,7 +65,7 @@ inline void bdFastArray<T>::copyArrayArray(T* dest, const T* src, const bdUInt n
 }
 
 template<typename T>
-inline void bdFastArray<T>::copyArrayObject(T* dest, const T* src, const bdUInt n)
+inline void bdFastArray<T>::copyArrayObject(T* dest, const T& src, const bdUInt n)
 {
     for (bdUInt i = 0; i < n; ++i)
     {
@@ -74,7 +74,7 @@ inline void bdFastArray<T>::copyArrayObject(T* dest, const T* src, const bdUInt 
 }
 
 template<typename T>
-inline void bdFastArray<T>::copyObjectObject(T* dest, const T* src)
+inline void bdFastArray<T>::copyObjectObject(T* dest, const T& src)
 {
     bdMemcpy(dest, src, sizeof(T));
 }
@@ -141,7 +141,7 @@ inline void bdFastArray<T>::pushBack(T* value, bdUInt n)
 }
 
 template<typename T>
-inline void bdFastArray<T>::pushBack(const T* value)
+inline void bdFastArray<T>::pushBack(const T& value)
 {
     if (m_size == m_capacity)
     {
@@ -195,13 +195,13 @@ inline void bdFastArray<T>::removeAllKeepOrder(T value)
 }
 
 template<typename T>
-inline bdBool bdFastArray<T>::findFirst(const T* value, bdUInt* i)
+inline bdBool bdFastArray<T>::findFirst(const T& value, bdUInt& i)
 {
     for (bdUInt j = 0; j < m_size; ++j)
     {
-        if (*value == m_data[j])
+        if (value == m_data[j])
         {
-            *i = j;
+            i = j;
             return true;
         }
     }
@@ -224,14 +224,14 @@ inline bdBool bdFastArray<T>::rangeCheck(const bdUInt i)
 }
 
 template<typename T>
-inline void bdFastArray<T>::setGrow(const bdUInt i, const T* value)
+inline void bdFastArray<T>::setGrow(const bdUInt i, const T& value)
 {
     if (!rangeCheck(i))
     {
         ensureCapacity(i + 1);
         m_size = i + 1;
     }
-    m_data[i] = *value;
+    m_data[i] = value;
 }
 
 template<typename T>
@@ -247,10 +247,10 @@ inline T* bdFastArray<T>::end()
 }
 
 template<typename T>
-inline T* bdFastArray<T>::operator[](const bdUInt i)
+inline T& bdFastArray<T>::operator[](const bdUInt i)
 {
     bdAssert(rangeCheck(i), "bdFastArray<T>::operator[], rangecheck failed");
-    return &m_data[i];
+    return m_data[i];
 }
 
 template<typename T>

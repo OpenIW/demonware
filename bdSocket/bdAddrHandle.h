@@ -17,16 +17,16 @@ public:
     bdAddrHandleStatus m_status;
     bdAddr m_realAddr;
 
-    bdAddrHandle(bdCommonAddrRef ca, const bdSecurityID* secID);
+    bdAddrHandle(bdCommonAddrRef ca, const bdSecurityID& secID);
     ~bdAddrHandle();
     void operator delete(void* p);
-    bdBool operator==(const bdAddrHandle* other);
-    void setRealAddr(const bdAddr* realAddr);
-    void setStatus(const bdAddrHandleStatus* status);
+    bdBool operator==(const bdAddrHandle& other) const;
+    void setRealAddr(const bdAddr& realAddr);
+    void setStatus(const bdAddrHandleStatus& status);
 
-    void getSecID(bdSecurityID* secID) const;
+    void getSecID(bdSecurityID& secID) const;
     bdInt getStatus() const;
-    bdAddr* getRealAddr() const;
+    bdAddr getRealAddr() const;
 };
 
 typedef bdReference<bdAddrHandle> bdAddrHandleRef;

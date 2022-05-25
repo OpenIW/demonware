@@ -5,7 +5,7 @@ class bdQoSProbeListener
 {
 public:
     virtual ~bdQoSProbeListener();
-    virtual void onQoSProbeSuccess(const bdQoSProbeInfo*);
+    virtual void onQoSProbeSuccess(const bdQoSProbeInfo&);
     virtual void onQoSProbeFailed(bdCommonAddrRef);
     void operator delete(void* p);
 };

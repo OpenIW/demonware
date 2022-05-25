@@ -9,8 +9,8 @@ bdNATTraversalPacket::bdNATTraversalPacket()
 {
 }
 
-bdNATTraversalPacket::bdNATTraversalPacket(const bdUByte8* m_type, const bdUInt ident, const bdAddr* addrSrc, const bdAddr* addrDest) 
-    : m_type(*m_type), m_protocolVersion(2), m_ident(ident), m_addrSrc(addrSrc), m_addrDest(addrDest)
+bdNATTraversalPacket::bdNATTraversalPacket(const bdUByte8& m_type, const bdUInt ident, const bdAddr& addrSrc, const bdAddr& addrDest) 
+    : m_type(m_type), m_protocolVersion(2), m_ident(ident), m_addrSrc(addrSrc), m_addrDest(addrDest)
 {
 }
 
@@ -18,44 +18,44 @@ bdNATTraversalPacket::~bdNATTraversalPacket()
 {
 }
 
-bdBool bdNATTraversalPacket::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdNATTraversalPacket::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool status;
 
-    *newOffset = offset;
-    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
-    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_protocolVersion);
+    newOffset = offset;
+    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
     if (m_protocolVersion < 2u)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
-    status = status == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
-    status = status == bdBytePacker::removeBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_ident);
-    status = status == m_addrSrc.deserialize(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset);
-    status = status == m_addrDest.deserialize(reinterpret_cast<const bdUByte8*>(data), size, *newOffset, newOffset);
+    status = status == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
+    status = status == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_ident);
+    status = status == m_addrSrc.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
+    status = status == m_addrDest.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
     if (!status)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
     return true;
 }
 
-bdBool bdNATTraversalPacket::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdNATTraversalPacket::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool status;
 
-    *newOffset = offset;
-    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, *newOffset, newOffset, &m_type);
-    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, *newOffset, newOffset, &m_protocolVersion);
-    status = status == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
-    status = status == bdBytePacker::appendBasicType<bdUInt>(data, size, *newOffset, newOffset, &m_ident);
-    status = status == m_addrSrc.serialize(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset);
-    status = status == m_addrDest.serialize(reinterpret_cast<bdUByte8*>(data), size, *newOffset, newOffset);
+    newOffset = offset;
+    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    status = status == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
+    status = status == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_ident);
+    status = status == m_addrSrc.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
+    status = status == m_addrDest.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
     if (status)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
     return true;
@@ -85,19 +85,19 @@ bdUInt bdNATTraversalPacket::getSize()
 {
     if (!serializedSize)
     {
-        serialize(NULL, 65535, 0, &serializedSize);
+        serialize(NULL, 65535, 0, serializedSize);
     }
     return serializedSize;
 }
 
-const bdAddr* bdNATTraversalPacket::getAddrSrc()
+const bdAddr& bdNATTraversalPacket::getAddrSrc()
 {
-    return &m_addrSrc;
+    return m_addrSrc;
 }
 
-const bdAddr* bdNATTraversalPacket::getAddrDest()
+const bdAddr& bdNATTraversalPacket::getAddrDest()
 {
-    return &m_addrDest;
+    return m_addrDest;
 }
 
 void bdNATTraversalPacket::setType(bdUByte8 type)

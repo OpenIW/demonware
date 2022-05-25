@@ -6,7 +6,7 @@ bdQoSProbeListener::~bdQoSProbeListener()
 {
 }
 
-void bdQoSProbeListener::onQoSProbeSuccess(const bdQoSProbeInfo*)
+void bdQoSProbeListener::onQoSProbeSuccess(const bdQoSProbeInfo&)
 {
 }
 

@@ -11,11 +11,11 @@ protected:
 public:
     void operator delete(void* p);
     bdDTLSCookieEcho();
-    bdDTLSCookieEcho(bdUInt16 vtag, bdDTLSInitAck* cookie, bdCommonAddrRef localCommonAddr, bdECCKey* ECCKey);
+    bdDTLSCookieEcho(bdUInt16 vtag, bdDTLSInitAck& cookie, bdCommonAddrRef localCommonAddr, bdECCKey* ECCKey);
     virtual ~bdDTLSCookieEcho();
-    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    const bdDTLSInitAck* getCookie() const;
+    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    const bdDTLSInitAck& getCookie() const;
     const bdUByte8* getECCKey() const;
     const bdUByte8* getCa() const;
     const bdUByte8* getSecID() const;

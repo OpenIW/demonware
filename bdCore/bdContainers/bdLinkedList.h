@@ -35,16 +35,15 @@ public:
     ~bdLinkedList();
 
     void clear();
-    T* forward(Position* position);
-    void addTail(const T* value);
-    T* getHead();
+    T& forward(Position& position);
+    void addTail(const T& value);
+    T& getHead();
     Position getHeadPosition();
     bdUInt getSize();
     Position getTailPosition();
-    T* getAt(const Position position);
-    void insertAfter(const Position position, const T* value);
+    void insertAfter(const Position position, const T& value);
     const bdBool isEmpty() const;
-    void removeAt(Position* position);
+    void removeAt(Position& position);
     void removeHead();
 };
 

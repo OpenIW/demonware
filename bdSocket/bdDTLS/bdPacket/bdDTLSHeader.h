@@ -14,8 +14,8 @@ public:
     bdDTLSHeader();
     bdDTLSHeader(bdDTLSPacketTypes type, bdUInt16 vtag, bdUInt16 counter);
     virtual ~bdDTLSHeader();
-    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
-    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset);
+    virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
+    virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     bdUByte8 getType();
     bdUByte8 getVersion();
     bdUInt16 getVtag();

@@ -9,10 +9,10 @@ protected:
 public:
     bdQueue();
     void dequeue();
-    void enqueue(const T* item);
+    void enqueue(const T& item);
     bdUInt getSize();
     bdBool isEmpty();
-    T* peek();
+    T& peek();
 };
 
 #include "bdQueue.inl"

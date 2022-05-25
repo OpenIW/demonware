@@ -16,9 +16,9 @@ public:
         return hash;
     }
     template <typename T>
-    bdUInt getHash(const T* key)
+    bdUInt getHash(const T& key)
     {
-        return getHash(reinterpret_cast<const bdUByte8*>(key), sizeof(T));
+        return getHash(reinterpret_cast<const bdUByte8*>(&key), sizeof(T));
     }
 };
 
@@ -37,7 +37,7 @@ public:
         void* operator new(bdUWord nbytes);
         void operator delete(void* p);
         Node();
-        Node(keyType* key, dataType* value, Node* const next);
+        Node(keyType const& key, dataType const& value, Node* const next);
         ~Node();
     };
     bdUInt m_size;
@@ -66,7 +66,7 @@ public:
         }
         return m_map[numIter];
     }
-    Iterator getIterator(const keyType* key)
+    Iterator getIterator(const keyType& key)
     {
         Node* n;
         bdUInt hash;
@@ -78,7 +78,7 @@ public:
         hash = m_hashClass.getHash(key);
         for (n = m_map[getHashIndex(hash)]; n; n = n->m_next)
         {
-            if (const_cast<keyType*>(key) == &n->m_key)
+            if (key == &n->m_key)
             {
                 ++m_numIterators;
                 return n;
@@ -87,20 +87,20 @@ public:
         return NULL;
     }
     void releaseIterator(Iterator iterator);
-    dataType* getValue(Iterator iterator);
-    keyType* getKey(Iterator iterator);
-    void next(Iterator* iterator);
-    bdBool remove(const keyType* key);
-    bdBool remove(const keyType* key, dataType* value);
-    bdBool remove(Iterator* iterator);
+    dataType& getValue(Iterator iterator);
+    keyType& getKey(Iterator iterator);
+    void next(Iterator& iterator);
+    bdBool remove(const keyType& key);
+    bdBool remove(const keyType& key, dataType& value);
+    bdBool remove(Iterator& iterator);
     void clear();
     void resize(const bdUInt newSize);
-    bdBool get(const keyType* key, const dataType* value);
-    bdBool put(const keyType* key, const dataType* value);
+    bdBool get(const keyType& key, const dataType& value);
+    bdBool put(const keyType& key, const dataType& value);
     void createMap(const bdUInt initialCapacity, const bdFloat32 loadFactor);
     bdUInt getHashIndex(const bdUInt hash);
     bdInt getSize();
-    bdBool containsKey(const keyType* key);
+    bdBool containsKey(const keyType& key);
     static bdUInt getNextCapacity(const bdUInt targetCapacity);
 };
 

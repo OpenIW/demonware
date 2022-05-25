@@ -5,7 +5,7 @@
 bdUInt64 bdPlatformStreamSocket::m_totalBytesSent = 0;
 bdUInt64 bdPlatformStreamSocket::m_totalBytesRecvd = 0;
 
-SOCKET bdPlatformStreamSocket::create(bdBool blocking)
+bdInt bdPlatformStreamSocket::create(bdBool blocking)
 {
     u_long nonblocking;
 
@@ -18,7 +18,7 @@ SOCKET bdPlatformStreamSocket::create(bdBool blocking)
     return s;
 }
 
-bdSocketStatusCode bdPlatformStreamSocket::connect(SOCKET handle, bdInAddr addr, bdUInt16 port)
+bdSocketStatusCode bdPlatformStreamSocket::connect(bdInt handle, bdInAddr addr, bdUInt16 port)
 {
     sockaddr remoteAddr;
 
@@ -47,7 +47,7 @@ bdSocketStatusCode bdPlatformStreamSocket::connect(SOCKET handle, bdInAddr addr,
     }
 }
 
-bool bdPlatformStreamSocket::close(SOCKET handle)
+bool bdPlatformStreamSocket::close(bdInt handle)
 {
     if (handle == -1)
     {
@@ -67,7 +67,7 @@ bool bdPlatformStreamSocket::close(SOCKET handle)
     return false;
 }
 
-bool bdPlatformStreamSocket::checkSocketException(SOCKET handle)
+bool bdPlatformStreamSocket::checkSocketException(bdInt handle)
 {
     timeval zero;
     fd_set fdset;
@@ -80,7 +80,7 @@ bool bdPlatformStreamSocket::checkSocketException(SOCKET handle)
     return select(0, 0, 0, &fdset, &zero) || __WSAFDIsSet(handle, &fdset);
 }
 
-bdBool bdPlatformStreamSocket::isWritable(SOCKET handle, bdSocketStatusCode* error)
+bdBool bdPlatformStreamSocket::isWritable(bdInt handle, bdSocketStatusCode& error)
 {
     timeval zero;
     fd_set fdwrite;
@@ -99,30 +99,30 @@ bdBool bdPlatformStreamSocket::isWritable(SOCKET handle, bdSocketStatusCode* err
         ++fderr.fd_count;
     }
 
-    *error = BD_NET_SUCCESS;
+    error = BD_NET_SUCCESS;
     success = __WSAFDIsSet(handle, &fdwrite) && select(0, 0, &fdwrite, &fderr, &zero) != -1;
     if (__WSAFDIsSet(handle, &fderr))
     {
         switch (WSAGetLastError())
         {
         case WSAEINTR:
-            *error = BD_NET_BLOCKING_CALL_CANCELED;
+            error = BD_NET_BLOCKING_CALL_CANCELED;
         case WSAEINVAL:
-            *error = BD_NET_NOT_BOUND;
+            error = BD_NET_NOT_BOUND;
         case WSAEWOULDBLOCK:
-            *error = BD_NET_WOULD_BLOCK;
+            error = BD_NET_WOULD_BLOCK;
         case WSAEMSGSIZE:
-            *error = BD_NET_MSG_SIZE;
+            error = BD_NET_MSG_SIZE;
         case WSAEHOSTUNREACH:
-            *error = BD_NET_CONNECTION_RESET;
+            error = BD_NET_CONNECTION_RESET;
         default:
-            *error = BD_NET_ERROR;
+            error = BD_NET_ERROR;
         }
     }
     return success;
 }
 
-bool bdPlatformStreamSocket::getSocketAddr(SOCKET handle, bdInAddr* socketAddr)
+bdBool bdPlatformStreamSocket::getSocketAddr(bdInt handle, bdInAddr& socketAddr)
 {
     sockaddr_in retrievedAddr;
     int length = 16;
@@ -131,11 +131,11 @@ bool bdPlatformStreamSocket::getSocketAddr(SOCKET handle, bdInAddr* socketAddr)
     {
         return 0;
     }
-    *socketAddr = *(bdInAddr*)&retrievedAddr.sin_addr;
+    socketAddr = *(bdInAddr*)&retrievedAddr.sin_addr;
     return 1;
 }
 
-bdInt bdPlatformStreamSocket::send(SOCKET handle, const void* const data, bdUInt length)
+bdInt bdPlatformStreamSocket::send(bdInt handle, const void* const data, bdUInt length)
 {
     if (handle == -1)
     {
@@ -167,7 +167,7 @@ bdInt bdPlatformStreamSocket::send(SOCKET handle, const void* const data, bdUInt
     }
 }
 
-bdInt bdPlatformStreamSocket::receive(SOCKET handle, void* const data, bdUInt length)
+bdInt bdPlatformStreamSocket::receive(bdInt handle, void* const data, bdUInt length)
 {
     if (handle == -1)
     {
@@ -197,8 +197,8 @@ bdInt bdPlatformStreamSocket::receive(SOCKET handle, void* const data, bdUInt le
     }
 }
 
-bdBool bdPlatformStreamSocket::isWritable(SOCKET handle)
+bdBool bdPlatformStreamSocket::isWritable(bdInt handle)
 {
     bdSocketStatusCode ignored;
-    return isWritable(handle, &ignored);
+    return isWritable(handle, ignored);
 }

@@ -27,7 +27,7 @@ public:
 
     const bdUInt getDataSize() const;
     const bdUInt getReadSize() const;
-    bdBool getStringLength(bdUInt* length);
+    bdBool getStringLength(bdUInt& length);
     bdUByte8* getData();
     const bdUInt getSize() const;
     const bdUInt getMaxWriteSize() const;
@@ -40,29 +40,29 @@ public:
     bdBool expand(bdUInt32 increaseSize);
 
     bdBool read(void* data, bdUInt size);
-    bdBool readArrayStart(bdUByte8 expectedType, bdUInt32* numElements);
+    bdBool readArrayStart(bdUByte8 expectedType, bdUInt32& numElements);
     void readArrayEnd();
-    bdBool readUByte8(bdUByte8* b);
-    bdBool readUInt32(bdUInt* u);
-    bdBool readBool(bdBool* b);
+    bdBool readUByte8(bdUByte8& b);
+    bdBool readUInt32(bdUInt& u);
+    bdBool readBool(bdBool& b);
     bdBool readDataType(const bdBitBufferDataType expectedDataType);
-    bdBool readNChar8(bdNChar8* c);
-    bdBool readByte8(bdByte8* b);
-    bdBool readInt16(bdInt16* i);
-    bdBool readUInt16(bdUInt16* u);
-    bdBool readInt32(bdInt* i);
-    bdBool readInt64(bdInt64* i);
-    bdBool readUInt64(bdUInt64* u);
-    bdBool readFloat32(bdFloat32* f);
-    bdBool readFloat64(bdFloat64* f);
+    bdBool readNChar8(bdNChar8& c);
+    bdBool readByte8(bdByte8& b);
+    bdBool readInt16(bdInt16& i);
+    bdBool readUInt16(bdUInt16& u);
+    bdBool readInt32(bdInt& i);
+    bdBool readInt64(bdInt64& i);
+    bdBool readUInt64(bdUInt64& u);
+    bdBool readFloat32(bdFloat32& f);
+    bdBool readFloat64(bdFloat64& f);
     bdBool readString(bdNChar8* const s, const bdUWord maxLen);
-    bdBool readBlob(bdUByte8* const blob, bdUInt32* length);
-    bdBool readAndAllocateBlob(bdUByte8** blob, bdUInt32* length);
-    bdBool readAndAllocateCompressedMsg(bdUByte8** msg, bdUInt32* length, bdUInt32* compressedLength);
+    bdBool readBlob(bdUByte8* const blob, bdUInt32& length);
+    bdBool readAndAllocateBlob(bdUByte8*& blob, bdUInt32& length);
+    bdBool readAndAllocateCompressedMsg(bdUByte8*& msg, bdUInt32& length, bdUInt32& compressedLength);
     bdBool readNAN();
     bdBitBufferDataType readDataType();
     template <typename dataType>
-    bdBool read(dataType* var)
+    bdBool read(dataType& var)
     {
         bdBool result;
         dataType temp;

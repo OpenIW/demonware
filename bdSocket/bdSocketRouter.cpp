@@ -25,9 +25,9 @@ bdSocketRouter::~bdSocketRouter()
     bdHashMap<bdEndpoint,bdDTLSAssociation*,bdEndpointHashingClass>::Iterator it;
 
     m_keyStore.unregisterListener();
-    for (it = m_dtls.getIterator(); it; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it; m_dtls.next(it))
     {
-        bdDTLSAssociation* value = *m_dtls.getValue(it);
+        bdDTLSAssociation* value = m_dtls.getValue(it);
         if (value)
         {
             value->~bdDTLSAssociation();
@@ -36,7 +36,7 @@ bdSocketRouter::~bdSocketRouter()
 
 }
 
-bdBool bdSocketRouter::init(bdSocket* socket, bdCommonAddrRef localCommonAddr, bdSocketRouterConfig* config)
+bdBool bdSocketRouter::init(bdSocket* socket, bdCommonAddrRef localCommonAddr, bdSocketRouterConfig& config)
 {
     bdBool ok;
 
@@ -63,7 +63,7 @@ bdBool bdSocketRouter::init(bdSocket* socket, bdCommonAddrRef localCommonAddr, b
     }
     if (ok)
     {
-        ok = m_natTrav.init(socket, &m_qosBandwidth, bdCommonAddrRef(&m_localCommonAddr));
+        ok = m_natTrav.init(socket, &m_qosBandwidth, bdCommonAddrRef(m_localCommonAddr));
     }
     if (ok)
     {
@@ -80,7 +80,7 @@ bdBool bdSocketRouter::init(bdSocket* socket, bdCommonAddrRef localCommonAddr, b
     registerInterceptor(&m_natTrav);
     registerInterceptor(&m_qosProber);
     m_keyStore.registerListener(this);
-    m_config = *config;
+    m_config = config;
     m_config.sanityCheckConfig();
     return true;
 }
@@ -88,7 +88,6 @@ bdBool bdSocketRouter::init(bdSocket* socket, bdCommonAddrRef localCommonAddr, b
 void bdSocketRouter::pump()
 {
     bdHashMap<bdEndpoint, bdDTLSAssociation*, bdEndpointHashingClass>::Iterator it;
-    bdEndpoint* endpoint;
     bdDTLSAssociation* conn;
     bdNChar8 addrString[22];
     bdNChar8 secIDString[18];
@@ -97,22 +96,22 @@ void bdSocketRouter::pump()
     m_natTrav.pump();
     m_qosProber.pump();
     bdQueue<bdEndpoint> toRemove;
-    for (it = m_dtls.getIterator(); it; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it; m_dtls.next(it))
     {
-        endpoint = m_dtls.getKey(it);
-        conn = *m_dtls.getValue(it);
+        bdEndpoint endpoint = m_dtls.getKey(it);
+        conn = m_dtls.getValue(it);
         conn->pump();
         assoStatus = static_cast<bdDTLSAssociationStatus>(conn->getStatus());
         if (assoStatus == BD_SOCKET_LOST)
         {
-            bdAddrHandleRef addrHandle(&conn->getAddrHandle());
+            bdAddrHandleRef addrHandle(conn->getAddrHandle());
             bdAddr(addrHandle->getRealAddr()).toString(addrString, sizeof(addrString));
-            bdSecurityInfo::toString(endpoint->getSecID(), secIDString, sizeof(secIDString));
+            bdSecurityInfo::toString(endpoint.getSecID(), secIDString, sizeof(secIDString));
             bdLogInfo("bdSocket/bdSocketRouter", "DTLS closed. Removing address %s on security ID %s.", addrString, secIDString);
             bdAddrHandle::bdAddrHandleStatus status = bdAddrHandle::BD_ADDR_UNRESOLVED;
-            addrHandle->setStatus(&status);
+            addrHandle->setStatus(status);
             toRemove.enqueue(endpoint);
-            m_addrMap.unregisterAddr(&addrHandle);
+            m_addrMap.unregisterAddr(addrHandle);
         }
         else if ((assoStatus - 1) >= 2 && assoStatus == BD_SOCKET_IDLE)
         {
@@ -128,12 +127,12 @@ void bdSocketRouter::pump()
             bdLogWarn("bdSocket/bdSocketRouter", "Couldn't find dlts connection in map.");
             break;
         }
-        conn = *m_dtls.getValue(it);
+        conn = m_dtls.getValue(it);
         if (conn)
         {
             delete conn;
         }
-        m_dtls.remove(&it);
+        m_dtls.remove(it);
         toRemove.dequeue();
         m_dtls.releaseIterator(it);
     }
@@ -151,9 +150,9 @@ bdBool bdSocketRouter::quit()
         return false;
     }
     m_keyStore.unregisterListener();
-    for (it = m_dtls.getIterator(); it; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it; m_dtls.next(it))
     {
-        conn = *m_dtls.getValue(it);
+        conn = m_dtls.getValue(it);
         if (conn)
         {
             delete conn;
@@ -173,7 +172,7 @@ bdBool bdSocketRouter::quit()
     return safeQuit;
 }
 
-bdBool bdSocketRouter::connect(bdAddrHandleRef* addrHandle)
+bdBool bdSocketRouter::connect(bdAddrHandleRef& addrHandle)
 {
     bdAddrHandle::bdAddrHandleStatus status;
     bdBool added;
@@ -185,18 +184,18 @@ bdBool bdSocketRouter::connect(bdAddrHandleRef* addrHandle)
         bdLogWarn("bdSocket/bdSocketRouter", "Cannot connect before class has been initialized");
         return false;
     }
-    if (addrHandle->isNull())
+    if (addrHandle.isNull())
     {
         bdLogWarn("bdSocket/bdSocketRouter", "Cannot connect using null addr handle ref");
         return false;
     }
-    bdCommonAddrRef remote((*addrHandle)->m_endpoint.getCommonAddr());
+    bdCommonAddrRef remote(addrHandle->m_endpoint.getCommonAddr());
     bdLogInfo("bdSocket/bdSocketRouter", "\tConnecting to address.");
-    bdCommonAddrInfo::getInfo(bdCommonAddrRef(&remote), commonAddrInfo, sizeof(commonAddrInfo));
+    bdCommonAddrInfo::getInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
     bdLogInfo("bdSocket/bdSocketRouter", commonAddrInfo);
-    bdSecurityInfo::toString((*addrHandle)->m_endpoint.getSecID(), secIDString, sizeof(secIDString));
+    bdSecurityInfo::toString(addrHandle->m_endpoint.getSecID(), secIDString, sizeof(secIDString));
     bdLogInfo("bdSocket/bdSocketRouter", "Using security ID: %s", secIDString);
-    if (!m_keyStore.contains((*addrHandle)->m_endpoint.getSecID()))
+    if (!m_keyStore.contains(addrHandle->m_endpoint.getSecID()))
     {
         bdLogWarn("bdSocket/bdSocketRouter", "Security ID is not registered. ");
     }
@@ -215,29 +214,29 @@ bdBool bdSocketRouter::connect(bdAddrHandleRef* addrHandle)
     case bdAddrHandle::BD_ADDR_NOT_RESOLVED:
     {
         bdLogInfo("bdSocket/bdSocketRouter", "Address not resolved. Sending to NAT Trav.");
-        bdEndpoint endpoint(&bdCommonAddrRef(&remote), (*addrHandle)->m_endpoint.getSecID());
-        added = m_endpointToAddrMap.put(&endpoint, addrHandle);
+        bdEndpoint endpoint(bdCommonAddrRef(remote), addrHandle->m_endpoint.getSecID());
+        added = m_endpointToAddrMap.put(endpoint, addrHandle);
         if (!added)
         {
             bdLogWarn("bdSocket/bdSocketRouter", "Remote addr already exists in map");
             bdLogInfo("bdSocket/bdSocketRouter", "Cancelling existing NAT Trav if any....");
-            m_natTrav.cancelConnect(bdCommonAddrRef(&remote));
+            m_natTrav.cancelConnect(bdCommonAddrRef(remote));
             bdLogInfo("bdSocket/bdSocketRouter", "Removing addr from map .... and re-adding");
-            m_endpointToAddrMap.remove(&endpoint);
-            added = m_endpointToAddrMap.put(&endpoint, addrHandle);
+            m_endpointToAddrMap.remove(endpoint);
+            added = m_endpointToAddrMap.put(endpoint, addrHandle);
         }
         if (!added)
         {
             bdLogError("bdSocket/bdSocketRouter", "Repeated failure to add addr to map");
             return false;
         }
-        return m_natTrav.connect(bdCommonAddrRef(&remote), this, false);
+        return m_natTrav.connect(bdCommonAddrRef(remote), this, false);
     }
     }
     return false;
 }
 
-bdBool bdSocketRouter::disconnect(bdAddrHandleRef* addrHandle)
+bdBool bdSocketRouter::disconnect(bdAddrHandleRef& addrHandle)
 {
     bdDTLSAssociation* conn;
     bdUInt numFound = 0;
@@ -248,19 +247,19 @@ bdBool bdSocketRouter::disconnect(bdAddrHandleRef* addrHandle)
         bdLogWarn("bdSocket/bdSocketRouter", "Cannot disconnect unless class is initialized");
         return false;
     }
-    if (addrHandle->isNull())
+    if (addrHandle.isNull())
     {
         bdLogWarn("bdSocket/bdSocketRouter", "Cannot disconnect using null addr handle ref");
         return false;
     }
-    for (it = m_dtls.getIterator(); it; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it; m_dtls.next(it))
     {
-        conn = *m_dtls.getValue(it);
-        if (bdAddrHandleRef(&conn->getAddrHandle()) == addrHandle)
+        conn = m_dtls.getValue(it);
+        if (bdAddrHandleRef(conn->getAddrHandle()) == addrHandle)
         {
             delete conn;
             ++numFound;
-            m_dtls.remove(&it);
+            m_dtls.remove(it);
         }
     }
     m_dtls.releaseIterator(NULL);
@@ -286,19 +285,19 @@ bdInt bdSocketRouter::sendTo(const bdAddrHandleRef addrHandle, void* data, const
         bdLogWarn("bdSocket/bdSocketRouter", "Cannot send data to null addr handle ref");
         return -1;
     }
-    bdEndpoint endpoint(&bdCommonAddrRef(addrHandle->m_endpoint.getCommonAddr()), addrHandle->m_endpoint.getSecID());
-    m_dtls.get(&endpoint, &dtls);
+    bdEndpoint endpoint(bdCommonAddrRef(addrHandle->m_endpoint.getCommonAddr()), addrHandle->m_endpoint.getSecID());
+    m_dtls.get(endpoint, dtls);
     if (!dtls)
     {
         bdLogError("bdSocket/bdSocketRouter", "Not established! Call connect() first.");
-        bdCommonAddrInfo::getBriefInfo(&bdAddrHandleRef(addrHandle)->m_endpoint.getCommonAddr(), commonAddrInfo, sizeof(commonAddrInfo));
+        bdCommonAddrInfo::getBriefInfo(bdAddrHandleRef(addrHandle)->m_endpoint.getCommonAddr(), commonAddrInfo, sizeof(commonAddrInfo));
         bdLogInfo("bdSocket/bdSocketRouter", commonAddrInfo);
         return -1;
     }
     return dtls->sendTo(addrHandle->getRealAddr(), data, length, addrHandle->m_endpoint.getSecID());
 }
 
-bdInt bdSocketRouter::receiveFrom(bdAddrHandleRef* addrHandle, void* data, const bdUInt size)
+bdInt bdSocketRouter::receiveFrom(bdAddrHandleRef& addrHandle, void* data, const bdUInt size)
 {
     bdInt val;
 
@@ -312,15 +311,15 @@ bdInt bdSocketRouter::receiveFrom(bdAddrHandleRef* addrHandle, void* data, const
     bdAddr realAddr;
     while (receiving)
     {
-        val = m_socket->receiveFrom(&realAddr, data, size);
+        val = m_socket->receiveFrom(realAddr, data, size);
         if (val > 0)
         {
-            val = processPacket(addrHandle, &realAddr, data, size, val, &receiving);
+            val = processPacket(addrHandle, realAddr, data, size, val, receiving);
             continue;
         }
         if (val < 0)
         {
-            processError(&realAddr, val, &resetCount, &receiving);
+            processError(realAddr, val, resetCount, receiving);
             continue;
         }
         bdLogError("bdSocket/bdSocketRouter", "socket receiveFrom returned 0 ");
@@ -329,7 +328,7 @@ bdInt bdSocketRouter::receiveFrom(bdAddrHandleRef* addrHandle, void* data, const
     return val;
 }
 
-bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAddr, void* data, const bdUInt size, const bdUInt bytesTransferred, bdBool* receiving)
+bdInt bdSocketRouter::processPacket(bdAddrHandleRef& addrHandle, bdAddr& realAddr, void* data, const bdUInt size, const bdUInt bytesTransferred, bdBool& receiving)
 {
     bdUInt tmpUInt;
     bdNChar8 addrString[22];
@@ -345,13 +344,13 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
     {
         bdDTLSInit init;
         tmpUInt = 0;
-        if (!init.deserialize(data, recievedBytes, 0, &tmpUInt))
+        if (!init.deserialize(data, recievedBytes, 0, tmpUInt))
         {
             break;
         }
         bdSecurityID initSecID;
-        init.getSecID(&initSecID);
-        if (tryToFindConnection(data, &size, &initSecID, realAddr, addrHandle, (bdInt*)&recievedBytes, true))
+        init.getSecID(initSecID);
+        if (tryToFindConnection(data, size, initSecID, realAddr, addrHandle, (bdInt&)recievedBytes, true))
         {
             break;
         }
@@ -361,7 +360,7 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
             &m_ECCKey,
             realAddr,
             bdAddrHandleRef(addrHandle),
-            bdCommonAddrRef(&m_localCommonAddr),
+            bdCommonAddrRef(m_localCommonAddr),
             &m_addrMap,
             m_config.m_DTLSAssociationReceiveTimeout
         );
@@ -373,26 +372,26 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
     {
         bdDTLSInitAck initAck;
         tmpUInt = 0;
-        if (!initAck.deserialize(data, recievedBytes, 0, &tmpUInt))
+        if (!initAck.deserialize(data, recievedBytes, 0, tmpUInt))
         {
             break;
         }
         bdSecurityID initAckSecID;
-        initAck.getSecID(&initAckSecID);
-        tryDecryptPacket(data, &size, &initAckSecID, realAddr, addrHandle, (bdInt*)&recievedBytes, true);
+        initAck.getSecID(initAckSecID);
+        tryDecryptPacket(data, size, initAckSecID, realAddr, addrHandle, (bdInt&)recievedBytes, true);
         break;
     }
     case 3:
     {
         bdDTLSCookieEcho cookieEcho;
         tmpUInt = 0;
-        if (!cookieEcho.deserialize(data, recievedBytes, 0, &tmpUInt))
+        if (!cookieEcho.deserialize(data, recievedBytes, 0, tmpUInt))
         {
             break;
         }
         bdSecurityID cookieEchoSecID;
-        bdMemcpy(&cookieEchoSecID, cookieEcho.getSecID(), sizeof(cookieEchoSecID));
-        if (tryToFindConnection(data, &size, &cookieEchoSecID, realAddr, addrHandle, (bdInt*)&recievedBytes, true))
+        bdMemcpy(cookieEchoSecID.ab, cookieEcho.getSecID(), sizeof(cookieEchoSecID));
+        if (tryToFindConnection(data, size, cookieEchoSecID, realAddr, addrHandle, (bdInt&)recievedBytes, true))
         {
             break;
         }
@@ -402,7 +401,7 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
             &m_ECCKey,
             realAddr,
             bdAddrHandleRef(addrHandle),
-            bdCommonAddrRef(&m_localCommonAddr),
+            bdCommonAddrRef(m_localCommonAddr),
             &m_addrMap,
             m_config.m_DTLSAssociationReceiveTimeout
         );
@@ -413,26 +412,26 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
     {
         bdDTLSCookieAck cookieAck;
         tmpUInt = 0;
-        if (!cookieAck.deserialize(data, recievedBytes, 0, &tmpUInt))
+        if (!cookieAck.deserialize(data, recievedBytes, 0, tmpUInt))
         {
             break;
         }
         bdSecurityID cookieAckSecID;
-        cookieAck.getSecID(&cookieAckSecID);
-        tryDecryptPacket(data, &size, &cookieAckSecID, realAddr, addrHandle, (bdInt*)&recievedBytes, true);
+        cookieAck.getSecID(cookieAckSecID);
+        tryDecryptPacket(data, size, cookieAckSecID, realAddr, addrHandle, (bdInt&)recievedBytes, true);
         break;
     }
     case 5:
     {
         bdDTLSError error;
         tmpUInt = 0;
-        if (!error.deserialize(data, recievedBytes, 0, &tmpUInt))
+        if (!error.deserialize(data, recievedBytes, 0, tmpUInt))
         {
             break;
         }
         bdSecurityID errorSecID;
-        error.getSecID(&errorSecID);
-        if (tryToFindConnection(data, &size, &errorSecID, realAddr, addrHandle, (bdInt*)&recievedBytes, true))
+        error.getSecID(errorSecID);
+        if (tryToFindConnection(data, size, errorSecID, realAddr, addrHandle, (bdInt&)recievedBytes, true))
         {
             break;
         }
@@ -442,7 +441,7 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
             &m_ECCKey,
             realAddr,
             bdAddrHandleRef(addrHandle),
-            bdCommonAddrRef(&m_localCommonAddr),
+            bdCommonAddrRef(m_localCommonAddr),
             &m_addrMap,
             m_config.m_DTLSAssociationReceiveTimeout
         );
@@ -453,7 +452,7 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
     case 6:
     {
         bdSecurityID secID;
-        *receiving = !tryDecryptPacket(data, &size, &secID, realAddr, addrHandle, (bdInt*)&recievedBytes, true);
+        receiving = !tryDecryptPacket(data, size, secID, realAddr, addrHandle, (bdInt&)recievedBytes, true);
         break;
     }
     default:
@@ -465,7 +464,7 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
             {
                 break;
             }
-            accepted = (*m_interceptors[i])->acceptPacket(m_socket, bdAddr(realAddr), data, recievedBytes, type);
+            accepted = m_interceptors[i]->acceptPacket(m_socket, bdAddr(realAddr), data, recievedBytes, type);
         }
         break;
     }
@@ -480,17 +479,17 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
         &m_ECCKey,
         realAddr,
         bdAddrHandleRef(addrHandle),
-        bdCommonAddrRef(&m_localCommonAddr),
+        bdCommonAddrRef(m_localCommonAddr),
         &m_addrMap,
         m_config.m_DTLSAssociationReceiveTimeout
     );
     recievedBytes = dtlsSocket->receiveFrom(realAddr, data, recievedBytes, addrHandle, data, size);
-    realAddr->toString(addrString, sizeof(addrString));
+    realAddr.toString(addrString, sizeof(addrString));
     bdLogInfo("bdSocket/bdSocketRouter", "New incoming DTLS connection from %s.", addrString);
-    bdEndpoint endpoint(&bdCommonAddrRef((*addrHandle)->m_endpoint.getCommonAddr()), (*addrHandle)->m_endpoint.getSecID());
-    if (!m_dtls.put(&endpoint, &dtlsSocket))
+    bdEndpoint endpoint(bdCommonAddrRef(addrHandle->m_endpoint.getCommonAddr()), addrHandle->m_endpoint.getSecID());
+    if (!m_dtls.put(endpoint, dtlsSocket))
     {
-        bdCommonAddrInfo::getInfo(bdCommonAddrRef((*addrHandle)->m_endpoint.getCommonAddr()), addrString, sizeof(addrString));
+        bdCommonAddrInfo::getInfo(bdCommonAddrRef(addrHandle->m_endpoint.getCommonAddr()), addrString, sizeof(addrString));
         bdSecurityInfo::toString(endpoint.getSecID(), secIDString, sizeof(secIDString));
         bdLogError("bdSocket/bdSocketRouter", "New DTLS with secID %s NOT added to the list.", secIDString);
         bdLogError("bdSocket/bdSocketRouter", "addrString %s", addrString);
@@ -501,16 +500,16 @@ bdInt bdSocketRouter::processPacket(bdAddrHandleRef* addrHandle, bdAddr* realAdd
     }
     if ((recievedBytes & 0x80000000) == 0)
     {
-        *receiving = false;
+        receiving = false;
     }
     return recievedBytes;
 }
 
-void bdSocketRouter::processError(bdAddr* realAddr, bdInt val, bdUInt* resetCount, bdBool* receiving)
+void bdSocketRouter::processError(bdAddr& realAddr, bdInt val, bdUInt& resetCount, bdBool& receiving)
 {
     bdNChar8 addrBuffer[100];
 
-    *receiving = false;
+    receiving = false;
     switch (val)
     {
     case -13:
@@ -526,20 +525,20 @@ void bdSocketRouter::processError(bdAddr* realAddr, bdInt val, bdUInt* resetCoun
     case -5:
         if (m_config.m_ignoreConnectionReset)
         {
-            realAddr->toString(addrBuffer, sizeof(addrBuffer));
+            realAddr.toString(addrBuffer, sizeof(addrBuffer));
             bdLogInfo("bdSocket/bdSocketRouter", "Connection reset packet received for %s. Ignoring.", addrBuffer);
         }
         else
         {
-            m_addrMap.unregisterRealAddr(&bdAddr(realAddr));
+            m_addrMap.unregisterRealAddr(bdAddr(realAddr));
         }
-        if ((*resetCount)++ < m_config.m_maxConnectionResets)
+        if (resetCount++ < m_config.m_maxConnectionResets)
         {
-            *receiving = true;
+            receiving = true;
             break;
         }
-        realAddr->toString(addrBuffer, sizeof(addrBuffer));
-        bdLogWarn("bdSocket/bdSocketRouter", "Exiting receiveAll loop after receiving %u connection resets.", *resetCount);
+        realAddr.toString(addrBuffer, sizeof(addrBuffer));
+        bdLogWarn("bdSocket/bdSocketRouter", "Exiting receiveAll loop after receiving %u connection resets.", resetCount);
         bdLogWarn("bdSocket/bdSocketRouter", "Last reset was received for addr %s ", addrBuffer);
         break;
     case -4:
@@ -557,17 +556,17 @@ void bdSocketRouter::processError(bdAddr* realAddr, bdInt val, bdUInt* resetCoun
     }
 }
 
-bdBool bdSocketRouter::tryToFindConnection(void* data, const bdUInt* size, const bdSecurityID* secID, bdAddr* realAddr, bdAddrHandleRef* addrHandle, bdInt* val, bdBool checkSecID)
+bdBool bdSocketRouter::tryToFindConnection(void* data, const bdUInt& size, const bdSecurityID& secID, bdAddr& realAddr, bdAddrHandleRef& addrHandle, bdInt& val, bdBool checkSecID)
 {
     bdHashMap<bdEndpoint,bdDTLSAssociation*,bdEndpointHashingClass>::Iterator it;
     bdDTLSAssociation* dtls;
     bdInt returnVal;
     bdBool found = false;
 
-    for (it = m_dtls.getIterator(); it, !found; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it, !found; m_dtls.next(it))
     {
         bdEndpoint key(m_dtls.getKey(it));
-        dtls = *m_dtls.getValue(it);
+        dtls = m_dtls.getValue(it);
         bdAddrHandleRef dtlsAddrHandle;
         bdAddr dtlsRealAddr;
         if (dtls)
@@ -579,21 +578,21 @@ bdBool bdSocketRouter::tryToFindConnection(void* data, const bdUInt* size, const
             bdMemcpy(&dtlsRealAddr, &bdAddr(dtlsAddrHandle->getRealAddr()), sizeof(dtlsRealAddr));
         }
 
-        if (dtlsAddrHandle.notNull() && &dtlsRealAddr == realAddr)
+        if (dtlsAddrHandle.notNull() && dtlsRealAddr == realAddr)
         {
             if (!checkSecID || (key.getSecID() == secID))
             {
-                returnVal = dtls->receiveFrom(realAddr, data, *val, addrHandle, data, *size);
+                returnVal = dtls->receiveFrom(realAddr, data, val, addrHandle, data, size);
                 if (returnVal >= 0)
                 {
                     found = true;
-                    *val = returnVal;
+                    val = returnVal;
                     m_dtls.releaseIterator(it);
                 }
                 if (returnVal == -2)
                 {
                     found = true;
-                    *val = -2;
+                    val = -2;
                     m_dtls.releaseIterator(it);
                 }
             }
@@ -602,17 +601,17 @@ bdBool bdSocketRouter::tryToFindConnection(void* data, const bdUInt* size, const
     return found;
 }
 
-bdBool bdSocketRouter::tryDecryptPacket(void* data, const bdUInt* size, const bdSecurityID* secID, bdAddr* realAddr, bdAddrHandleRef* addrHandle, bdInt* val, bdBool checkSecID)
+bdBool bdSocketRouter::tryDecryptPacket(void* data, const bdUInt& size, const bdSecurityID& secID, bdAddr& realAddr, bdAddrHandleRef& addrHandle, bdInt& val, bdBool checkSecID)
 {
     bdHashMap<bdEndpoint, bdDTLSAssociation*, bdEndpointHashingClass>::Iterator it;
     bdDTLSAssociation* dtls;
     bdInt returnVal;
     bdBool found = false;
 
-    for (it = m_dtls.getIterator(); it, !found; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it, !found; m_dtls.next(it))
     {
         bdEndpoint key(m_dtls.getKey(it));
-        dtls = *m_dtls.getValue(it);
+        dtls = m_dtls.getValue(it);
         bdAddrHandleRef dtlsAddrHandle;
         bdAddr dtlsRealAddr;
         if (dtls)
@@ -624,15 +623,15 @@ bdBool bdSocketRouter::tryDecryptPacket(void* data, const bdUInt* size, const bd
             bdMemcpy(&dtlsRealAddr, &bdAddr(dtlsAddrHandle->getRealAddr()), sizeof(dtlsRealAddr));
         }
 
-        if (dtlsAddrHandle.notNull() && &dtlsRealAddr == realAddr)
+        if (dtlsAddrHandle.notNull() && dtlsRealAddr == realAddr)
         {
             if (!checkSecID || (key.getSecID() == secID))
             {
-                returnVal = dtls->receiveFrom(realAddr, data, *val, addrHandle, data, *size);
+                returnVal = dtls->receiveFrom(realAddr, data, val, addrHandle, data, size);
                 if (returnVal >= 0)
                 {
                     found = true;
-                    *val = returnVal;
+                    val = returnVal;
                     m_dtls.releaseIterator(it);
                 }
             }
@@ -641,7 +640,7 @@ bdBool bdSocketRouter::tryDecryptPacket(void* data, const bdUInt* size, const bd
     return found;
 }
 
-void bdSocketRouter::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr* realAddr)
+void bdSocketRouter::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAddr)
 {
     bdHashMap<bdEndpoint,bdReference<bdAddrHandle>,bdEndpointHashingClass>::Iterator it;
     bdDTLSAssociation* conn;
@@ -657,37 +656,37 @@ void bdSocketRouter::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr* re
         return;
     }
     bdBool found = false;
-    for (it = m_endpointToAddrMap.getIterator(); !found, it; m_endpointToAddrMap.next(&it))
+    for (it = m_endpointToAddrMap.getIterator(); !found, it; m_endpointToAddrMap.next(it))
     {
         bdEndpoint key(m_endpointToAddrMap.getKey(it));
         addrHandle = m_endpointToAddrMap.getValue(it);
-        if (!(*bdCommonAddrRef(key.getCommonAddr()) == *remote))
+        if (bdCommonAddrRef(key.getCommonAddr()) == remote)
         {
             continue;
         }
         found = true;
-        m_endpointToAddrMap.remove(&it);
+        m_endpointToAddrMap.remove(it);
         addrHandle->setRealAddr(realAddr);
         bdEndpoint endpoint(key.getCommonAddr(), addrHandle->m_endpoint.getSecID());
-        if (m_dtls.get(&endpoint, &conn))
+        if (m_dtls.get(endpoint, conn))
         {
             bdLogWarn("bdSocket/bdSocketRouter", "already connected.");
             continue;
         }
-        realAddr->toString(addrString, sizeof(addrString));
+        realAddr.toString(addrString, sizeof(addrString));
         bdLogInfo("bdSocket/bdSocketRouter", "Address lookup succeeded. Creating DTLS conn to %s.", addrString);
         conn = new bdDTLSAssociation(
             m_socket,
             &m_keyStore,
             &m_ECCKey,
             realAddr,
-            bdAddrHandleRef(&addrHandle),
-            bdCommonAddrRef(&m_localCommonAddr),
+            bdAddrHandleRef(addrHandle),
+            bdCommonAddrRef(m_localCommonAddr),
             &m_addrMap,
             m_config.m_DTLSAssociationReceiveTimeout
         );
         conn->connect();
-        if (!m_dtls.put(&key, &conn))
+        if (!m_dtls.put(key, conn))
         {
             bdCommonAddrInfo::getInfo(endpoint.getCommonAddr(), commonAddrString, sizeof(commonAddrString));
             bdSecurityInfo::toString(endpoint.getSecID(), secIDString, sizeof(secIDString));
@@ -702,7 +701,7 @@ void bdSocketRouter::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr* re
     if (!found)
     {
         bdLogError("bdSocket/bdSocketRouter", "Address lookup failed");
-        bdCommonAddrInfo::getInfo(&bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
+        bdCommonAddrInfo::getInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
         bdLogInfo("bdSocket/bdSocketRouter", commonAddrInfo);
     }
 }
@@ -723,7 +722,7 @@ void bdSocketRouter::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
     bdLogInfo(LogChannel, commonAddrInfo);
 
     bdAddrHandleRef addrHandle;
-    for (it = m_endpointToAddrMap.getIterator(); !found, it; m_endpointToAddrMap.next(&it))
+    for (it = m_endpointToAddrMap.getIterator(); !found, it; m_endpointToAddrMap.next(it))
     {
         bdEndpoint key(m_endpointToAddrMap.getKey(it));
         addrHandle = m_endpointToAddrMap.getValue(it);
@@ -732,11 +731,11 @@ void bdSocketRouter::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
             continue;
         }
         found = true;
-        m_endpointToAddrMap.remove(&it);
+        m_endpointToAddrMap.remove(it);
         if (addrHandle->getStatus() == bdAddrHandle::BD_ADDR_RESOLVED)
         {
             bdAddrHandle::bdAddrHandleStatus status = bdAddrHandle::BD_ADDR_ERROR;
-            addrHandle->setStatus(&status);
+            addrHandle->setStatus(status);
         }
     }
     if (!found)
@@ -745,7 +744,7 @@ void bdSocketRouter::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
     }
 }
 
-bdBool bdSocketRouter::setupIntroducers(const bdArray<bdAddr>* introducers)
+bdBool bdSocketRouter::setupIntroducers(const bdArray<bdAddr>& introducers)
 {
     if (m_status == BD_SOCKET_ROUTER_INITIALIZED)
     {
@@ -754,26 +753,26 @@ bdBool bdSocketRouter::setupIntroducers(const bdArray<bdAddr>* introducers)
     return false;
 }
 
-void bdSocketRouter::onSecurityKeyRemove(const bdSecurityID* id)
+void bdSocketRouter::onSecurityKeyRemove(const bdSecurityID& id)
 {
     bdHashMap<bdEndpoint,bdDTLSAssociation*,bdEndpointHashingClass>::Iterator it;
     bdDTLSAssociation* conn;
     bdAddrHandle::bdAddrHandleStatus status;
 
-    for (it = m_dtls.getIterator(); it; m_dtls.next(&it))
+    for (it = m_dtls.getIterator(); it; m_dtls.next(it))
     {
-        conn = *m_dtls.getValue(it);
+        conn = m_dtls.getValue(it);
         if (conn->getLocalSecurityId() == id)
         {
             bdAddrHandleRef addrHandle(conn->getAddrHandle());
             status = bdAddrHandle::BD_ADDR_UNRESOLVED;
-            addrHandle->setStatus(&status);
+            addrHandle->setStatus(status);
             if (conn)
             {
                 delete conn;
             }
-            m_dtls.remove(&it);
-            m_addrMap.unregisterAddr(&addrHandle);
+            m_dtls.remove(it);
+            m_addrMap.unregisterAddr(addrHandle);
         }
     }
 }
@@ -784,11 +783,11 @@ void bdSocketRouter::registerInterceptor(bdPacketInterceptor* const interceptor)
 
     if (m_status == BD_SOCKET_ROUTER_INITIALIZED)
     {
-        if (m_interceptors.findFirst(&interceptor, &index))
+        if (m_interceptors.findFirst(interceptor, index))
         {
             bdLogWarn("bdSocket/bdSocketRouter", "same listener registered multiple times.");
         }
-        m_interceptors.pushBack(&interceptor);
+        m_interceptors.pushBack(interceptor);
     }
     else
     {
@@ -829,7 +828,7 @@ bdInt bdSocketRouter::getStatus(const bdAddrHandleRef addrHandle)
     {
         bdEndpoint key(addrHandle->m_endpoint.getCommonAddr(), addrHandle->m_endpoint.getSecID());
         bdDTLSAssociation* dtlsSocket = NULL;
-        bdBool found = m_dtls.get(&key, &dtlsSocket);
+        bdBool found = m_dtls.get(key, dtlsSocket);
         if (found && dtlsSocket)
         {
             status = static_cast<bdDTLSAssociationStatus>(dtlsSocket->getStatus());
@@ -852,22 +851,22 @@ bdInt bdSocketRouter::getStatus(const bdAddrHandleRef addrHandle)
     return status;
 }
 
-const bdQoSProbe* bdSocketRouter::getQoSProber() const
+const bdQoSProbe& bdSocketRouter::getQoSProber() const
 {
-    return &m_qosProber;
+    return m_qosProber;
 }
 
-bdAddressMap* bdSocketRouter::getAddressMap()
+bdAddressMap& bdSocketRouter::getAddressMap()
 {
-    return &m_addrMap;
+    return m_addrMap;
 }
 
-const bdSecurityKeyMap* bdSocketRouter::getKeyMap() const
+const bdSecurityKeyMap& bdSocketRouter::getKeyMap() const
 {
-    return &m_keyStore;
+    return m_keyStore;
 }
 
 const bdCommonAddrRef bdSocketRouter::getLocalCommonAddr() const
 {
-    return bdCommonAddrRef(&m_localCommonAddr);
+    return bdCommonAddrRef(m_localCommonAddr);
 }

@@ -4,10 +4,10 @@
 class bdMutex
 {
 public:
-	bdMutex();
-	~bdMutex();
-	void lock();
-	void unlock();
+    bdMutex();
+    ~bdMutex();
+    void lock();
+    void unlock();
 protected:
-	void* m_handle;
+    void* m_handle;
 };

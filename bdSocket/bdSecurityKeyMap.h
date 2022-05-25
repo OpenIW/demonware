@@ -9,12 +9,12 @@ protected:
 public:
     bdSecurityKeyMap();
     ~bdSecurityKeyMap();
-    bdBool registerKey(const bdSecurityID* id, const bdSecurityKey* key);
-    bdBool unregisterKey(const bdSecurityID* id);
-    bdBool get(const bdSecurityID* id, bdSecurityKey* key);
-    bdBool contains(const bdSecurityID* id);
+    bdBool registerKey(const bdSecurityID& id, const bdSecurityKey& key);
+    bdBool unregisterKey(const bdSecurityID& id);
+    bdBool get(const bdSecurityID& id, bdSecurityKey& key);
+    bdBool contains(const bdSecurityID& id);
     void clear();
     void registerListener(bdSecurityKeyMapListener* listener);
     void unregisterListener();
-    static bdBool initKey(bdSecurityID* id, bdSecurityKey* key);
+    static bdBool initKey(bdSecurityID& id, bdSecurityKey& key);
 };

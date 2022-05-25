@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdPlatform/bdPlatform.h"
 
 bdInAddr::bdInAddr()
@@ -11,12 +12,12 @@ bdInAddr::bdInAddr(const bdNChar8* addr)
     fromString(addr);
 }
 
-void bdInAddr::fromString(const char* addr)
+void bdInAddr::fromString(const bdNChar8* addr)
 {
     inUn.m_iaddr = inet_addr(addr);
 }
 
-const bdUInt bdInAddr::toString(char* str, unsigned int size) const
+const bdUInt bdInAddr::toString(bdNChar8* str, bdUInt size) const
 {
     const char* src;
 
@@ -24,7 +25,7 @@ const bdUInt bdInAddr::toString(char* str, unsigned int size) const
     if (src)
     {
         bdStrlcpy(str, src, size);
-        return strlen(str);
+        return bdStrlen(str);
     }
     return 0;
 }

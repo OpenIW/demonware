@@ -7,10 +7,10 @@ protected:
     bdAddrHandleRef m_handle;
 public:
     bdAddrHandleRefWrapper();
-    bdAddrHandleRefWrapper(const bdAddrHandleRefWrapper* other);
+    bdAddrHandleRefWrapper(const bdAddrHandleRefWrapper& other);
     bdAddrHandleRefWrapper(bdAddrHandleRef handle);
     ~bdAddrHandleRefWrapper();
-    bdBool operator==(const bdAddrHandleRefWrapper* other) const;
-    bdUInt getHash(const bdAddrHandleRefWrapper* addr) const;
+    bdBool operator==(const bdAddrHandleRefWrapper& other) const;
+    bdUInt getHash(const bdAddrHandleRefWrapper& addr) const;
     bdAddrHandleRef getHandle() const;
 };

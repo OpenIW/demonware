@@ -3,102 +3,96 @@
 #include "bdSocket/bdSocket.h"
 
 bdNATTypeDiscoveryPacketReply::bdNATTypeDiscoveryPacketReply()
+    : m_type(0), m_protocolVersion(0), m_mappedAddr(), m_secAddr()
 {
-    m_type = 0;
-    m_protocolVersion = 0;
-    m_mappedAddr = bdAddr();
-    m_secAddr = bdAddr();
 }
 
-bdNATTypeDiscoveryPacketReply::bdNATTypeDiscoveryPacketReply(const bdAddr* mappedAddr, const bdAddr* secAddr, const bdUInt16 protocolVersion)
+bdNATTypeDiscoveryPacketReply::bdNATTypeDiscoveryPacketReply(const bdAddr& mappedAddr, const bdAddr& secAddr, const bdUInt16 protocolVersion)
+    : m_type(21), m_protocolVersion(protocolVersion), m_mappedAddr(mappedAddr), m_secAddr(secAddr)
 {
-    m_type = 21;
-    m_protocolVersion = protocolVersion;
-    m_mappedAddr = bdAddr(mappedAddr);
-    m_secAddr = bdAddr(secAddr);
 }
 
-bdBool bdNATTypeDiscoveryPacketReply::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdNATTypeDiscoveryPacketReply::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool status = true;
 
-    *newOffset = offset;
-    AppendBasicType(status, bdUByte8, data, size, *newOffset, newOffset, &m_type);
+    newOffset = offset;
+    AppendBasicType(status, bdUByte8, data, size, newOffset, newOffset, &m_type);
     if (m_protocolVersion == 1)
     {
-        SkipBytes(status, data, size, *newOffset, newOffset, 1u);
+        SkipBytes(status, data, size, newOffset, newOffset, 1u);
     }
-    AppendBasicType(status, bdUInt16, data, size, *newOffset, newOffset, &m_protocolVersion);
-    Serialize(status, m_mappedAddr, data, size, *newOffset, newOffset);
+    AppendBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
+    Serialize(status, m_mappedAddr, data, size, newOffset, newOffset);
     if (m_protocolVersion == 1)
     {
-        SkipBytes(status, data, size, *newOffset, newOffset, 2u);
+        SkipBytes(status, data, size, newOffset, newOffset, 2u);
     }
-    Serialize(status, m_secAddr, data, size, *newOffset, newOffset);
+    Serialize(status, m_secAddr, data, size, newOffset, newOffset);
     if (m_protocolVersion == 1)
     {
-        SkipBytes(status, data, size, *newOffset, newOffset, 2u);
+        SkipBytes(status, data, size, newOffset, newOffset, 2u);
     }
     if (!status)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
     return status;
 }
 
-bdBool bdNATTypeDiscoveryPacketReply::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt* newOffset)
+bdBool bdNATTypeDiscoveryPacketReply::deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)
 {
     bdBool status = true;
 
-    *newOffset = offset;
-    RemoveBasicType(status, bdUByte8, data, size, *newOffset, newOffset, &m_type);
+    newOffset = offset;
+    RemoveBasicType(status, bdUByte8, data, size, newOffset, newOffset, &m_type);
     if (m_type < 0x14 || m_type > 0x1D)
     {
-        *newOffset = offset;
+        newOffset = offset;
         return false;
     }
-    RemoveBasicType(status, bdUInt16, data, size, *newOffset, newOffset, &m_protocolVersion);
+    RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
     if (m_protocolVersion != 2)
     {
-        RewindBytes(status, data, size, *newOffset, newOffset, 2u);
-        SkipBytes(status, data, size, *newOffset, newOffset, 2u);
-        RemoveBasicType(status, bdUInt16, data, size, *newOffset, newOffset, &m_protocolVersion);
+        RewindBytes(status, data, size, newOffset, newOffset, 2u);
+        SkipBytes(status, data, size, newOffset, newOffset, 2u);
+        RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
         if (m_protocolVersion != 1)
         {
-            *newOffset = offset;
+            newOffset = offset;
             return false;
         }
     }
-    Deserialize(status, m_mappedAddr, data, size, *newOffset, newOffset);
+    Deserialize(status, m_mappedAddr, data, size, newOffset, newOffset);
     if (m_protocolVersion == 1)
     {
-        SkipBytes(status, data, size, *newOffset, newOffset, 2u);
+        SkipBytes(status, data, size, newOffset, newOffset, 2u);
     }
-    Deserialize(status, m_secAddr, data, size, *newOffset, newOffset);
+    Deserialize(status, m_secAddr, data, size, newOffset, newOffset);
     if (!status)
     {
-        *newOffset = offset;
+        newOffset = offset;
     }
     return status;
 }
 
-bdUByte8 bdNATTypeDiscoveryPacketReply::getType()
+bdUByte8 bdNATTypeDiscoveryPacketReply::getType() const
 {
     return m_type;
 }
 
-bdUInt16 bdNATTypeDiscoveryPacketReply::getVersion()
+bdUInt16 bdNATTypeDiscoveryPacketReply::getVersion() const
 {
     return m_protocolVersion;
 }
 
-bdAddr* bdNATTypeDiscoveryPacketReply::getMappedAddr()
+const bdAddr& bdNATTypeDiscoveryPacketReply::getMappedAddr() const
 {
-    return &m_mappedAddr;
+    return m_mappedAddr;
 }
 
-bdAddr* bdNATTypeDiscoveryPacketReply::getSecAddr()
+const bdAddr& bdNATTypeDiscoveryPacketReply::getSecAddr() const
 {
-    return &m_secAddr;
+    return m_secAddr;
 }
