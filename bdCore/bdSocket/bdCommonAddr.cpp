@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
 
 void* bdCommonAddr::operator new(bdUWord nbytes)
@@ -34,43 +35,30 @@ bdBool bdCommonAddr::operator<(bdCommonAddr& other) const
     return m_hash < other.m_hash;
 }
 
-bdCommonAddr::bdCommonAddr() : bdReferencable()
+bdCommonAddr::bdCommonAddr()
+    : bdReferencable(), m_localAddrs(0u), m_publicAddr(), m_natType(BD_NAT_OPEN), m_hash(0), m_isLoopback(false)
 {
-    m_localAddrs = bdArray<bdAddr>(0u);
-    m_publicAddr = bdAddr();
-    m_natType = BD_NAT_OPEN;
-    m_hash = 0;
-    m_isLoopback = false;
 }
 
-bdCommonAddr::bdCommonAddr(const bdAddr& publicAddr) : bdReferencable()
+bdCommonAddr::bdCommonAddr(const bdAddr& publicAddr)
+    : bdReferencable(), m_localAddrs(0u), m_publicAddr(publicAddr), m_natType(BD_NAT_OPEN), m_isLoopback(false)
 {
-    m_localAddrs = bdArray<bdAddr>((bdUInt)0);
-    m_publicAddr = bdAddr(publicAddr);
-    m_natType = BD_NAT_OPEN;
-    m_isLoopback = false;
     bdAssert(publicAddr.getAddress().isValid(), "Address not valid!");
     m_localAddrs.pushBack(publicAddr);
     calculateHash();
 }
 
-bdCommonAddr::bdCommonAddr(const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType) : bdReferencable()
+bdCommonAddr::bdCommonAddr(const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType)
+    : bdReferencable(), m_localAddrs(localAddrs), m_publicAddr(publicAddr), m_natType(natType), m_isLoopback(true)
 {
-    m_localAddrs = bdArray<bdAddr>(localAddrs);
-    m_publicAddr = bdAddr(publicAddr);
-    m_natType = natType;
-    m_isLoopback = true;
     bdAssert(localAddrs.getSize() > 0, "Too few local addresses!");
     bdAssert(localAddrs.getSize() <= BD_MAX_LOCAL_ADDRS, "Too many local addresses!");
     calculateHash();
 }
 
-bdCommonAddr::bdCommonAddr(bdCommonAddrRef me, const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType) : bdReferencable()
+bdCommonAddr::bdCommonAddr(bdCommonAddrRef me, const bdArray<bdAddr>& localAddrs, const bdAddr& publicAddr, const bdNATType natType)
+    : bdReferencable(), m_localAddrs(localAddrs), m_publicAddr(publicAddr), m_natType(natType), m_isLoopback(false)
 {
-    m_localAddrs = bdArray<bdAddr>(localAddrs);
-    m_publicAddr = bdAddr(publicAddr);
-    m_natType = natType;
-    m_isLoopback = false;
     bdAssert(localAddrs.getSize() > 0, "Too few local addresses!");
     bdAssert(localAddrs.getSize() <= BD_MAX_LOCAL_ADDRS, "Too many local addresses!");
     calculateHash();

@@ -116,7 +116,7 @@ inline void bdArray<T>::pushBack(const T* value, const bdUInt n)
     {
         increaseCapacity(n - spare);
     }
-    copyConstructArrayArray(&this->m_data[this->m_size], value, n);
+    copyConstructArrayArray(&m_data[m_size], value, n);
 }
 
 template<typename T>
@@ -132,7 +132,7 @@ inline void bdArray<T>::popBack()
 template<typename T>
 void bdArray<T>::copyConstructObjectObject(T* dest, const T& src)
 {
-    dest = new(dest) T(src);
+    new(dest) T(src);
 }
 
 template<typename T>

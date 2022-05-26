@@ -64,34 +64,28 @@ bdNetImpl::~bdNetImpl()
     delete &m_params;
 }
 
-bdBool bdNetImpl::findFreePort(bdNetStartParams& params, bdAddr& addr)
+bdBool bdNetImpl::findFreePort(bdAddr& addr)
 {
     bdSocketStatusCode bindResult;
     bdPort basePort = addr.getPort();
     bdPort port = basePort;
-    bdBool success = false;
 
-    if (!params.m_socket)
-    {
-        params.m_socket = new bdSocket();
-    }
     for (bdUInt i = 0; i < 100; ++i)
     {
-        if (params.m_socket->create(false, true) == 0)
+        bdSocket sock;
+        if (sock.create(false, true) == 0)
         {
             bdLogWarn("bdNet/net", "Create socket failed ");
             break;
         }
         bdAddr tryAddr(addr.getAddress(), port);
-        bindResult = params.m_socket->bind(tryAddr);
+        bindResult = sock.bind(tryAddr);
         if (bindResult == BD_NET_SUCCESS)
         {
-            params.m_gamePort = tryAddr.getPort();
-            bdLogInfo("bdNet/net", "Requested port %u, using port %u", port, params.m_gamePort);
-            success = true;
-            break;
+            bdLogInfo("bdNet/net", "Using port %u", port);
+            return true;
         }
-        else if (bindResult == BD_NET_ADDRESS_IN_USE && (params.m_socket->close() & 1) != 0)
+        else if (bindResult == BD_NET_ADDRESS_IN_USE && sock.close())
         {
             bdLogWarn("bdNet/net", "Socket bind failed, but subsequent close succeeded!");
         }
@@ -99,9 +93,9 @@ bdBool bdNetImpl::findFreePort(bdNetStartParams& params, bdAddr& addr)
         {
             bdLogWarn("bdNet/net", "Socket failed to close with an error");
         }
-        port = bdRandom().nextUInt() % 100 + basePort;
+        ++port;
     }
-    return success;
+    return false;
 }
 
 bdBool bdNetImpl::start(const bdNetStartParams& params)
@@ -119,7 +113,7 @@ bdBool bdNetImpl::start(const bdNetStartParams& params)
         m_status = BD_NET_PARAMS_CONFIG_ERROR;
         return false;
     }
-    if (!findFreePort(m_params, addr))
+    if (!findFreePort(addr))
     {
         bdLogWarn("bdNet/net", "Failed to find a free port");
         m_status = BD_NET_BIND_FAILED;

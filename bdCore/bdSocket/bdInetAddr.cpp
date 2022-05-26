@@ -55,8 +55,8 @@ bdInetAddr::~bdInetAddr()
 }
 
 bdInetAddr::bdInetAddr(const bdInetAddr& other)
+    : m_addr(other.m_addr)
 {
-    *this = other;
 }
 
 bdInetAddr::bdInetAddr(const char* address)
@@ -70,8 +70,8 @@ bdInetAddr::bdInetAddr(unsigned int address)
 }
 
 bdInetAddr::bdInetAddr(bdInAddr address)
+    : m_addr(address)
 {
-    m_addr = address;
 }
 
 void bdInetAddr::set(const bdInetAddr& other)
@@ -91,9 +91,9 @@ void bdInetAddr::set(unsigned int address)
 
 const bdBool bdInetAddr::isValid() const
 {
-    bdInetAddr* chk = &bdInetAddr();
+    bdInetAddr chk;
 
-    return (this == chk) == 0;
+    return !(m_addr.inUn.m_iaddr == chk.m_addr.inUn.m_iaddr);
 }
 
 const bdUInt bdInetAddr::toString(char* str, bdUInt size) const

@@ -45,7 +45,7 @@ public:
     void* operator new (bdUWord nbytes);
     bdNetImpl();
     ~bdNetImpl();
-    static bdBool findFreePort(bdNetStartParams& params, bdAddr& addr);
+    static bdBool findFreePort(bdAddr& addr);
     bdBool start(const bdNetStartParams& params);
     void pump();
     void stop();

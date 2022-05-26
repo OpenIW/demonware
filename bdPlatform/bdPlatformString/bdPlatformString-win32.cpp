@@ -79,10 +79,14 @@ bdInt bdVsnprintf(bdNChar8* buf, const bdUWord maxlen, const bdNChar8* format, v
 
 bdInt bdPrintf(const bdNChar8* format, ...)
 {
+    static char s_buf[1024];
     va_list va;
 
     va_start(va, format);
-    return vfprintf(stdout + 1, format, va);
+    _vsnprintf(s_buf, sizeof(s_buf), format, va);
+    va_end(va);
+    OutputDebugString(s_buf);
+    return 0;
 }
 
 bdUInt bdStrGetToken(const bdNChar8* str, const bdNChar8* delimeters, bdNChar8* tokenBuffer, bdUInt tokenBufferSize, const bdNChar8** end)

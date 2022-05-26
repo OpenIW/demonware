@@ -7,7 +7,7 @@ public:
     bdInAddr();
     bdInAddr(const bdNChar8* addr);
     void fromString(const bdNChar8* addr);
-    const bdUInt toString(bdNChar8* str, unsigned int size) const;
+    const bdUInt toString(bdNChar8* str, bdUInt size) const;
     union
     {
         struct

@@ -13,13 +13,12 @@ void bdSocket::operator delete(void* p)
 }
 
 bdSocket::bdSocket()
+    : m_handle(-1)
 {
-    m_handle = -1;
 }
 
 bdSocket::~bdSocket()
 {
-    delete this;
 }
 
 bdBool bdSocket::create(const bdBool blocking, const bdBool broadcast)

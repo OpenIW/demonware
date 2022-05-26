@@ -31,5 +31,6 @@ bdNetStartParams& bdNetStartParams::operator=(const bdNetStartParams& other)
     m_localAddresses = other.m_localAddresses;
     m_hostNameLookupConfig = other.m_hostNameLookupConfig;
     m_UPnPConfig = other.m_UPnPConfig;
+    m_useAnyIP = other.m_useAnyIP;
     return *this;
 }

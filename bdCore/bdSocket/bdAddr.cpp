@@ -20,26 +20,23 @@ void* bdAddr::operator new(bdUWord nbytes, void* p)
 }
 
 bdAddr::bdAddr()
+    : m_address(), m_port(0)
 {
-    m_address = bdInetAddr();
-    m_port = 0;
 }
 
 bdAddr::bdAddr(const bdAddr& other)
+    : m_address(bdInetAddr(other.getAddress())), m_port(other.m_port)
 {
-    m_address = bdInetAddr(other.m_address);
-    m_port = other.m_port;
 }
 
 bdAddr::bdAddr(const bdInetAddr& address, const bdPort port)
+    : m_address(bdInetAddr(address)), m_port(port)
 {
-    m_address = bdInetAddr(address);
-    m_port = port;
 }
 
 bdAddr::bdAddr(const bdNChar8* socketAddress)
+    : m_address()
 {
-    m_address = bdInetAddr();
     set(socketAddress);
 }
 
