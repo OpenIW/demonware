@@ -4,13 +4,13 @@
 
 bdBool bdGroupCount::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readUInt32(&m_groupID) && buffer->readUInt32(&m_groupCount);
+    return buffer->readUInt32(m_groupID) && buffer->readUInt32(m_groupCount);
 }
 
-void bdGroupCount::serialize(bdByteBuffer* buffer)
+void bdGroupCount::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt32(m_groupID);
-    buffer->writeUInt32(m_groupCount);
+    buffer.writeUInt32(m_groupID);
+    buffer.writeUInt32(m_groupCount);
 }
 
 bdUInt bdGroupCount::sizeOf()

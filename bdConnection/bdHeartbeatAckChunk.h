@@ -14,8 +14,8 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdHeartbeatAckChunk();
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
     const bdHeartbeatAckFlags getFlags() const;
 };

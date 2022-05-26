@@ -28,7 +28,7 @@ public:
     const bdUInt getDataSize() const;
     const bdUInt getReadSize() const;
     bdBool getStringLength(bdUInt& length);
-    bdUByte8* getData();
+    bdUByte8* getData() const;
     const bdUInt getSize() const;
     const bdUInt getMaxWriteSize() const;
     const bdUInt getMaxReadSize() const;
@@ -70,7 +70,7 @@ public:
         result = read(reinterpret_cast<void*>(&temp), sizeof(dataType));
         if (result)
         {
-            bdBitOperations::endianSwap<dataType>(&temp, var);
+            bdBitOperations::endianSwap<dataType>(temp, var);
         }
         return result;
     }
@@ -96,11 +96,11 @@ public:
     bdBool writeNAN();
     bdBool writeNoType();
     template <typename dataType>
-    bdBool write(const dataType* var)
+    bdBool write(const dataType& var)
     {
         dataType evar;
 
-        bdBitOperations::endianSwap<dataType>(var, &evar);
+        bdBitOperations::endianSwap<dataType>(var, evar);
         return write(reinterpret_cast<void*>(&evar), sizeof(dataType));
     }
 };

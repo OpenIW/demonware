@@ -23,17 +23,17 @@ bdLANDiscoveryServer::~bdLANDiscoveryServer()
 
 void bdLANDiscoveryServer::registerListener(bdLANDiscoveryListener* listener)
 {
-    m_listeners.pushBack(&listener);
+    m_listeners.pushBack(listener);
 }
 
-bdBool bdLANDiscoveryServer::start(const bdReference<bdGameInfo> gameInfo, const bdInetAddr* localAddr, const bdInt16 discoveryPort)
+bdBool bdLANDiscoveryServer::start(const bdReference<bdGameInfo> gameInfo, const bdInetAddr& localAddr, const bdInt16 discoveryPort)
 {
     if (!m_socket.create(false, true))
     {
         m_status = BD_DOWNLOAD;
         return false;
     }
-    if (m_socket.bind(&bdAddr(localAddr, discoveryPort)) != BD_NET_SUCCESS)
+    if (m_socket.bind(bdAddr(localAddr, discoveryPort)) != BD_NET_SUCCESS)
     {
         m_status = BD_DOWNLOAD;
         return false;
@@ -70,7 +70,7 @@ void bdLANDiscoveryServer::update()
         return;
     }
     bdAddr tempAddr;
-    bytesReceived = m_socket.receiveFrom(&tempAddr, dataReceived, sizeof(dataReceived));
+    bytesReceived = m_socket.receiveFrom(tempAddr, dataReceived, sizeof(dataReceived));
     if (bytesReceived <= 11)
     {
         return;
@@ -84,7 +84,7 @@ void bdLANDiscoveryServer::update()
     }
     ok = bitBuffer.readDataType(BD_BB_FULL_TYPE);
     ok = ok == bitBuffer.readBits(tempNonce, CHAR_BIT * sizeof(tempNonce));
-    ok = ok == bitBuffer.readUInt32(&tempTitleID);
+    ok = ok == bitBuffer.readUInt32(tempTitleID);
     if (!ok)
     {
         return;
@@ -99,8 +99,8 @@ void bdLANDiscoveryServer::update()
     replyBitBuffer.writeBits(&replyType, CHAR_BIT);
     replyBitBuffer.writeDataType(BD_BB_FULL_TYPE);
     replyBitBuffer.writeBits(tempNonce, CHAR_BIT * sizeof(tempNonce));
-    m_gameInfo->serialize(&replyBitBuffer);
-    bdInt sendResult = m_socket.sendTo(&tempAddr, replyBitBuffer.getData(), replyBitBuffer.getDataSize());
+    m_gameInfo->serialize(replyBitBuffer);
+    bdInt sendResult = m_socket.sendTo(tempAddr, replyBitBuffer.getData(), replyBitBuffer.getDataSize());
     if (sendResult <= 0)
     {
         return;
@@ -109,6 +109,6 @@ void bdLANDiscoveryServer::update()
     bdLogInfo("bdNet/discovery server", "Sent discovery reply to: %s", addrStr);
     for (bdUInt i = 0; i < m_listeners.getSize(); ++i)
     {
-        (*m_listeners[i])->onRequest();
+        m_listeners[i]->onRequest();
     }
 }

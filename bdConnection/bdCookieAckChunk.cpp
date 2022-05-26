@@ -16,30 +16,32 @@ bdCookieAckChunk::bdCookieAckChunk() : bdChunk(BD_CT_COOKIE_ACK), m_flags(bdCook
 {
 }
 
-bdUInt bdCookieAckChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdCookieAckChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     bdUInt offset = bdChunk::serialize(data, size);
     bdUInt16 length = 0;
     bdBool ok = true;
 
-    AppendBasicType(ok, bdUByte8, data, size, offset, &offset, reinterpret_cast<bdUByte8*>(&m_flags));
-    AppendBasicType(ok, bdUInt16, data, size, offset, &offset, &length);
+    AppendBasicType(ok, bdUByte8, data, size, offset, offset, m_flags);
+    AppendBasicType(ok, bdUInt16, data, size, offset, offset, length);
 
     return offset;
 }
 
-bdBool bdCookieAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdCookieAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
-    bdUInt bytesRead = *offset;
+    bdUInt bytesRead = offset;
     bdBool ok = false;
 
-    ok = bdChunk::deserialize(data, size, &bytesRead);
-    RemoveBasicType(ok, bdUByte8, data, size, bytesRead, &bytesRead, reinterpret_cast<bdUByte8*>(&m_flags));
+    ok = bdChunk::deserialize(data, size, bytesRead);
+    bdUByte8 flags = 0;
+    RemoveBasicType(ok, bdUByte8, data, size, bytesRead, bytesRead, flags);
+    m_flags = static_cast<bdCookieAckFlags>(flags);
     bdUInt16 length = 0;
-    RemoveBasicType(ok, bdUInt16, data, size, bytesRead, &bytesRead, &length);
+    RemoveBasicType(ok, bdUInt16, data, size, bytesRead, bytesRead, length);
     if (ok)
     {
-        *offset = bytesRead;
+        offset = bytesRead;
     }
     return ok;
 }

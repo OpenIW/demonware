@@ -15,7 +15,7 @@ bdNATTravClient::~bdNATTravClient()
     while (it)
     {
         bdNATTravClientData data(m_callbacks.getValue(it));
-        bdCommonAddrInfo::getBriefInfo(&bdCommonAddrRef(data.m_remote), tmp, sizeof(tmp));
+        bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(data.m_remote), tmp, sizeof(tmp));
         bdLogInfo("bdSocket/nat", "NAT traversal to %s failed.", tmp);
         data.callOnNATAddrDiscoveryFailed(bdCommonAddrRef(data.m_remote));
         m_callbacks.next(it);
@@ -48,7 +48,7 @@ bdBool bdNATTravClient::init(bdSocket* socket, bdServiceBandwidthArbitrator* ban
     }
     m_socket = socket;
     m_bandArb = bandArb;
-    m_localCommonAddr = localCommonAddr.m_ptr;
+    m_localCommonAddr = *localCommonAddr;
     bdSingleton<bdTrulyRandomImpl>::getInstance()->getRandomUByte8(m_secretKey, sizeof(m_secretKey));
     m_status = BD_NAT_TRAV_INITIALIZED;
     return sendKeepAlive();
@@ -72,7 +72,7 @@ bdBool bdNATTravClient::connect(bdCommonAddrRef remote, bdNATTravListener* liste
         bdNATTravClientData data = m_callbacks.getValue(it);
         if (data.m_secondaryListener)
         {
-            bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote.m_ptr), commonAddrInfo, sizeof(commonAddrInfo));
+            bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
             bdLogWarn("bdSocket/nat", "Third connect request to %s. Ignoring.", commonAddrInfo);
             return false;
         }
@@ -81,23 +81,23 @@ bdBool bdNATTravClient::connect(bdCommonAddrRef remote, bdNATTravListener* liste
     }
     else
     {
-        bdNATTravClientData data(&bdCommonAddrRef(m_localCommonAddr), &bdCommonAddrRef(remote.m_ptr), listener);
+        bdNATTravClientData data(bdCommonAddrRef(m_localCommonAddr), bdCommonAddrRef(remote), listener);
         data.m_throttled = throttle;
         data.m_age.start();
-        bdCommonAddrInfo::getInfo(bdCommonAddrRef(remote.m_ptr), destAddr, sizeof(destAddr));
+        bdCommonAddrInfo::getInfo(bdCommonAddrRef(remote), destAddr, sizeof(destAddr));
         bdLogInfo("bdSocket/nat", "Starting NAT trav to %s", destAddr);
         if (!sendStage1(data))
         {
             bdLogWarn("bdSocket/nat", "Initial stage 1 send failed. Continuing anyway");
         }
-        if (m_callbacks.put(identifier, &data))
+        if (m_callbacks.put(identifier, data))
         {
             m_status = BD_NAT_TRAV_RUNNING;
         }
         else
         {
             bdLogError("bdSocket/nat", "Failed to put address in map");
-            bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote.m_ptr), commonAddrInfo, sizeof(commonAddrInfo));
+            bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
             bdLogInfo("bdSocket/nat", commonAddrInfo);
             return false;
         }
@@ -119,11 +119,11 @@ void bdNATTravClient::cancelConnect(bdCommonAddrRef remote)
     bdNATTravClientData callback;
     if (m_callbacks.remove(identifier, callback))
     {
-        callback.callOnNATAddrDiscoveryFailed(bdCommonAddrRef(remote.m_ptr));
+        callback.callOnNATAddrDiscoveryFailed(bdCommonAddrRef(remote));
     }
     else
     {
-        bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote.m_ptr), commonAddrInfo, sizeof(commonAddrInfo));
+        bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
         bdLogWarn("bdSocket/nat", "Connect canceled to unknown remote host %s. Ignoring.", commonAddrInfo);
     }
 }
@@ -558,7 +558,7 @@ bdBool bdNATTravClient::doHMac(const bdUInt32 identifier, const bdAddr& src, con
     bdUByte8 addrBuffer[136];
 
     offset = 0;
-    if (!bdBytePacker::appendBasicType<bdUInt32>(reinterpret_cast<void*>(ident), sizeof(ident), 0, offset, &identifier))
+    if (!bdBytePacker::appendBasicType<bdUInt32>(reinterpret_cast<void*>(ident), sizeof(ident), 0, offset, identifier))
     {
         return false;
     }

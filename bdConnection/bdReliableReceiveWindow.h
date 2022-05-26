@@ -18,6 +18,6 @@ public:
     bdReliableReceiveWindow();
     bdBool add(bdDataChunkRef chunk);
     void calculateAck();
-    void getDataToSend(bdPacket* packet);
+    void getDataToSend(bdPacket& packet);
     bdDataChunkRef getNextToRead();
 };

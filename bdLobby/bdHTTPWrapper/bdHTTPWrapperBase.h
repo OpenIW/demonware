@@ -39,5 +39,5 @@ public:
     void finalize();
 protected:
     bdBool startAsyncOperation(bdHTTPWrapperBase::bdOperation op);
-    bdBool parseURL(const bdNChar8* const url, bdNChar8* serverName, bdNChar8** startRequestPath, bdUInt32* port);
+    bdBool parseURL(const bdNChar8* const url, bdNChar8* serverName, bdNChar8** startRequestPath, bdUInt32& port);
 };

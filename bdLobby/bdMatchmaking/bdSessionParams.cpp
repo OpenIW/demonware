@@ -16,7 +16,7 @@ bdSessionParams::~bdSessionParams()
 {
 }
 
-bdBool bdSessionParams::serialize(bdByteBuffer* buffer)
+bdBool bdSessionParams::serialize(bdByteBuffer& buffer)
 {
     return true;
 }

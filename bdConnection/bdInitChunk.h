@@ -19,8 +19,8 @@ public:
     void* operator new(bdUWord nbytes);
     bdInitChunk();
     bdInitChunk(bdUInt32 initTag, const bdWord windowCredit);
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
 
     const bdWord getWindowCredit() const;

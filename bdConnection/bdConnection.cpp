@@ -37,11 +37,11 @@ bdConnection::~bdConnection()
 void bdConnection::registerListener(bdConnectionListener* const listener)
 {
     bdUInt32 index;
-    if (m_listeners.findFirst(&listener, &index))
+    if (m_listeners.findFirst(listener, index))
     {
         bdLogWarn("bdConnection/connections", "same listener registered multiple times.");
     }
-    m_listeners.pushBack(&listener);
+    m_listeners.pushBack(listener);
 }
 
 void bdConnection::unregisterListener(bdConnectionListener* const listener)
@@ -49,7 +49,7 @@ void bdConnection::unregisterListener(bdConnectionListener* const listener)
     m_listeners.removeAllKeepOrder(listener);
 }
 
-void bdConnection::setAddressHandle(const bdAddrHandleRef* addr)
+void bdConnection::setAddressHandle(const bdAddrHandleRef& addr)
 {
     m_addrHandle = addr;
 }
@@ -64,9 +64,9 @@ bdUInt bdConnection::getTransmissionRate() const
     return m_maxTransmissionRate;
 }
 
-const bdAddrHandleRef* bdConnection::getAddressHandle() const
+const bdAddrHandleRef& bdConnection::getAddressHandle() const
 {
-    return &m_addrHandle;
+    return m_addrHandle;
 }
 
 bdCommonAddrRef bdConnection::getAddress() const

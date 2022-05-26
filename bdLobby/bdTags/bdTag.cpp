@@ -2,8 +2,8 @@
 
 #include "bdLobby/bdLobby.h"
 
-bdTag::bdTag(bdTag* other)
-    : bdTaskResult(), m_priTag(other->m_priTag), m_secTag(other->m_secTag)
+bdTag::bdTag(bdTag& other)
+    : bdTaskResult(), m_priTag(other.m_priTag), m_secTag(other.m_secTag)
 {
 }
 
@@ -21,15 +21,15 @@ bdTag::~bdTag()
 {
 }
 
-void bdTag::serialize(bdByteBuffer* buffer) const
+void bdTag::serialize(bdByteBuffer& buffer) const
 {
-    buffer->writeUInt64(m_priTag);
-    buffer->writeUInt64(m_secTag);
+    buffer.writeUInt64(m_priTag);
+    buffer.writeUInt64(m_secTag);
 }
 
 bdBool bdTag::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readUInt64(&m_priTag) && buffer->readUInt64(&m_secTag);
+    return buffer->readUInt64(m_priTag) && buffer->readUInt64(m_secTag);
 }
 
 bdUInt bdTag::sizeOf()
@@ -43,9 +43,9 @@ void bdTag::set(bdUInt64 priTag, bdUInt64 secTag)
     m_secTag = secTag;
 }
 
-bdTag* bdTag::operator=(const bdTag* other)
+bdTag& bdTag::operator=(const bdTag& other)
 {
-    m_priTag = other->m_priTag;
-    m_secTag = other->m_secTag;
-    return this;
+    m_priTag = other.m_priTag;
+    m_secTag = other.m_secTag;
+    return *this;
 }

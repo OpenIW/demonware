@@ -17,7 +17,7 @@ public:
         void operator delete(void* p);
         void* operator new(bdUWord nbytes);
         bdGapAckBlock();
-        bdGapAckBlock(bdGapAckBlock* other);
+        bdGapAckBlock(const bdGapAckBlock& other);
         bdGapAckBlock(bdUInt start, bdUInt end);
     };
 protected:
@@ -30,15 +30,15 @@ public:
     void* operator new(bdUWord nbytes);
     bdSAckChunk();
     bdSAckChunk(const bdWord windowCredit, bdSAckFlags flags);
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
 
-    void addGap(const bdSAckChunk::bdGapAckBlock* gap);
+    void addGap(const bdSAckChunk::bdGapAckBlock& gap);
     void setCumulativeAck(bdSeqNumber cumulativeAck);
     void setWindowCredit(bdWord windowCredit);
 
-    bdLinkedList<bdSAckChunk::bdGapAckBlock>* getGapList();
+    bdLinkedList<bdSAckChunk::bdGapAckBlock>& getGapList();
     const bdWord getWindowCredit() const;
     const bdSeqNumber getCumulativeAck() const;
 };

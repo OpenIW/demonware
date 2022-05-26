@@ -23,10 +23,10 @@ bdUnreliableSendWindow::~bdUnreliableSendWindow()
 void bdUnreliableSendWindow::add(bdDataChunkRef chunk)
 {
     bdAssert(chunk.notNull(), "Chunk should never be null.");
-    m_sendQueue.enqueue(&chunk);
+    m_sendQueue.enqueue(chunk);
 }
 
-void bdUnreliableSendWindow::getDataToSend(bdPacket* packet)
+void bdUnreliableSendWindow::getDataToSend(bdPacket& packet)
 {
     bdBool addedChunk = 1;
     bdDataChunkRef chunk;
@@ -35,7 +35,7 @@ void bdUnreliableSendWindow::getDataToSend(bdPacket* packet)
         chunk = m_sendQueue.peek();
         bdAssert(chunk.notNull(), "Chunk should never be null.");
         chunk->setSequenceNumber(m_seqNumber);
-        addedChunk = packet->addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(&chunk)));
+        addedChunk = packet.addChunk(bdChunkRef(*chunk));
         if (addedChunk)
         {
             ++m_seqNumber;

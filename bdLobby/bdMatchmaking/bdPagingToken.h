@@ -21,7 +21,7 @@ public:
     ~bdPagingToken();
     void setRandomSessionID();
     virtual bdBool processResult(bdTaskResult* lastResultSet, bdUInt numResults);
-    const bdSecurityID* getSessionID() const;
+    const bdSecurityID& getSessionID() const;
     bdUInt getNumResultsPerPage() const;
     bdPagingToken::bdStatus getStatus() const;
 };

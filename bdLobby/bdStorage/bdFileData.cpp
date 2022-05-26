@@ -19,7 +19,7 @@ bdFileData::bdFileData(void* fileData, bdUInt fileSize)
 
 bdBool bdFileData::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readBlob(reinterpret_cast<bdUByte8*>(m_fileData), &m_fileSize);
+    return buffer->readBlob(reinterpret_cast<bdUByte8*>(m_fileData), m_fileSize);
 }
 
 bdUInt bdFileData::sizeOf()

@@ -42,7 +42,7 @@ bdBool bdSocket::create(const bdBool blocking, const bdBool broadcast)
 
 bdSocketStatusCode bdSocket::bind(bdAddr& addr)
 {
-    return bdPlatformSocket::bind(&m_handle, addr.getAddress().getInAddr(), addr.getPort());
+    return bdPlatformSocket::bind(m_handle, addr.getAddress().getInAddr(), addr.getPort());
 }
 
 bdSocketStatusCode bdSocket::bind(const bdPort port)
@@ -64,7 +64,7 @@ bdInt bdSocket::receiveFrom(bdAddr& addr, void* data, const bdUInt size)
     bdInAddr inaddr;
     bdPort port;
 
-    status = bdPlatformSocket::receiveFrom(m_handle, &inaddr, &port, data, size);
+    status = bdPlatformSocket::receiveFrom(m_handle, inaddr, port, data, size);
     if (status < 0 && status != -5)
     {
         return status;
@@ -76,7 +76,7 @@ bdInt bdSocket::receiveFrom(bdAddr& addr, void* data, const bdUInt size)
 
 bdBool bdSocket::close()
 {
-    return bdPlatformSocket::close(&m_handle);
+    return bdPlatformSocket::close(m_handle);
 }
 
 bdInt bdSocket::getHandle()

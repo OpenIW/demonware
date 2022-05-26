@@ -14,9 +14,9 @@ bdBool bdNATTypeDiscoveryPacket::serialize(void* data, const bdUInt size, const 
     bdBool ok = true;
     newOffset = offset;
 
-    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
-    ok = ok == bdBytePacker::appendBasicType<bdByte8>(data, size, newOffset, newOffset, reinterpret_cast<bdByte8*>(&m_request));
+    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
+    ok = ok == bdBytePacker::appendBasicType<bdByte8>(data, size, newOffset, newOffset, m_request);
     if (!ok)
     {
         newOffset = offset;
@@ -29,13 +29,13 @@ bdBool bdNATTypeDiscoveryPacket::deserialize(const void* data, const bdUInt size
     bdBool ok = true;
     newOffset = offset;
 
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     if (m_protocolVersion != 2)
     {
         ok = ok == bdBytePacker::rewindBytes(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, sizeof(bdUInt16));
         ok = ok == bdBytePacker::skipBytes(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, 1u);
-        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     }
     if (m_protocolVersion != 1 || m_protocolVersion != 2)
     {
@@ -46,14 +46,16 @@ bdBool bdNATTypeDiscoveryPacket::deserialize(const void* data, const bdUInt size
     {
         return false;
     }
-    ok = ok == bdBytePacker::removeBasicType<bdByte8>(data, size, newOffset, newOffset, reinterpret_cast<bdByte8*>(&m_request));
+    bdByte8 request = 0;
+    ok = ok == bdBytePacker::removeBasicType<bdByte8>(data, size, newOffset, newOffset, request);
+    m_request = static_cast<bdNATTypeDiscoveryPacketRequest>(request);
     if (m_protocolVersion == 1)
     {
         bdUByte8 zero = 0;
 
-        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &zero);
-        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &zero);
-        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &zero);
+        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, zero);
+        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, zero);
+        ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, zero);
     }
     return ok;
 }

@@ -17,7 +17,7 @@ public:
     ~bdMatchMakingInfo();
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     bdCommonAddrRef getHostAddrAsCommonAddr(bdCommonAddrRef localCommonAddr);
     void setHostAddr(bdCommonAddrRef localCommonAddr);
 };

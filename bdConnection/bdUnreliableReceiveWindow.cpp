@@ -22,11 +22,11 @@ bdUnreliableReceiveWindow::~bdUnreliableReceiveWindow()
 
 bdBool bdUnreliableReceiveWindow::add(bdDataChunkRef chunk)
 {
-    bdSequenceNumber newSeqNum(&m_seqNumber, chunk->getSequenceNumber(), 16);
+    bdSequenceNumber newSeqNum(m_seqNumber, chunk->getSequenceNumber(), 16);
     
-    if (newSeqNum > &m_seqNumber)
+    if (newSeqNum > m_seqNumber)
     {
-        m_recvQueue.enqueue(&chunk);
+        m_recvQueue.enqueue(chunk);
         m_seqNumber = newSeqNum;
     }
     return true;

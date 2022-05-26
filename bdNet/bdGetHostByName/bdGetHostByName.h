@@ -33,7 +33,7 @@ public:
     void pump();
     void cancelLookup();
 
-    bdInAddr* getAddressAt(bdUInt index) const;
+    bdInAddr getAddressAt(bdUInt index) const;
     const bdUInt getNumAddresses() const;
     const bdGetHostByName::bdStatus getStatus() const;
 };

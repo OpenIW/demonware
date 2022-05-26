@@ -17,10 +17,10 @@ bdRatingInfo::bdRatingInfo()
 {
 }
 
-void bdRatingInfo::serialize(bdByteBuffer* buffer)
+void bdRatingInfo::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt64(m_entityID);
-    buffer->writeUByte8(m_rating);
+    buffer.writeUInt64(m_entityID);
+    buffer.writeUByte8(m_rating);
 }
 
 bdBool bdRatingInfo::deserialize(bdByteBufferRef buffer)

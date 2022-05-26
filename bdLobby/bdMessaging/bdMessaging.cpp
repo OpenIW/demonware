@@ -63,13 +63,13 @@ bdRemoteTaskRef bdMessaging::getNotifications(bdNotification* notifications, con
     bdUInt taskSize = 76;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 6, 5);
+    m_remoteTaskManager->initTaskBuffer(buffer, 6, 5);
     bdBool status = buffer->writeUInt32(startIndex);
     status = status == buffer->writeUInt32(numNotifications);
     status = status == buffer->writeBool(deleteOnRead);
     if (status)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("messaging", "Failed to start task: Error %i");
@@ -83,7 +83,7 @@ bdRemoteTaskRef bdMessaging::getNotifications(bdNotification* notifications, con
     {
         bdLogWarn("messaging", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdMessaging::deleteNotifications(unsigned long long*, const unsigned int)
@@ -147,12 +147,12 @@ bdRemoteTaskRef bdMessaging::sendGlobalInstantMessage(const bdUInt64 recipientUI
     bdUInt taskSize = newMsgSize + 78;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 6, 14);
+    m_remoteTaskManager->initTaskBuffer(buffer, 6, 14);
     bdBool status = buffer->writeUInt64(recipientUID);
     status = status == buffer->writeBlob(message, newMsgSize);
     if (status)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("messaging", "Failed to start task: Error %i");
@@ -162,5 +162,5 @@ bdRemoteTaskRef bdMessaging::sendGlobalInstantMessage(const bdUInt64 recipientUI
     {
         bdLogWarn("messaging", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }

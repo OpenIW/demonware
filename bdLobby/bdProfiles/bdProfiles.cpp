@@ -26,13 +26,13 @@ bdRemoteTaskRef bdProfiles::deleteProfile()
 {
     bdRemoteTaskRef task;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(64, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 8, 5);
-    bdInt started = m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->initTaskBuffer(buffer, 8, 5);
+    bdInt started = m_remoteTaskManager->startTask(task, buffer);
     if (started)
     {
         bdLogWarn("profiles", "Failed to start task: Error %i", started);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdProfiles::setPublicInfo(bdProfileInfo* profileInfo)
@@ -40,14 +40,14 @@ bdRemoteTaskRef bdProfiles::setPublicInfo(bdProfileInfo* profileInfo)
     bdRemoteTaskRef task;
     bdUInt taskSize = profileInfo->sizeOf() + 65;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 8, 3);
-    profileInfo->serialize(*buffer);
-    bdInt started = m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->initTaskBuffer(buffer, 8, 3);
+    profileInfo->serialize(**buffer);
+    bdInt started = m_remoteTaskManager->startTask(task, buffer);
     if (started)
     {
         bdLogWarn("profiles", "Failed to start task: Error %i", started);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdProfiles::setPrivateInfo(bdProfileInfo* profileInfo)
@@ -55,14 +55,14 @@ bdRemoteTaskRef bdProfiles::setPrivateInfo(bdProfileInfo* profileInfo)
     bdRemoteTaskRef task;
     bdUInt taskSize = profileInfo->sizeOf() + 65;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 8, 4);
-    profileInfo->serialize(*buffer);
-    bdInt started = m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->initTaskBuffer(buffer, 8, 4);
+    profileInfo->serialize(**buffer);
+    bdInt started = m_remoteTaskManager->startTask(task, buffer);
     if (started)
     {
         bdLogWarn("profiles", "Failed to start task: Error %i", started);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdProfiles::getPublicInfos(const bdUInt64* userIDs, bdProfileInfo* publicProfiles, const bdUInt numProfiles)
@@ -70,7 +70,7 @@ bdRemoteTaskRef bdProfiles::getPublicInfos(const bdUInt64* userIDs, bdProfileInf
     bdRemoteTaskRef task;
     bdUInt taskSize = 9 * numProfiles + 64;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 8, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 8, 1);
     bdBool ok = true;
     for (bdUInt i = 0; i < numProfiles && ok; ++i)
     {
@@ -79,7 +79,7 @@ bdRemoteTaskRef bdProfiles::getPublicInfos(const bdUInt64* userIDs, bdProfileInf
 
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("profiles", "Failed to start task: Error %i", startTaskResult);
@@ -93,15 +93,15 @@ bdRemoteTaskRef bdProfiles::getPublicInfos(const bdUInt64* userIDs, bdProfileInf
     {
         bdLogWarn("profiles", "Failed to serialize the task buffer.");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdProfiles::getPrivateInfo(bdProfileInfo* const privateProfile)
 {
     bdRemoteTaskRef task;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(64, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 8, 2);
-    bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->initTaskBuffer(buffer, 8, 2);
+    bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
     if (startTaskResult)
     {
         bdLogWarn("profiles", "Failed to start task: Error %i", startTaskResult);
@@ -110,5 +110,5 @@ bdRemoteTaskRef bdProfiles::getPrivateInfo(bdProfileInfo* const privateProfile)
     {
         task->setTaskResult(privateProfile, 1);
     }
-    return &task;
+    return task;
 }

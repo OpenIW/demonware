@@ -29,11 +29,11 @@ bdStatsInfo::~bdStatsInfo()
 
 bdBool bdStatsInfo::deserialize(bdByteBufferRef buffer)
 {
-    bdBool ok = buffer->readUInt64(&m_entityID);
-    ok = ok == buffer->readInt64(&m_rating);
-    ok = ok == buffer->readUInt64(&m_rank);
+    bdBool ok = buffer->readUInt64(m_entityID);
+    ok = ok == buffer->readInt64(m_rating);
+    ok = ok == buffer->readUInt64(m_rank);
     ok = ok == buffer->readString(m_entityName, sizeof(m_entityName));
-    ok = ok == buffer->readUInt32(&m_secondsSinceUpdate);
+    ok = ok == buffer->readUInt32(m_secondsSinceUpdate);
     if (!ok)
     {
         bdLogError("statsInfo", "Deserialization failed");
@@ -41,12 +41,12 @@ bdBool bdStatsInfo::deserialize(bdByteBufferRef buffer)
     return ok;
 }
 
-void bdStatsInfo::serialize(bdByteBuffer* buffer)
+void bdStatsInfo::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt32(m_leaderboardID);
-    buffer->writeUInt64(m_entityID);
-    buffer->writeUByte8(m_writeType);
-    buffer->writeInt64(m_rating);
+    buffer.writeUInt32(m_leaderboardID);
+    buffer.writeUInt64(m_entityID);
+    buffer.writeUByte8(m_writeType);
+    buffer.writeInt64(m_rating);
 }
 
 bdUInt bdStatsInfo::sizeOf()

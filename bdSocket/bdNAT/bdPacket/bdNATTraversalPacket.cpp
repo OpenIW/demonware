@@ -23,15 +23,15 @@ bdBool bdNATTraversalPacket::deserialize(const void* data, const bdUInt size, co
     bdBool status;
 
     newOffset = offset;
-    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     if (m_protocolVersion < 2u)
     {
         newOffset = offset;
         return false;
     }
     status = status == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
-    status = status == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_ident);
+    status = status == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, m_ident);
     status = status == m_addrSrc.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
     status = status == m_addrDest.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
     if (!status)
@@ -47,10 +47,10 @@ bdBool bdNATTraversalPacket::serialize(void* data, const bdUInt size, const bdUI
     bdBool status;
 
     newOffset = offset;
-    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     status = status == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, m_hmac, BD_NAT_TRAV_HMAC_SIZE);
-    status = status == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_ident);
+    status = status == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, m_ident);
     status = status == m_addrSrc.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
     status = status == m_addrDest.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
     if (status)

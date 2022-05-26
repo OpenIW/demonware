@@ -28,6 +28,6 @@ public:
     void registerListener(bdLANDiscoveryListener* listener);
     void stop();
     void unregisterListener(bdLANDiscoveryListener* listener);
-    bdBool discover(const bdUInt titleID, const bdFloat32 timeout, const bdInetAddr* addr, const bdUInt16 discoveryPort);
+    bdBool discover(const bdUInt titleID, const bdFloat32 timeout, const bdInetAddr& addr, const bdUInt16 discoveryPort);
     void update();
 };

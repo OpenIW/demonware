@@ -23,7 +23,7 @@ bdRemoteTaskRef bdGroup::setGroups(const bdUInt32* const groupIDs, const bdUInt 
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
     bdRemoteTaskRef task;
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 28, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 28, 1);
     bdBool status = buffer->writeArrayStart(8, numEntries, sizeof(bdUInt));
     for (bdUInt i = 0; i < numEntries; ++i)
     {
@@ -32,7 +32,7 @@ bdRemoteTaskRef bdGroup::setGroups(const bdUInt32* const groupIDs, const bdUInt 
     buffer->writeArrayEnd();
     if (status)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("groups", "Failed to start task: Error %i", status);
@@ -42,7 +42,7 @@ bdRemoteTaskRef bdGroup::setGroups(const bdUInt32* const groupIDs, const bdUInt 
     {
         bdLogWarn("groups", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdGroup::setGroupsForEntity(const bdUInt64 entityID, const bdUInt32* const groupIDs, const bdUInt numEntries)
@@ -61,7 +61,7 @@ bdRemoteTaskRef bdGroup::getGroupCounts(const bdUInt32* const groupIDs, const bd
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
     bdRemoteTaskRef task;
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 28, 4);
+    m_remoteTaskManager->initTaskBuffer(buffer, 28, 4);
     bdBool status = buffer->writeArrayStart(8, numGroupIDs, sizeof(bdUInt));
     for (bdUInt i = 0; i < numGroupIDs; ++i)
     {
@@ -70,7 +70,7 @@ bdRemoteTaskRef bdGroup::getGroupCounts(const bdUInt32* const groupIDs, const bd
     buffer->writeArrayEnd();
     if (status)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("groups", "Failed to start task: Error %i", startTaskResult);
@@ -84,5 +84,5 @@ bdRemoteTaskRef bdGroup::getGroupCounts(const bdUInt32* const groupIDs, const bd
     {
         bdLogWarn("groups", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }

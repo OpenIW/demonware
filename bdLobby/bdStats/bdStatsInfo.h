@@ -18,6 +18,6 @@ public:
     bdStatsInfo();
     ~bdStatsInfo();
     virtual bdBool deserialize(bdByteBufferRef buffer);
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     virtual bdUInt sizeOf();
 };

@@ -6,6 +6,6 @@ class bdTaskResult
 public:
     virtual ~bdTaskResult();
     virtual bdBool deserialize(bdByteBufferRef);
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     virtual bdUInt sizeOf();
 };

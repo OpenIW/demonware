@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdCookie : bdReferencable
+class bdCookie : public bdReferencable
 {
 protected:
     static bdBool m_secretInitialized;
@@ -15,8 +15,8 @@ public:
     void operator delete(void* p);
     bdCookie();
     bdCookie(bdUInt32 localTag, bdUInt32 peerTag, bdUInt32 localTieTag, bdUInt32 peerTieTag);
-    bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     bdUInt getSerializedSize();
 
     const bdUInt32 getLocalTag() const;

@@ -11,7 +11,7 @@ public:
     bdSessionID();
     bdSessionID(const bdSessionID* sessionID);
     ~bdSessionID();
-    virtual void serialize(bdByteBuffer* buffer) const;
+    virtual void serialize(bdByteBuffer& buffer) const;
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
 };

@@ -27,7 +27,7 @@ public:
     void operator delete(void* p);
     bdBool init(bdSocket* socket, const bdAddr& server, bdIPDiscoveryConfig config);
     bdBool sendIPDiscoveryPacket();
-    const bdAddr* getPublicAddress();
+    bdAddr& getPublicAddress();
     void pump(bdAddr fromAddr, bdUByte8* data, bdUInt dataSize);
     void quit();
     bdUInt getStatus();

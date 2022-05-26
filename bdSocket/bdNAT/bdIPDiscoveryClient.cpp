@@ -106,13 +106,13 @@ bdUInt bdIPDiscoveryClient::getStatus()
     return m_status;
 }
 
-const bdAddr* bdIPDiscoveryClient::getPublicAddress()
+bdAddr& bdIPDiscoveryClient::getPublicAddress()
 {
     if (m_status != BD_IP_DISC_SUCCESS)
     {
         bdLogWarn("bdSocket/nat", "bdIPDiscoveryClient::getPublicAddress() called, but ip discovery was not successful (or not yet finished).");
     }
-    return &m_publicAddr;
+    return m_publicAddr;
 }
 
 bdBool bdIPDiscoveryClient::sendIPDiscoveryPacket()

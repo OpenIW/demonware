@@ -40,6 +40,6 @@ public:
     bdBool sendForTest1();
     bdBool sendForTest2();
     bdBool sendForTest3();
-    bdBool sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& const serverAddr);
+    bdBool sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& serverAddr);
     void handleResponse(const bdAddr& addr, const bdNATTypeDiscoveryPacketReply& reply);
 };

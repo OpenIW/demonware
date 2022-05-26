@@ -85,7 +85,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::next(Iterator& iterator)
     }
     else
     {
-        hash = m_hashClass.getHash(&n->m_key);
+        hash = m_hashClass.getHash(n->m_key);
         for (bdUInt i = getHashIndex(hash) + 1; i < m_capacity; ++i)
         {
             if (m_map[i])
@@ -118,7 +118,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType& key
         {
             return false;
         }
-        if (key == &n->m_key)
+        if (key == n->m_key)
         {
             break;
         }
@@ -167,7 +167,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(const keyType& key
     {
         m_map[i] = n->m_next;
     }
-    value = &n->m_data;
+    value = n->m_data;
     --m_size;
     return true;
 }
@@ -182,7 +182,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::remove(Iterator& iterator
     iter = iterator;
     next(iter);
     n = reinterpret_cast<Node*>(iterator);
-    *iterator = iter;
+    iterator = iter;
     bdUInt numIterators = m_numIterators;
     m_numIterators = 0;
     bdBool result = remove(n->m_key);
@@ -241,7 +241,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::resize(const bdUInt newSize
         n = oldmap[i];
         while (n)
         {
-            put(&n->m_key, &n->m_data);
+            put(n->m_key, n->m_data);
             prev = n;
             n = n->m_next;
 
@@ -253,7 +253,7 @@ inline void bdHashMap<keyType, dataType, hashClass>::resize(const bdUInt newSize
 }
 
 template<typename keyType, typename dataType, typename hashClass>
-inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType& key, const dataType& value)
+inline bdBool bdHashMap<keyType, dataType, hashClass>::get(const keyType& key, dataType& value)
 {
     Iterator iterator = getIterator(key);
     if (!iterator)
@@ -278,7 +278,7 @@ inline bdBool bdHashMap<keyType, dataType, hashClass>::put(const keyType& key, c
     i = getHashIndex(hash);
     for (n = m_map[i]; n; n = n->m_next)
     {
-        if (const_cast<keyType*>(key) == &n->m_key)
+        if (key == n->m_key)
         {
             return false;
         }

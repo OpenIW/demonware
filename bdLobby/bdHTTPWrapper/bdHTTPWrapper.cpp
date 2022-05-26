@@ -54,7 +54,7 @@ bdHTTPWrapperBase::bdStatus bdHTTPWrapper::startCopy(const bdNChar8* const copyU
 
     m_status = BD_FAILED;
     requestPath = NULL;
-    if (parseURL(copyURL, serverName, &requestPath, &port)
+    if (parseURL(copyURL, serverName, &requestPath, port)
         && m_httpClient.httpCopy(serverName, requestPath, destination, port, transactionID))
     {
         startAsyncOperation(BD_COPY);
@@ -70,7 +70,7 @@ bdHTTPWrapperBase::bdStatus bdHTTPWrapper::startDelete(const bdNChar8* const del
 
     this->m_status = BD_FAILED;
     requestPath = 0;
-    if (parseURL(deleteURL, serverName, &requestPath, &port)
+    if (parseURL(deleteURL, serverName, &requestPath, port)
         && m_httpClient.httpDelete(serverName, requestPath, port, transactionID))
     {
         startAsyncOperation(BD_DELETE);
@@ -158,7 +158,7 @@ bdHTTPWrapperBase::bdStatus bdHTTPWrapper::_startDownload(const bdNChar8* const 
 
     m_status = BD_FAILED;
     requestPath = NULL;
-    if (parseURL(downloadURL, serverName, &requestPath, &port)
+    if (parseURL(downloadURL, serverName, &requestPath, port)
         && m_httpClient.httpGet(serverName, requestPath, downloadBuffer, bufferSize, downloadHandler, port, transactionID, startByte, endByte))
     {
         startAsyncOperation(BD_DOWNLOAD);
@@ -175,7 +175,7 @@ bdHTTPWrapperBase::bdStatus bdHTTPWrapper::_startUpload(const bdNChar8* const up
 
     m_status = BD_FAILED;
     requestPath = NULL;
-    if (parseURL(uploadURL, serverName, &requestPath, &port)
+    if (parseURL(uploadURL, serverName, &requestPath, port)
         && m_httpClient.httpPut(serverName, requestPath, fileData, uploadSize, uploadHandler, port, transactionID, checkSum))
     {
         startAsyncOperation(BD_UPLOAD);

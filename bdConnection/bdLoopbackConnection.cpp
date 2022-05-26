@@ -25,7 +25,7 @@ bdUInt bdLoopbackConnection::getDataToSend()
     return 0;
 }
 
-bdBool bdLoopbackConnection::getMessageToDispatch(bdMessageRef* message)
+bdBool bdLoopbackConnection::getMessageToDispatch(bdMessageRef& message)
 {
     if (!m_messages.isEmpty())
     {
@@ -59,7 +59,7 @@ void bdLoopbackConnection::updateStatus()
     {
         for (bdUInt i = 0; i < m_listeners.getSize(); ++i)
         {
-            (*m_listeners[i])->onConnect(&bdConnectionRef(this));
+            m_listeners[i]->onConnect(bdConnectionRef(this));
         }
         m_status = BD_CONNECTED;
         break;
@@ -68,7 +68,7 @@ void bdLoopbackConnection::updateStatus()
     {
         for (bdUInt i = 0; i < m_listeners.getSize(); ++i)
         {
-            (*m_listeners[i])->onDisconnect(&bdConnectionRef(this));
+            m_listeners[i]->onDisconnect(bdConnectionRef(this));
         }
         m_status = BD_DISCONNECTED;
         break;

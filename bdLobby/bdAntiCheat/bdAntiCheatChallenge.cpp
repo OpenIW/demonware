@@ -12,8 +12,8 @@ void* bdAntiCheatChallenge::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
-bdAntiCheatChallenge::bdAntiCheatChallenge(bdAntiCheatChallenge* other)
-    : m_functionID(other->m_functionID), m_challengeID(other->m_challengeID), m_parameters(&other->m_parameters)
+bdAntiCheatChallenge::bdAntiCheatChallenge(bdAntiCheatChallenge& other)
+    : m_functionID(other.m_functionID), m_challengeID(other.m_challengeID), m_parameters(other.m_parameters)
 {
 }
 
@@ -31,7 +31,3 @@ bdBool bdAntiCheatChallenge::deserialize(bdByteBufferRef buffer)
     return bdBool();
 }
 
-bdAntiCheatChallenge* bdAntiCheatChallenge::operator=(bdAntiCheatChallenge* other)
-{
-    return NULL;
-}

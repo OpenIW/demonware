@@ -13,5 +13,5 @@ public:
     ~bdPerformanceValue();
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
 };

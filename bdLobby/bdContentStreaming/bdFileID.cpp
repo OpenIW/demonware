@@ -11,14 +11,14 @@ bdFileID::~bdFileID()
 {
 }
 
-void bdFileID::serialize(bdByteBuffer* buffer)
+void bdFileID::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt64(m_fileID);
+    buffer.writeUInt64(m_fileID);
 }
 
 bdBool bdFileID::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readUInt64(&m_fileID);
+    return buffer->readUInt64(m_fileID);
 }
 
 bdUInt bdFileID::sizeOf()

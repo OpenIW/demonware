@@ -12,9 +12,9 @@ bdUPnP::~bdUPnP()
 {
 }
 
-bdBool bdUPnP::init(bdPort gamePort, bdArray<bdInetAddr>* localAddrs, bdUPnPConfig* config)
+bdBool bdUPnP::init(bdPort gamePort, bdArray<bdInetAddr>* localAddrs, bdUPnPConfig config)
 {
-    if (config->m_disabled)
+    if (config.m_disabled)
     {
         bdLogInfo("bdnet/upnp", "UPnP disabled.");
         m_state = BD_UPNP_FINISHED;
@@ -92,7 +92,7 @@ void bdUPnP::pump()
                     break;
                 }
 
-                if (discoveredDevice.getDeviceAddr()->getAddress() == &m_config.m_gatewayAddr)
+                if (discoveredDevice.getDeviceAddr().getAddress() == m_config.m_gatewayAddr)
                 {
                     bdLogInfo("bdnet/upnp", "UPnP capable device discovered which matches gateway. Finished Discovery.");
                     bdMemcpy(&m_device, &discoveredDevice, sizeof(m_device));
@@ -238,7 +238,7 @@ bdBool bdUPnP::startDiscovery()
             i ? "WANIPConnection:1" : "WANPPPConnection:1"
         );
         bdAddr discoveryAddr("239.255.255.250:1900");
-        if (m_discoverySocket.sendTo(&discoveryAddr, messageBuffer, discLength) != discLength)
+        if (m_discoverySocket.sendTo(discoveryAddr, messageBuffer, discLength) != discLength)
         {
             bdLogError("bdnet/upnp", "Failed to send discovery packet");
             success = false;
@@ -264,19 +264,19 @@ bdBool bdUPnP::handleDiscoveryResponse(bdUPnPDevice* discoveredDevice)
     bdByte8* fetchLoc = NULL;
     bdUInt fetchLen = 0;
 
-    if (!extractDeviceInfo(&deviceAddr, &fetchLoc, &fetchLen))
+    if (!extractDeviceInfo(deviceAddr, &fetchLoc, fetchLen))
     {
         return false;
     }
     deviceAddr.toString(addressBuffer, sizeof(addressBuffer));
     bdLogInfo("bdnet/upnp", "Discovered Device at address %s", addressBuffer);
-    return discoveredDevice->init(m_localAddrs, fetchLoc, fetchLen, deviceAddr.getAddress(), deviceAddr.getPort(), bdUPnPConfig(&m_config));
+    return discoveredDevice->init(m_localAddrs, fetchLoc, fetchLen, &deviceAddr.getAddress(), deviceAddr.getPort(), bdUPnPConfig(m_config));
 }
 
 bdBool bdUPnP::checkForDiscoveredDevices(bdUPnPDevice* discoveredDevice)
 {
     bdAddr incomingAddress;
-    bdInt received = m_discoverySocket.receiveFrom(&incomingAddress, m_readBuffer, sizeof(m_readBuffer));
+    bdInt received = m_discoverySocket.receiveFrom(incomingAddress, m_readBuffer, sizeof(m_readBuffer));
     if (received <= 0 || received > 1024)
     {
         if (received == -2)
@@ -289,7 +289,7 @@ bdBool bdUPnP::checkForDiscoveredDevices(bdUPnPDevice* discoveredDevice)
     return handleDiscoveryResponse(discoveredDevice);
 }
 
-bdBool bdUPnP::extractDeviceInfo(bdAddr* deviceAddr, bdByte8** fetchLoc, bdUInt* fetchLen)
+bdBool bdUPnP::extractDeviceInfo(bdAddr& deviceAddr, bdByte8** fetchLoc, bdUInt& fetchLen)
 {
     bdNChar8* lineEnd;
     bdUInt addrStringLength;
@@ -314,7 +314,7 @@ bdBool bdUPnP::extractDeviceInfo(bdAddr* deviceAddr, bdByte8** fetchLoc, bdUInt*
     if (slashLoc != httpString && addrStringLength < sizeof(addrString))
     {
         bdStrlcpy(addrString, httpString, addrStringLength + 1);
-        deviceAddr = &bdAddr(addrString);
+        deviceAddr = bdAddr(addrString);
         lineEnd = bdStrchr(httpString, 13);
         if (!lineEnd)
         {
@@ -322,17 +322,17 @@ bdBool bdUPnP::extractDeviceInfo(bdAddr* deviceAddr, bdByte8** fetchLoc, bdUInt*
             return false;
         }
         *fetchLoc = slashLoc;
-        *fetchLen = lineEnd - slashLoc;
+        fetchLen = lineEnd - slashLoc;
         return true;
     }
     return false;
 }
 
-bdBool bdUPnP::getExternalAddr(bdAddr* externalAddr)
+bdBool bdUPnP::getExternalAddr(bdAddr& externalAddr)
 {
     externalAddr = m_device.getExternalAddr();
 
-    if (externalAddr->getAddress()->isValid())
+    if (externalAddr.getAddress().isValid())
     {
         return true;
     }

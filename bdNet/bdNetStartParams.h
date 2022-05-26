@@ -12,8 +12,9 @@ public:
     bdGetHostByNameConfig m_hostNameLookupConfig;
     bdUPnPConfig m_UPnPConfig;
     bdBool m_useAnyIP;
+
     bdNetStartParams();
-    bdNetStartParams(const bdNetStartParams* other);
+    bdNetStartParams(const bdNetStartParams& other);
     ~bdNetStartParams();
-    bdNetStartParams* operator=(bdNetStartParams* other);
+    bdNetStartParams& operator=(const bdNetStartParams& other);
 };

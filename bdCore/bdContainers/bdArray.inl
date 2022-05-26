@@ -18,15 +18,15 @@ inline bdArray<T>::bdArray(const bdUInt capacity)
 }
 
 template<typename T>
-inline bdArray<T>::bdArray(const bdArray<T>* a)
+inline bdArray<T>::bdArray(const bdArray<T>& a)
 {
-    m_capacity = a->m_capacity;
-    m_size = a->m_size;
+    m_capacity = a.m_capacity;
+    m_size = a.m_size;
     m_data = uninitializedCopy(a);
 }
 
 template<typename T>
-inline bdArray<T>::bdArray(const bdUInt capacity, T* value)
+inline bdArray<T>::bdArray(const bdUInt capacity, T& value)
 {
     m_data = NULL;
     m_capacity = capacity;
@@ -56,7 +56,7 @@ inline bdBool bdArray<T>::get(const bdUInt i, T& value)
     bdBool inRange = rangeCheck(i);
     if (inRange)
     {
-        bdMemcpy(value, m_data[i], sizeof(T));
+        bdMemcpy(&value, &m_data[i], sizeof(T));
     }
     return inRange;
 }
@@ -140,7 +140,7 @@ void bdArray<T>::copyConstructArrayArray(T* dest, const T* src, unsigned int n)
 {
     for (int i = 0; i < n; ++i)
     {
-        dest[i] = new T(src[i]);
+        new(&dest[i]) T(src[i]);
     }
 }
 
@@ -149,7 +149,7 @@ inline void bdArray<T>::copyConstructArrayObject(T* dest, const T& src, bdUInt n
 {
     for (bdUInt i = 0; i < n; ++i)
     {
-        dest[i] = new T(*src);
+        new(&dest[i]) T(src);
     }
 }
 
@@ -260,7 +260,7 @@ void bdArray<T>::operator=(const bdArray<T>& a)
 {
     bdUInt newSize;
 
-    if (this == a)
+    if (this == &a)
     {
         return;
     }
@@ -278,7 +278,7 @@ void bdArray<T>::operator=(const bdArray<T>& a)
     {
         for (bdUInt i = 0; i < newSize; ++i)
         {
-            &m_data[i] = a[i];
+            m_data[i] = a[i];
         }
         destruct(&m_data[newSize], m_size - newSize);
         m_size = newSize;
@@ -288,7 +288,7 @@ void bdArray<T>::operator=(const bdArray<T>& a)
     {
         for (bdUInt i = 0; i < m_size; ++i)
         {
-            &m_data[i] = a[i];
+            m_data[i] = a[i];
         }
         copyConstructArrayArray(&m_data[m_size], &a.m_data[m_size], newSize - m_size);
         m_size = newSize;

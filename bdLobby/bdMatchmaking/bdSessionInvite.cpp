@@ -23,12 +23,12 @@ bdSessionInvite::~bdSessionInvite()
 
 bdBool bdSessionInvite::deserialize(bdByteBufferRef buffer)
 {
-    bdBool ok = buffer->readUInt64(&m_senderID);
+    bdBool ok = buffer->readUInt64(m_senderID);
     ok = ok == buffer->readString(m_senderName, sizeof(m_senderName));
     bdUInt sessionIDSize = 8;
-    ok = ok == buffer->readBlob(m_sessionID.m_sessionID.ab, &sessionIDSize);
+    ok = ok == buffer->readBlob(m_sessionID.m_sessionID.ab, sessionIDSize);
     m_attachmentSize = 1024;
-    ok = ok == buffer->readBlob(m_attachment, &m_attachmentSize);
+    ok = ok == buffer->readBlob(m_attachment, m_attachmentSize);
     if (!ok)
     {
         bdLogError("session invite", "Deserialization failed");

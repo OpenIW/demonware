@@ -14,12 +14,11 @@ public:
     ~bdReference();
     bdBool isNull() const;
     bdBool notNull() const;
-    T* operator->();
-    const T* operator->() const;
+    T* operator->() const;
     bdBool operator!() const;
     void operator=(T* p);
     bdReference<T>& operator=(const bdReference<T>& other);
-    bdBool operator==(const bdReference<T>& other);
+    bdBool operator==(const bdReference<T>& other) const;
     T* operator*() const;
 };
 

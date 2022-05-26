@@ -14,7 +14,7 @@ public:
     void* operator new(bdUWord nbytes);
     bdVoteRankStatsInfo();
     ~bdVoteRankStatsInfo();
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
 };

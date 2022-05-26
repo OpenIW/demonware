@@ -68,7 +68,7 @@ bdBool bdHTTPWrapperBase::startAsyncOperation(bdHTTPWrapperBase::bdOperation op)
     return success;
 }
 
-bdBool bdHTTPWrapperBase::parseURL(const bdNChar8* const url, bdNChar8* serverName, bdNChar8** startRequestPath, bdUInt32* port)
+bdBool bdHTTPWrapperBase::parseURL(const bdNChar8* const url, bdNChar8* serverName, bdNChar8** startRequestPath, bdUInt32& port)
 {
     const bdNChar8* endServerName;
     const bdNChar8* startServerName;
@@ -94,13 +94,13 @@ bdBool bdHTTPWrapperBase::parseURL(const bdNChar8* const url, bdNChar8* serverNa
     endServerName = bdStrchr(startServerName, ':');
     if (endServerName)
     {
-        *port = atoi(endServerName-- + 1);
+        port = atoi(endServerName-- + 1);
         if (startServerName > endServerName || endServerName > *startRequestPath)
         {
             bdLogError("http", "URL was not of expected form. expected: http(s)://serverName:port/resource\nactual: %s", url);
             return false;
         }
-        if (!*port)
+        if (!port)
         {
             bdLogError("http", "URL was not of expected form. expected: http(s)://serverName:port/resource\nactual: %s", url);
             return false;
@@ -108,7 +108,7 @@ bdBool bdHTTPWrapperBase::parseURL(const bdNChar8* const url, bdNChar8* serverNa
     }
     else
     {
-        *port = 80;
+        port = 80;
         endServerName = *startRequestPath - 1;
     }
     bdUInt len = endServerName - startServerName + 2;

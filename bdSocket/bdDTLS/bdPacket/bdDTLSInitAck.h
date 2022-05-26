@@ -20,7 +20,6 @@ public:
     bdDTLSInitAck(const bdDTLSInitAck& other);
     ~bdDTLSInitAck();
     bdDTLSInitAck* operator=(bdDTLSInitAck& other);
-    virtual ~bdDTLSInitAck();
     virtual bdBool serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     virtual bdBool deserialize(const void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset);
     void sign(bdHMacSHA1& hmac);

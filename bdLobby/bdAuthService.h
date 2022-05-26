@@ -42,7 +42,7 @@ protected:
 public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
-    bdAuthService(bdUInt titleID, const bdAddr* addr);
+    bdAuthService(bdUInt titleID, const bdAddr& addr);
     ~bdAuthService();
     bdBool createAccount(const bdNChar8* userName, const bdNChar8* password, const bdNChar8* cdKey);
     bdBool changePassword(char*, char*, char*);
@@ -56,7 +56,7 @@ public:
     bdBool authorizeDedicatedServer();
     bdBool authorizeDedicatedServerRSA();
     bdBool getUsernamesForLicense(const bdNChar8* licenseCode);
-    bdUByte8* getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt* steamCookieKeySize);
+    bdUByte8* getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt& steamCookieKeySize);
     bdBool authorizeSteamTicket(bdNChar8* ticket, const bdUInt ticketSize);
     static void createSteamCookie(bdUByte8* cookie);
     void setSteamCookie(char*);

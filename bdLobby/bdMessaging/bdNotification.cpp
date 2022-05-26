@@ -23,14 +23,16 @@ bdNotification::~bdNotification()
 
 bdBool bdNotification::deserialize(bdByteBufferRef buffer)
 {
-    bdBool ok = buffer->readUInt32(reinterpret_cast<bdUInt*>(&m_type));
-    ok = ok == buffer->readUInt32(&m_timeStamp);
-    ok = ok == buffer->readUInt64(&m_ID);
-    ok = ok == buffer->readUInt64(&m_sourceUser);
+    bdUInt type = 0;
+    bdBool ok = buffer->readUInt32(type);
+    m_type = static_cast<bdNotificationType>(type);
+    ok = ok == buffer->readUInt32(m_timeStamp);
+    ok = ok == buffer->readUInt64(m_ID);
+    ok = ok == buffer->readUInt64(m_sourceUser);
     ok = ok == buffer->readString(m_sourceUserName, sizeof(m_sourceUserName));
-    ok = ok == buffer->readUInt64(&m_affectedUser);
+    ok = ok == buffer->readUInt64(m_affectedUser);
     ok = ok == buffer->readString(m_affectedUserName, sizeof(m_affectedUserName));
-    ok = ok == buffer->readUInt64(&m_teamID);
+    ok = ok == buffer->readUInt64(m_teamID);
     ok = ok == buffer->readString(m_teamName, sizeof(m_teamName));
     return ok;
 }

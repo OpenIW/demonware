@@ -8,7 +8,7 @@ public:
 
     bdFileID();
     ~bdFileID();
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
 };

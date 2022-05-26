@@ -24,12 +24,12 @@ bdBool bdIPDiscoveryPacketReply::serialize(void* data, const bdUInt size, const 
     bdBool status;
 
     newOffset = offset;
-    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    status = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
     if (m_protocolVersion == 1)
     {
         status = status == bdBytePacker::skipBytes(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, 1u);
     }
-    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    status = status == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     status = status == m_addr.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
     if (m_protocolVersion == 1)
     {
@@ -48,18 +48,18 @@ bdBool bdIPDiscoveryPacketReply::deserialize(const void* data, const bdUInt size
     bdBool status;
 
     newOffset = offset;
-    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
+    status = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
     if (m_type < 30 || m_type > 39)
     {
         newOffset = offset;
         return false;
     }
-    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+    status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     if (m_protocolVersion != 2)
     {
         status = status == bdBytePacker::rewindBytes(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, 2u);
         status = status == bdBytePacker::skipBytes(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, 1u);
-        status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+        status = status == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
         if (m_protocolVersion != 1)
         {
             newOffset = offset;

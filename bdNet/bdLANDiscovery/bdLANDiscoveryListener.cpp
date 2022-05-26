@@ -2,6 +2,11 @@
 
 #include "bdNet/bdNet.h"
 
+void* bdLANDiscoveryListener::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
 void bdLANDiscoveryListener::operator delete(void* p)
 {
     bdMemory::deallocate(p);

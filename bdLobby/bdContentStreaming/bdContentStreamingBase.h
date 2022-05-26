@@ -52,7 +52,7 @@ public:
     bdContentStreamingBase(bdRemoteTaskManager* const remoteTaskManager);
     virtual ~bdContentStreamingBase();
     void abortHTTPOperation();
-    void checkProgress(bdUInt* bytesTransfered, bdFloat32* dataRate);
+    void checkProgress(bdUInt& bytesTransfered, bdFloat32& dataRate);
     bdInt getLastHTTPError();
     void pump();
     void enableVerboseOutput(bdBool enable);

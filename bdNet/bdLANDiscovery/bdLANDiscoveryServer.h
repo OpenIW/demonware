@@ -23,7 +23,7 @@ public:
     bdLANDiscoveryServer();
     ~bdLANDiscoveryServer();
     void registerListener(bdLANDiscoveryListener* listener);
-    bdBool start(const bdReference<bdGameInfo> gameInfo, const bdInetAddr* localAddr, const bdInt16 discoveryPort);
+    bdBool start(const bdReference<bdGameInfo> gameInfo, const bdInetAddr& localAddr, const bdInt16 discoveryPort);
     void stop();
     void unregisterListener(bdLANDiscoveryListener* listener);
     void update();

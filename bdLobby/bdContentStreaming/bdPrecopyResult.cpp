@@ -20,9 +20,9 @@ bdPreCopyResult::~bdPreCopyResult()
 bdBool bdPreCopyResult::deserialize(bdByteBufferRef buffer)
 {
     reset();
-    bdBool ok = m_source->deserialize(&bdByteBufferRef(*buffer));
+    bdBool ok = m_source->deserialize(bdByteBufferRef(buffer));
     ok = ok == buffer->readString(m_destination, sizeof(m_destination));
-    ok = ok == buffer->readUInt32(&m_fileSize);
+    ok = ok == buffer->readUInt32(m_fileSize);
     return ok;
 }
 

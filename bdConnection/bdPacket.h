@@ -17,7 +17,7 @@ public:
     bdUInt serialize(bdUByte8* outBuffer, const bdUInt outSize);
     bdBool deserialize(const bdUByte8* inData, const bdUInt inSize);
     bdBool addChunk(bdChunkRef chunk);
-    bdBool getNextChunk(bdChunkRef* chunk);
+    bdBool getNextChunk(bdChunkRef& chunk);
 
     const bdBool isEmpty() const;
     const bdUInt32 getVerificationTag() const;

@@ -160,7 +160,7 @@ bdBool bdAddr::serialize(bdUByte8* data, const bdUInt size, const bdUInt offset,
     newOffset = offset;
     if (m_address.serialize(data, size, newOffset, newOffset))
     {
-        ok = bdBytePacker::appendBasicType<bdPort>(data, size, newOffset, newOffset, &m_port);
+        ok = bdBytePacker::appendBasicType<bdPort>(data, size, newOffset, newOffset, m_port);
     }
     if (!ok)
     {
@@ -176,7 +176,7 @@ bdBool bdAddr::deserialize(const bdUByte8* data, const bdUInt size, const bdUInt
     newOffset = offset;
     if (m_address.deserialize(data, size, newOffset, newOffset))
     {
-        ok = bdBytePacker::removeBasicType<bdPort>(data, size, newOffset, newOffset, &m_port);
+        ok = bdBytePacker::removeBasicType<bdPort>(data, size, newOffset, newOffset, m_port);
     }
     if (!ok)
     {

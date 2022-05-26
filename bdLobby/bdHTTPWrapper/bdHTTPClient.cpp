@@ -31,25 +31,25 @@ bdHTTPClient::~bdHTTPClient()
     }
 }
 
-bdBool bdHTTPClient::performOperation(bdStreamSocket* socket)
+bdBool bdHTTPClient::performOperation(bdStreamSocket& socket)
 {
     bdStopwatch stopwatch;
     stopwatch.start();
     m_dataRate = 0.0f;
     m_bytesTransfered = 0;
-    bdInt sendResult = socket->send(m_buffer.m_httpCommonBuffer, m_buffer.m_httpCommonBufferSize);
+    bdInt sendResult = socket.send(m_buffer.m_httpCommonBuffer, m_buffer.m_httpCommonBufferSize);
     if (sendResult < 0)
     {
         bdLogError("http", "Failed to send HTTP request with status code %d", sendResult);
         return false;
     }
-    if ((m_buffer.m_contentSendBufferSize || m_uploadHandler) && !sendPayload(socket, &stopwatch))
+    if ((m_buffer.m_contentSendBufferSize || m_uploadHandler) && !sendPayload(socket, stopwatch))
     {
         return false;
     }
 
     bdUInt headerContentSize = 0;
-    return recvResponseHeader(socket, &headerContentSize) && (m_operation || recvResponsePayload(socket, headerContentSize));
+    return recvResponseHeader(socket, headerContentSize) && (m_operation || recvResponsePayload(socket, headerContentSize));
 }
 
 void bdHTTPClient::performOperation()
@@ -65,19 +65,19 @@ void bdHTTPClient::performOperation()
     bdStreamSocket sock;
     if (resolveHostIP(&addr) && !m_abort && sock.create(false))
     {
-        bdSocketStatusCode sockStatus = sock.connect(&bdAddr(&addr));
+        bdSocketStatusCode sockStatus = sock.connect(bdAddr(addr));
         bdBool connected = false;
         bdBool canWrite;
         if (sockStatus == BD_NET_SUCCESS || sockStatus == BD_NET_WOULD_BLOCK)
         {
-            for (canWrite = sock.isWritable(&sockStatus); !m_abort && !canWrite && sockStatus == BD_NET_SUCCESS; canWrite = sock.isWritable(&sockStatus))
+            for (canWrite = sock.isWritable(sockStatus); !m_abort && !canWrite && sockStatus == BD_NET_SUCCESS; canWrite = sock.isWritable(sockStatus))
             {
                 bdPlatformTiming::sleep(50);
             }
             if (canWrite && sockStatus == BD_NET_SUCCESS)
             {
                 connected = true;
-                if (performOperation(&sock))
+                if (performOperation(sock))
                 {
                     m_socketErrorCode = 0;
                     m_status = BD_HTTP_STATUS_DONE;
@@ -334,9 +334,9 @@ void bdHTTPClient::setSocketErrorCode(bdInt64)
 {
 }
 
-bdHTTPBuffer* bdHTTPClient::getInternalBuffer()
+bdHTTPBuffer& bdHTTPClient::getInternalBuffer()
 {
-    return &m_buffer;
+    return m_buffer;
 }
 
 bdHTTPClient::BD_HTTP_OPERATION bdHTTPClient::getOperation()
@@ -499,7 +499,7 @@ bdBool bdHTTPClient::resolveHostIP(bdAddr* hostAddr)
         }
         if (i == 2 && getHostByName.getNumAddresses())
         {
-            addr.set(getHostByName.getAddressAt(0)->inUn.m_iaddr);
+            addr.set(getHostByName.getAddressAt(0).inUn.m_iaddr);
         }
     }
 
@@ -507,11 +507,11 @@ bdBool bdHTTPClient::resolveHostIP(bdAddr* hostAddr)
     {
         return false;
     }
-    hostAddr->set(&addr, m_port);
+    hostAddr->set(addr, m_port);
     return true;
 }
 
-bdBool bdHTTPClient::sendPayload(bdStreamSocket* sock, bdStopwatch* httpTime)
+bdBool bdHTTPClient::sendPayload(bdStreamSocket& sock, bdStopwatch& httpTime)
 {
     bdFloat32 elapsed = 0.0f;
     bdInt errorCode = 0;
@@ -526,11 +526,11 @@ bdBool bdHTTPClient::sendPayload(bdStreamSocket* sock, bdStopwatch* httpTime)
             ok = false;
             break;
         }
-        errorCode = writePayloadData(sock, &bytesSent);
+        errorCode = writePayloadData(sock, bytesSent);
         if (errorCode > 0)
         {
             setBytesTransfered(bytesSent);
-            elapsed = httpTime->getElapsedTimeInSeconds();
+            elapsed = httpTime.getElapsedTimeInSeconds();
             if (elapsed > 0.0f)
             {
                 m_dataRate = bytesSent / elapsed;
@@ -538,7 +538,7 @@ bdBool bdHTTPClient::sendPayload(bdStreamSocket* sock, bdStopwatch* httpTime)
         }
         if (!m_httpResponseCode)
         {
-            recvStatus = sock->recv(&m_buffer.m_responseStatusBuffer[m_buffer.m_responseStatusBufferSize], 128 - m_buffer.m_responseStatusBufferSize);
+            recvStatus = sock.recv(&m_buffer.m_responseStatusBuffer[m_buffer.m_responseStatusBufferSize], 128 - m_buffer.m_responseStatusBufferSize);
             if (recvStatus <= 0)
             {
                 if (recvStatus != 2)
@@ -570,7 +570,7 @@ bdBool bdHTTPClient::sendPayload(bdStreamSocket* sock, bdStopwatch* httpTime)
     return ok;
 }
 
-bdInt bdHTTPClient::writePayloadData(bdStreamSocket* sock, bdUInt* totalSent)
+bdInt bdHTTPClient::writePayloadData(bdStreamSocket& sock, bdUInt& totalSent)
 {
     const bdNChar8* payload;
     bdUInt totalSize;
@@ -583,7 +583,7 @@ bdInt bdHTTPClient::writePayloadData(bdStreamSocket* sock, bdUInt* totalSent)
         bdUInt chunkLen = m_chunked ? 10 : 0;
         bdUInt chunkBytes = m_chunked ? 2 : 0;
         chunkSize = chunkBytes + chunkLen;
-        bdUInt bytesToSend = m_uploadHandler->handleUpload(&m_buffer.m_httpCommonBuffer[chunkLen], 1024 - (chunkBytes + chunkLen), *totalSent);
+        bdUInt bytesToSend = m_uploadHandler->handleUpload(&m_buffer.m_httpCommonBuffer[chunkLen], 1024 - (chunkBytes + chunkLen), totalSent);
         if (bytesToSend > 1024 - (chunkBytes + chunkLen))
         {
             return -1;
@@ -605,13 +605,13 @@ bdInt bdHTTPClient::writePayloadData(bdStreamSocket* sock, bdUInt* totalSent)
     }
     else
     {
-        payload = reinterpret_cast<const bdNChar8*>(m_buffer.m_contentSendBuffer) + *totalSent;
-        totalSize = m_buffer.m_contentSendBufferSize - *totalSent >= 1024 ? 1024 : m_buffer.m_contentSendBufferSize - *totalSent;
+        payload = reinterpret_cast<const bdNChar8*>(m_buffer.m_contentSendBuffer) + totalSent;
+        totalSize = m_buffer.m_contentSendBufferSize - totalSent >= 1024 ? 1024 : m_buffer.m_contentSendBufferSize - totalSent;
     }
 
     do
     {
-        for (j = sock->send(payload, totalSize); j == -2 && !m_abort; j = sock->send(payload, totalSize))
+        for (j = sock.send(payload, totalSize); j == -2 && !m_abort; j = sock.send(payload, totalSize))
         {
             bdPlatformTiming::sleep(50);
         }
@@ -633,12 +633,12 @@ bdInt bdHTTPClient::writePayloadData(bdStreamSocket* sock, bdUInt* totalSent)
         {
             sentSize = sentSize <= chunkSize ? 0 : sentSize - chunkSize;
         }
-        *totalSent += sentSize;
+        totalSent += sentSize;
     }
     return sentSize;
 }
 
-bdBool bdHTTPClient::recvResponseHeader(bdStreamSocket* sock, bdUInt* bytesDownloaded)
+bdBool bdHTTPClient::recvResponseHeader(bdStreamSocket& sock, bdUInt& bytesDownloaded)
 {
     bdInt endBufferSize = -1;
     bdUInt oldSize = 0;
@@ -651,16 +651,16 @@ bdBool bdHTTPClient::recvResponseHeader(bdStreamSocket* sock, bdUInt* bytesDownl
         oldSize = m_buffer.m_responseStatusBufferSize;
         m_buffer.m_responseStatusBufferSize = 0;
     }
-    bdSocketStatusCode validHeaderEnd = readUntilStr(sock, headerEndStr, responseBuffer, headerMaxSize, &oldSize, &endBufferSize);
+    bdSocketStatusCode validHeaderEnd = readUntilStr(sock, headerEndStr, responseBuffer, headerMaxSize, &oldSize, endBufferSize);
     if (endBufferSize < 0 && validHeaderEnd == BD_NET_SUCCESS)
     {
         recvData = bdAllocate<bdNChar8>(4096);
         bdMemcpy(recvData, responseBuffer, oldSize);
         headerMaxSize = 4096;
         responseBuffer = recvData;
-        validHeaderEnd = readUntilStr(sock, headerEndStr, recvData, headerMaxSize, &oldSize, &endBufferSize);
+        validHeaderEnd = readUntilStr(sock, headerEndStr, recvData, headerMaxSize, &oldSize, endBufferSize);
     }
-    *bytesDownloaded = 0;
+    bytesDownloaded = 0;
     if (oldSize && validHeaderEnd == BD_NET_SUCCESS && endBufferSize >= 0 && parseIncomingHttpResponse(responseBuffer, oldSize))
     {
         endBufferSize += bdStrlen(headerEndStr);
@@ -672,14 +672,14 @@ bdBool bdHTTPClient::recvResponseHeader(bdStreamSocket* sock, bdUInt* bytesDownl
             {
                 ok = false;
             }
-            *bytesDownloaded = contentSize;
+            bytesDownloaded = contentSize;
         }
         else if (contentSize <= m_buffer.m_contentReceiveBufferSize)
         {
             if (contentSize)
             {
-                memmove(m_buffer.m_contentReceiveBuffer, &responseBuffer[endBufferSize], contentSize);
-                *bytesDownloaded = contentSize;
+                bdMemmove(m_buffer.m_contentReceiveBuffer, &responseBuffer[endBufferSize], contentSize);
+                bytesDownloaded = contentSize;
             }
         }
         else
@@ -700,7 +700,7 @@ bdBool bdHTTPClient::recvResponseHeader(bdStreamSocket* sock, bdUInt* bytesDownl
     return false;
 }
 
-bdBool bdHTTPClient::recvResponsePayload(bdStreamSocket* sock, bdUInt bytesDownloaded)
+bdBool bdHTTPClient::recvResponsePayload(bdStreamSocket& sock, bdUInt bytesDownloaded)
 {
     bdStopwatch stopwatch;
     stopwatch.start();
@@ -710,7 +710,7 @@ bdBool bdHTTPClient::recvResponsePayload(bdStreamSocket* sock, bdUInt bytesDownl
     
     while (bytesDownloaded < m_expectedContentSize && !isError && !m_abort)
     {
-        recvSize = sock->recv(m_buffer.m_httpCommonBuffer, 1024);
+        recvSize = sock.recv(m_buffer.m_httpCommonBuffer, 1024);
         if (recvSize == -2)
         {
             bdPlatformTiming::sleep(50);
@@ -763,22 +763,22 @@ bdBool bdHTTPClient::recvResponsePayload(bdStreamSocket* sock, bdUInt bytesDownl
     return false;
 }
 
-bdSocketStatusCode bdHTTPClient::readUntilStr(bdStreamSocket* socket, const bdNChar8* endString, bdNChar8* recvData, bdUInt maxSize, bdUInt* bufSize, bdInt* endSize)
+bdSocketStatusCode bdHTTPClient::readUntilStr(bdStreamSocket& socket, const bdNChar8* endString, bdNChar8* recvData, bdUInt maxSize, bdUInt* bufSize, bdInt& endSize)
 {
     bdNChar8* endLoc;
     bdInt recvd;
 
     bdUInt remainingSize = maxSize > *bufSize ? maxSize - *bufSize - 1 : 0;
     bdNChar8* recvStart = &recvData[*bufSize];
-    *endSize = -1;
+    endSize = -1;
     if (*bufSize && remainingSize && (*recvStart = 0, (endLoc = strstr(recvData, endString)) != 0))
     {
-        *endSize = endLoc - recvData;
+        endSize = endLoc - recvData;
         return BD_NET_SUCCESS;
     }
     while (remainingSize)
     {
-        recvd = socket->recv(recvStart, remainingSize);
+        recvd = socket.recv(recvStart, remainingSize);
         if (m_abort || recvd != -2)
         {
             if (m_abort || recvd <= 0)
@@ -791,7 +791,7 @@ bdSocketStatusCode bdHTTPClient::readUntilStr(bdStreamSocket* socket, const bdNC
             *recvStart = 0;
             if (endLoc = bdStrstr(recvData, endString))
             {
-                *endSize = endLoc - recvData;
+                endSize = endLoc - recvData;
                 return BD_NET_SUCCESS;
             }
         }

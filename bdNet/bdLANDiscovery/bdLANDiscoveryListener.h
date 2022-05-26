@@ -4,6 +4,7 @@
 class bdLANDiscoveryListener
 {
 public:
+    void* operator new(bdUWord nbytes);
     void operator delete(void* p);
     virtual ~bdLANDiscoveryListener();
     virtual void onDiscovery(bdReference<bdGameInfo> __formal);

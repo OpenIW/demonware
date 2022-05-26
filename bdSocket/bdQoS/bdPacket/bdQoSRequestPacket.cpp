@@ -36,10 +36,10 @@ bdBool bdQoSRequestPacket::deserialize(const void* data, const bdUInt size, cons
     bdBool ok;
 
     newOffset = offset;
-    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt64>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_id);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_secid);
+    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt64>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, m_id);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, m_secid);
     if (!ok)
     {
         newOffset = offset;
@@ -52,10 +52,10 @@ bdBool bdQoSRequestPacket::serialize(void* data, const bdUInt size, const bdUInt
     bdBool ok;
 
     newOffset = offset;
-    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt64>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_id);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_secid);
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt64>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, m_id);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, m_secid);
     if (!ok)
     {
         newOffset = offset;

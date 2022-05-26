@@ -28,7 +28,7 @@ bool bdDTLSInit::serialize(void* data, const bdUInt size, const bdUInt offset, b
 
     newOffset = offset;
     ok = bdDTLSHeader::serialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_initTag);
     ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)
     {
@@ -43,7 +43,7 @@ bool bdDTLSInit::deserialize(const void* data, const bdUInt size, const bdUInt o
 
     newOffset = offset;
     ok = bdDTLSHeader::deserialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_initTag);
     ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)
     {

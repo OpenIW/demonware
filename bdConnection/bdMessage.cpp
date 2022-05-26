@@ -43,12 +43,12 @@ bdBitBufferRef bdMessage::getPayload()
     {
         m_payload = new bdBitBuffer(0, m_payloadTypeChecked);
     }
-    return bdBitBufferRef(&m_payload);
+    return bdBitBufferRef(m_payload);
 }
 
 const bdByteBufferRef bdMessage::getUnencryptedPayload() const
 {
-    return bdByteBufferRef(&m_unencPayload);
+    return bdByteBufferRef(m_unencPayload);
 }
 
 const bdBool bdMessage::hasUnencryptedPayload() const

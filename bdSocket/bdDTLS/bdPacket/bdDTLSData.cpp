@@ -30,14 +30,14 @@ bdBool bdDTLSData::serialize(void* outData, const bdUInt outDataSize, const bdUI
 
     inDataOffset = 0;
     encryptedDataSize = 0;
-    ok = bdBytePacker::removeBasicType<bdUInt16>(inData, inDataSize, 0, inDataOffset, &encryptedDataSize);
+    ok = bdBytePacker::removeBasicType<bdUInt16>(inData, inDataSize, 0, inDataOffset, encryptedDataSize);
     if (ok)
     {
         ok = bdDTLSHeader::serialize(outData, outDataSize, outDataOffset, outDataNewOffset);
     }
     if (ok)
     {
-        ok = bdBytePacker::appendBasicType<bdUInt16>(outData, outDataSize, outDataNewOffset, outDataNewOffset, &encryptedDataSize);
+        ok = bdBytePacker::appendBasicType<bdUInt16>(outData, outDataSize, outDataNewOffset, outDataNewOffset, encryptedDataSize);
     }
     inPayloadStart = &inData[inDataOffset];
     inPlainPayloadStart = &inPayloadStart[encryptedDataSize];
@@ -87,7 +87,7 @@ bdBool bdDTLSData::deserialize(const void* inData, const bdUInt inDataSize, cons
 
     encryptedDataSize = 0;
     ok = deserialize(inData, inDataSize, inDataOffset, inDataNewOffset);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(inData, inDataSize, inDataNewOffset, inDataNewOffset, &encryptedDataSize);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(inData, inDataSize, inDataNewOffset, inDataNewOffset, encryptedDataSize);
     if (!ok)
     {
         bdLogWarn("bdSocket/dtls", "Failed to deserialize header.");
@@ -132,7 +132,7 @@ bdBool bdDTLSData::deserialize(const void* inData, const bdUInt inDataSize, cons
     }
     bdMemcpy(outPlainPayloadStart, &inPayloadStart[paddedEncryptedDataSize], plainDataSize);
     bdUInt tmpOffset = 0;
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(outData, outDataMaxSize, 0, tmpOffset, &encryptedDataSize);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(outData, outDataMaxSize, 0, tmpOffset, encryptedDataSize);
     if (!ok)
     {
         bdLogWarn("bdSocket/dtls", "Decryption failed.");

@@ -14,12 +14,11 @@ bdSummaryMetaHandler::bdSummaryMetaHandler()
 
 bdSummaryMetaHandler::~bdSummaryMetaHandler()
 {
-    delete this;
 }
 
 bdBool bdSummaryMetaHandler::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readString(m_url, sizeof(m_url)) && buffer->readUInt32(&m_fileSize);
+    return buffer->readString(m_url, sizeof(m_url)) && buffer->readUInt32(m_fileSize);
 }
 
 bdUInt bdSummaryMetaHandler::sizeOf()

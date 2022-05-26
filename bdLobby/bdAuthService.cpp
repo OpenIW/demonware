@@ -20,7 +20,7 @@ void* bdAuthService::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
-bdAuthService::bdAuthService(bdUInt titleID, const bdAddr* addr)
+bdAuthService::bdAuthService(bdUInt titleID, const bdAddr& addr)
     : bdLobbyConnectionListener(), m_usernamesForLicenseResult(0u), m_connection(), m_authServiceAddr(), m_request(), m_authInfo(), m_authTicket(), m_errorCode(BD_NO_ERROR),
     m_sendBufSize(0), m_recvBufSize(0), m_cdKeyTimeToLiveSecs(0), m_RSAKey(), m_titleID(titleID)
 {
@@ -39,7 +39,7 @@ bdBool bdAuthService::createAccount(const bdNChar8* userName, const bdNChar8* pa
     {
         return false;
     }
-    m_request = &makeCreateAccount(m_titleID, userName, password, cdKey);
+    m_request = makeCreateAccount(m_titleID, userName, password, cdKey);
     startTask();
     return true;
 }
@@ -51,7 +51,7 @@ bdBool bdAuthService::authorizeAccount(const bdNChar8* accountName, const bdNCha
     {
         return false;
     }
-    m_request = &makeAuthAccountForService(m_titleID, accountName);
+    m_request = makeAuthAccountForService(m_titleID, accountName);
     startTask();
     return true;
 }
@@ -63,7 +63,7 @@ bdBool bdAuthService::authorizeDedicatedHost(const bdNChar8* licenseKey)
     {
         return false;
     }
-    m_request = &makeAuthHostForService(m_titleID, licenseKey);
+    m_request = makeAuthHostForService(m_titleID, licenseKey);
     startTask();
     return true;
 }
@@ -75,17 +75,17 @@ bdBool bdAuthService::getUsernamesForLicense(const bdNChar8* licenseKey)
     {
         return false;
     }
-    m_request = &makeGetUsernamesForLicense(m_titleID, licenseKey);
+    m_request = makeGetUsernamesForLicense(m_titleID, licenseKey);
     startTask();
     return true;
 }
 
-bdUByte8* bdAuthService::getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt* steamCookieKeySize)
+bdUByte8* bdAuthService::getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt& steamCookieKeySize)
 {
     createSteamCookie(m_steamCookieKey);
     bdMemset(&m_steamCookieKey[24], 0, 64);
     bdStrlcpy(reinterpret_cast<bdNChar8*>(&m_steamCookieKey[24]), reinterpret_cast<const bdNChar8*>(steamCookieKey), 64);
-    *steamCookieKeySize = 88;
+    steamCookieKeySize = 88;
     return m_steamCookieKey;
 }
 
@@ -95,7 +95,7 @@ bdBool bdAuthService::authorizeSteamTicket(bdNChar8* ticket, const bdUInt ticket
     {
         return false;
     }
-    m_request = &makeAuthForSteam(m_titleID, ticket, ticketSize);
+    m_request = makeAuthForSteam(m_titleID, ticket, ticketSize);
     startTask();
     return true;
 }
@@ -110,9 +110,9 @@ bdAuthService::bdStatus bdAuthService::getStatus()
     bdBitBufferRef message;
     bdUByte8 messageType;
 
-    if (*m_connection && m_connection->getMessageToDispatch(&messageType, &message))
+    if (*m_connection && m_connection->getMessageToDispatch(messageType, message))
     {
-        m_errorCode = handleReply(messageType, &message);
+        m_errorCode = handleReply(messageType, message);
         m_status = BD_READY;
         m_connection->close();
         m_connection = (bdLobbyConnection*)NULL;
@@ -139,14 +139,14 @@ void bdAuthService::startTask()
 {
     if (m_sendBufSize)
     {
-        m_connection = new bdLobbyConnection(&m_authServiceAddr, m_sendBufSize, m_recvBufSize, this);
+        m_connection = new bdLobbyConnection(m_authServiceAddr, m_sendBufSize, m_recvBufSize, this);
     }
     else
     {
-        m_connection = new bdLobbyConnection(&m_authServiceAddr, this);
+        m_connection = new bdLobbyConnection(m_authServiceAddr, this);
     }
 
-    if (m_connection->connect(&m_authInfo))
+    if (m_connection->connect(m_authInfo))
     {
         m_status = BD_CONNECTING;
     }
@@ -516,7 +516,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
         }
         bdULong outSize = 86;
         bdMemset(m_cdKey, 0, sizeof(m_cdKey));
-        m_RSAKey.decrypt(encCDKey, &encCDKeySize, reinterpret_cast<bdUByte8*>(m_cdKey), &outSize);
+        m_RSAKey.decrypt(encCDKey, encCDKeySize, reinterpret_cast<bdUByte8*>(m_cdKey), outSize);
         m_cdKeyTimeToLiveSecs = 0;
         if (!reply->readInt32(m_cdKeyTimeToLiveSecs))
         {

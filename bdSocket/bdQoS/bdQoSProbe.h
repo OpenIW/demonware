@@ -33,9 +33,7 @@ public:
         bdQoSProbeEntryWrapper();
         bdQoSProbeEntryWrapper(const bdQoSProbe::bdQoSProbeEntryWrapper& other);
         ~bdQoSProbeEntryWrapper();
-        bdQoSProbe::bdQoSProbeEntryWrapper& bdQoSProbe::bdQoSProbeEntryWrapper::operator=(bdQoSProbe::bdQoSProbeEntryWrapper& other);
-        void* operator new(bdUWord nbytes);
-        void* operator new(bdUWord __formal, void* p);
+        bdQoSProbe::bdQoSProbeEntryWrapper& bdQoSProbe::bdQoSProbeEntryWrapper::operator=(const bdQoSProbe::bdQoSProbeEntryWrapper& other);
     };
 protected:
     unsigned int m_maxBandwidth;

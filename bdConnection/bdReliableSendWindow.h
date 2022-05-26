@@ -40,10 +40,10 @@ public:
     void* operator new(bdUWord nbytes);
     bdReliableSendWindow();
     bdBool add(bdDataChunkRef chunk);
-    void getDataToSend(bdPacket* packet);
+    void getDataToSend(bdPacket& packet);
     void decreaseCongestionWindow(const bdReliableSendWindow::bdCongestionWindowDecreaseReason reason);
     void increaseCongestionWindow(const bdUWord bytesAcked);
-    bdBool handleAck(bdSAckChunkRef chunk, bdFloat32* rtt);
+    bdBool handleAck(bdSAckChunkRef chunk, bdFloat32& rtt);
     bdBool isEmpty();
     void setTimeoutPeriod(const bdFloat32 secs);
     const bdFloat32 getTimeoutPeriod() const;

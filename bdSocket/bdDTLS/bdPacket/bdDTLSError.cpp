@@ -28,8 +28,8 @@ bdBool bdDTLSError::serialize(void* data, const bdUInt size, const bdUInt offset
 
     newOffset = offset;
     ok = bdDTLSHeader::serialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &shortEtype);
-    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, shortEtype);
+    ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, m_secID.ab, sizeof(bdSecurityID));
     if (!ok)
     {
         newOffset = offset;
@@ -44,9 +44,9 @@ bdBool bdDTLSError::deserialize(const void* data, const bdUInt size, const bdUIn
 
     newOffset = offset;
     ok = bdDTLSHeader::deserialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &shortEtype);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, shortEtype);
     m_etype = static_cast<bdDTLSErrorType>(shortEtype);
-    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
+    ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, m_secID.ab, sizeof(bdSecurityID));
     if (!ok)
     {
         newOffset = offset;

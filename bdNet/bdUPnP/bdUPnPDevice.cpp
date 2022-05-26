@@ -64,7 +64,7 @@ void bdUPnPDevice::pump()
 
     case BD_UPNP_DEVICE_SENDING_DESCRIPTION_REQ:
         isComplete = false;
-        ok = pumpSendRequest(&isComplete);
+        ok = pumpSendRequest(isComplete);
         if (!ok)
         {
             bdLogWarn("bdnet/upnpdevice", "Failed to send device description request.");
@@ -120,7 +120,7 @@ void bdUPnPDevice::pump()
 
     case BD_UPNP_DEVICE_SENDING_IP_REQ:
         isComplete = false;
-        ok = pumpSendRequest(&isComplete);
+        ok = pumpSendRequest(isComplete);
         if (isComplete && ok)
         {
             m_state = BD_UPNP_DEVICE_DISCOVERING_IP;
@@ -165,7 +165,7 @@ void bdUPnPDevice::pump()
 
     case BD_UPNP_DEVICE_SENDING_PORT_QUERY_REQ:
         isComplete = false;
-        ok = pumpSendRequest(&isComplete);
+        ok = pumpSendRequest(isComplete);
         if (isComplete && ok)
         {
             m_state = BD_UPNP_DEVICE_DISCOVERING_PORT_MAPPING;
@@ -243,7 +243,7 @@ void bdUPnPDevice::pump()
 
    case BD_UPNP_DEVICE_SENDING_MAPPING_REQ:
         isComplete = false;
-        ok = pumpSendRequest(&isComplete);
+        ok = pumpSendRequest(isComplete);
         if (isComplete && ok)
         {
             m_state = BD_UPNP_DEVICE_MAPPING_PORT;
@@ -288,7 +288,7 @@ void bdUPnPDevice::pump()
 
     case BD_UPNP_DEVICE_SENDING_UNMAPPING_REQ:
         isComplete = false;
-        ok = pumpSendRequest(&isComplete);
+        ok = pumpSendRequest(isComplete);
         if (isComplete && ok)
         {
             m_state = BD_UPNP_DEVICE_UNMAPPING_PORT;
@@ -424,9 +424,9 @@ bdBool bdUPnPDevice::parseDescriptionResponse()
     bdUInt controlURLLen = 0;
     bdBool ok = confirmHttpSuccess();
 
-    ok = ok == extractURLBase(&URLBase, &URLBaseLen);
-    ok = ok == extractServiceType(&isIP);
-    ok = ok == extractControlURL(&controlURL, &controlURLLen);
+    ok = ok == extractURLBase(&URLBase, URLBaseLen);
+    ok = ok == extractServiceType(isIP);
+    ok = ok == extractControlURL(&controlURL, controlURLLen);
 
     if (!ok)
     {
@@ -466,7 +466,7 @@ bdBool bdUPnPDevice::connectToDevice()
     {
         m_deviceAddr.setPort(80);
     }
-    connectStatus = m_streamSocket.connect(&bdAddr(&m_deviceAddr));
+    connectStatus = m_streamSocket.connect(bdAddr(m_deviceAddr));
     if (connectStatus == 1 || connectStatus == -2)
     {
         m_connectTimer.reset();
@@ -476,9 +476,9 @@ bdBool bdUPnPDevice::connectToDevice()
     return false;
 }
 
-bdBool bdUPnPDevice::pumpSendRequest(bdBool* isComplete)
+bdBool bdUPnPDevice::pumpSendRequest(bdBool& isComplete)
 {
-    *isComplete = false;
+    isComplete = false;
     if (m_streamSocket.isConnected())
     {
         bdUInt requestLen = bdStrlen(m_requestBuffer);
@@ -493,7 +493,7 @@ bdBool bdUPnPDevice::pumpSendRequest(bdBool* isComplete)
         else
         {
             setupReceive();
-            *isComplete = true;
+            isComplete = true;
         }
     }
     else if (m_connectTimer.getElapsedTimeInSeconds() > m_config.m_connectTimeout)
@@ -563,7 +563,7 @@ bdBool bdUPnPDevice::parseGetExternalIPResponse()
     bdBool ok = confirmHttpSuccess();
     if (ok)
     {
-        ok = extractExternalAddress(&externalAddress);
+        ok = extractExternalAddress(externalAddress);
     }
     if (ok)
     {
@@ -616,13 +616,13 @@ void bdUPnPDevice::prepareCreatePortMappingRequest()
     genUPnPCommand("AddPortMapping", portMapArguments);
 }
 
-bdBool bdUPnPDevice::extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** value, bdUInt* valueLen)
+bdBool bdUPnPDevice::extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** value, bdUInt& valueLen)
 {
     bdNChar8* elementEnd;
     bdByte8* elementStart;
 
     *value = 0LL;
-    *valueLen = 0;
+    valueLen = 0;
     elementStart = bdStrstr(buffer, tag);
     if (!elementStart)
     {
@@ -642,7 +642,7 @@ bdBool bdUPnPDevice::extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** v
     if (elementEnd != elementStart)
     {
         *value = elementStart;
-        *valueLen = elementEnd - elementStart;
+        valueLen = elementEnd - elementStart;
         return true;
     }
     return false;
@@ -702,7 +702,7 @@ void bdUPnPDevice::genUPnPCommand(const bdByte8* const command, const bdByte8* c
     );
 }
 
-bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt* baseLen)
+bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt& baseLen)
 {
     bdNChar8* slashLoc;
     bdByte8* elementEnd;
@@ -714,12 +714,12 @@ bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt* baseLen)
     bdByte8 urlBase[9];
 
     *baseLoc = 0LL;
-    *baseLen = 0;
+    baseLen = 0;
     elementStart = 0LL;
     elementLen = 0;
     strcpy(urlBase, "<URLBase");
     
-    if (!extractTag(urlBase, m_readBuffer, &elementStart, &elementLen))
+    if (!extractTag(urlBase, m_readBuffer, &elementStart, elementLen))
     {
         return true;
     }
@@ -740,7 +740,7 @@ bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt* baseLen)
     else
     {
         *baseLoc = slashLoc;
-        *baseLen = elementEnd - slashLoc;
+        baseLen = elementEnd - slashLoc;
         addressEnd = slashLoc;
     }
 
@@ -753,15 +753,15 @@ bdBool bdUPnPDevice::extractURLBase(bdByte8** baseLoc, bdUInt* baseLen)
     return false;
 }
 
-bdBool bdUPnPDevice::extractServiceType(bdBool* serviceType)
+bdBool bdUPnPDevice::extractServiceType(bdBool& serviceType)
 {
     if (bdStrstr(m_readBuffer, "WANIPConnection:1"))
     {
-        *serviceType = true;
+        serviceType = true;
     }
     else if (bdStrstr(m_readBuffer, "WANPPPConnection:1"))
     {
-        *serviceType = false;
+        serviceType = false;
     }
     else
     {
@@ -771,7 +771,7 @@ bdBool bdUPnPDevice::extractServiceType(bdBool* serviceType)
     return true;
 }
 
-bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt* controlLen)
+bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt& controlLen)
 {
     bdByte8* elementEnd;
     bdNChar8* addressEnd;
@@ -783,7 +783,7 @@ bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt* controlLen)
     bdByte8 control_url[12];
 
     *controlLoc = 0LL;
-    *controlLen = 0;
+    controlLen = 0;
     elementStart = 0LL;
     elementLen = 0;
 
@@ -802,7 +802,7 @@ bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt* controlLen)
     }
     strcpy(control_url, "<controlURL");
 
-    if (!extractTag(control_url, buffStart, &elementStart, &elementLen))
+    if (!extractTag(control_url, buffStart, &elementStart, elementLen))
     {
         bdLogWarn("bdnet/upnpdevice", "ControlURL specifier tag is missing");
         return false;
@@ -823,34 +823,34 @@ bdBool bdUPnPDevice::extractControlURL(bdByte8** controlLoc, bdUInt* controlLen)
             m_deviceAddr.set(addrString);
         }
         *controlLoc = addressEnd;
-        *controlLen = elementEnd - addressEnd;
+        controlLen = elementEnd - addressEnd;
     }
     else
     {
         *controlLoc = elementStart;
-        *controlLen = elementLen;
+        controlLen = elementLen;
     }
     return true;
 }
 
-bdBool bdUPnPDevice::extractExternalAddress(bdInetAddr* externalAddress)
+bdBool bdUPnPDevice::extractExternalAddress(bdInetAddr& externalAddress)
 {
     bdByte8 external_ip_address_string[22];
     bdByte8 addrString[22];
 
-    bdMemcpy(externalAddress, &bdInetAddr(), sizeof(bdInetAddr));
+    bdMemcpy(&externalAddress, &bdInetAddr(), sizeof(bdInetAddr));
     bdByte8* addrLoc = NULL;
     bdUInt addrLen = 0;
 
     strcpy(external_ip_address_string, "<NewExternalIPAddress");
-    if (!extractTag(external_ip_address_string, m_readBuffer, &addrLoc, &addrLen))
+    if (!extractTag(external_ip_address_string, m_readBuffer, &addrLoc, addrLen))
     {
         return true;
     }
     if (addrLen && addrLen < sizeof(addrString))
     {
         bdStrlcpy(addrString, addrLoc, addrLen + 1);
-        externalAddress->set(addrString);
+        externalAddress.set(addrString);
         bdLogInfo("bdnet/upnpdevice", "External address on device determined to be: %s", addrString);
         return true;
     }
@@ -885,7 +885,7 @@ bdBool bdUPnPDevice::parseGetMappingsResponse(bdBool* mappingExists, bdBool* map
 
     if (*mappingExists)
     {
-        if (!extractTag(internal_client_string, m_readBuffer, &addrLoc, &addrLen))
+        if (!extractTag(internal_client_string, m_readBuffer, &addrLoc, addrLen))
         {
             *mappingExists = 0;
         }
@@ -897,8 +897,8 @@ bdBool bdUPnPDevice::parseGetMappingsResponse(bdBool* mappingExists, bdBool* map
         for (bdUInt i = 0; i < m_localAddrs->getSize() && !*mappingIsMine; ++i)
         {
             bdInetAddr currAddress;
-            m_localAddrs->get(i, &currAddress);
-            if (currAddress == &mappingOwner)
+            m_localAddrs->get(i, currAddress);
+            if (currAddress == mappingOwner)
             {
                 *mappingIsMine = true;
             }
@@ -927,7 +927,7 @@ bdBool bdUPnPDevice::extractMappingOwner(bdInetAddr* owner, bdByte8* addrLoc, bd
         bdInetAddr mappingOwner(addrString);
         if (mappingOwner.isValid())
         {
-            owner->set(&mappingOwner);
+            owner->set(mappingOwner);
             return true;
         }
     }
@@ -944,12 +944,12 @@ const bdUPnPDevice::bdUPnPPortStatus bdUPnPDevice::getPortStatus() const
     return m_portStatus;
 }
 
-bdAddr* bdUPnPDevice::getExternalAddr()
+bdAddr bdUPnPDevice::getExternalAddr()
 {
-    return &bdAddr(&m_externalDeviceAddr, m_gamePort);
+    return bdAddr(m_externalDeviceAddr, m_gamePort);
 }
 
-bdAddr* bdUPnPDevice::getDeviceAddr()
+bdAddr bdUPnPDevice::getDeviceAddr()
 {
-    return &bdAddr(&m_deviceAddr);
+    return bdAddr(m_deviceAddr);
 }

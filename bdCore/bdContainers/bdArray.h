@@ -11,8 +11,8 @@ protected:
 public:
     bdArray();
     bdArray(const bdUInt capacity);
-    bdArray(const bdArray<T>* a);
-    bdArray(const bdUInt capacity, T* value);
+    bdArray(const bdArray<T>& a);
+    bdArray(const bdUInt capacity, T& value);
     ~bdArray();
     const bdUInt getCapacity() const;
     const bdUInt getSize() const;

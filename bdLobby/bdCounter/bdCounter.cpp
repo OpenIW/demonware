@@ -27,17 +27,17 @@ bdRemoteTaskRef bdCounter::incrementCounters(bdCounterValue* const counterIncrem
     }
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 23, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 23, 1);
     for (bdUInt i = 0; i < numEntries; ++i)
     {
-        counterIncrements[i].serialize(*buffer);
+        counterIncrements[i].serialize(**buffer);
     }
-    bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+    bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
     if (startTaskResult)
     {
         bdLogWarn("counters", "Failed to start task: Error %i", startTaskResult);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdCounter::getCounterTotals(bdCounterValue* results, const bdUInt numCounterIDs)
@@ -46,7 +46,7 @@ bdRemoteTaskRef bdCounter::getCounterTotals(bdCounterValue* results, const bdUIn
     bdUInt taskSize = 5 * numCounterIDs + 64;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 23, 2);
+    m_remoteTaskManager->initTaskBuffer(buffer, 23, 2);
     bdBool ok = true;
     for (bdUInt i = 0; i < numCounterIDs; ++i)
     {
@@ -54,7 +54,7 @@ bdRemoteTaskRef bdCounter::getCounterTotals(bdCounterValue* results, const bdUIn
     }
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("counters", "Failed to start task: Error %i", startTaskResult);
@@ -68,5 +68,5 @@ bdRemoteTaskRef bdCounter::getCounterTotals(bdCounterValue* results, const bdUIn
     {
         bdLogWarn("counter", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }

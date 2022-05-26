@@ -7,13 +7,13 @@ bdUInt bdCounterValue::sizeOf()
     return sizeof(bdCounterValue);
 }
 
-void bdCounterValue::serialize(bdByteBuffer* buffer)
+void bdCounterValue::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt32(m_counterID);
-    buffer->writeInt64(m_counterValue);
+    buffer.writeUInt32(m_counterID);
+    buffer.writeInt64(m_counterValue);
 }
 
 bdBool bdCounterValue::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readUInt32(&m_counterID) && buffer->readInt64(&m_counterValue);
+    return buffer->readUInt32(m_counterID) && buffer->readInt64(m_counterValue);
 }

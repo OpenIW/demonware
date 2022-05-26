@@ -24,12 +24,16 @@ bdFileInfo::~bdFileInfo()
 
 bdBool bdFileInfo::deserialize(bdByteBufferRef buffer)
 {
-    bdBool ok = buffer->readUInt32(&m_fileSize);
-    ok = ok == buffer->readUInt64(&m_fileID);
-    ok = ok == buffer->readUInt32(&m_createTime);
-    ok = ok == buffer->readUInt32(&m_modifedTime);
-    ok = ok == buffer->readBool(reinterpret_cast<bdBool*>(&m_visibility));
-    ok = ok == buffer->readUInt64(&m_ownerID);
+    bdBool ok = buffer->readUInt32(m_fileSize);
+    ok = ok == buffer->readUInt64(m_fileID);
+    ok = ok == buffer->readUInt32(m_createTime);
+    ok = ok == buffer->readUInt32(m_modifedTime);
+
+    bdBool visibility = false;
+    ok = ok == buffer->readBool(visibility);
+    m_visibility = static_cast<bdFileInfo::bdVisibility>(visibility);
+
+    ok = ok == buffer->readUInt64(m_ownerID);
     ok = ok == buffer->readString(m_fileName, sizeof(m_fileName));
     return ok;
 }

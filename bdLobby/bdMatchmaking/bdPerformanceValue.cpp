@@ -23,8 +23,8 @@ bdPerformanceValue::~bdPerformanceValue()
 
 bdBool bdPerformanceValue::deserialize(bdByteBufferRef buffer)
 {
-    bdBool ok = buffer->readUInt64(&m_entityID);
-    ok = ok == buffer->readInt64(&m_performanceValue);
+    bdBool ok = buffer->readUInt64(m_entityID);
+    ok = ok == buffer->readInt64(m_performanceValue);
     if (!ok)
     {
         bdLogError("err", "Deserialization failed");
@@ -37,8 +37,8 @@ bdUInt bdPerformanceValue::sizeOf()
     return sizeof(bdPerformanceValue);
 }
 
-void bdPerformanceValue::serialize(bdByteBuffer* buffer)
+void bdPerformanceValue::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt64(m_entityID);
-    buffer->writeInt64(m_performanceValue);
+    buffer.writeUInt64(m_entityID);
+    buffer.writeInt64(m_performanceValue);
 }

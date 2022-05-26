@@ -14,7 +14,7 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdPendingBufferTransfer(bdTaskByteBufferRef buffer, bdUInt totalSize);
-    bdPendingBufferTransfer(const bdPendingBufferTransfer* other);
+    bdPendingBufferTransfer(const bdPendingBufferTransfer& other);
     bdPendingBufferTransfer(bdByteBufferRef buffer, bdUInt totalSize);
     ~bdPendingBufferTransfer();
     bdUInt32 getAvail() const;
@@ -74,10 +74,10 @@ public:
     virtual bdBool send(bdUByte8* message, bdUInt messageSize, bdBool encrypt);
     void sendRaw(bdUByte8* buffer, const bdUInt32 bufferSize);
     void sendRaw(bdByteBufferRef buffer, const bdUInt32 bufferSize);
-    bdBool getMessageToDispatch(bdUByte8* type, bdByteBufferRef* payload);
-    bdBool getMessageToDispatch(bdUByte8* type, bdBitBufferRef* payload);
+    bdBool getMessageToDispatch(bdUByte8& type, bdByteBufferRef& payload);
+    bdBool getMessageToDispatch(bdUByte8& type, bdBitBufferRef& payload);
     void setSessionKey(const bdUByte8* const sesssionKey);
-    bdBool connect(bdAuthInfo* authInfo);
+    bdBool connect(bdAuthInfo& authInfo);
     void disconnect();
     void close();
     bdBool pump();

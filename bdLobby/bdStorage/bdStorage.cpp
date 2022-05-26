@@ -40,7 +40,7 @@ bdRemoteTaskRef bdStorage::uploadFile(const bdNChar8* const fileName, const void
         taskSize += 9;
     }
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 10, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 10, 1);
     bdBool ok = buffer->writeString(fileName, 128);
     ok = ok == buffer->writeBool(fileVisibility == 1);
     ok = ok == buffer->writeBlob(fileData, fileSize);
@@ -50,7 +50,7 @@ bdRemoteTaskRef bdStorage::uploadFile(const bdNChar8* const fileName, const void
     }
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("storage", "Failed to start task: Error %i", startTaskResult);
@@ -85,7 +85,7 @@ bdRemoteTaskRef bdStorage::removeFile(const bdNChar8* const fileName, const bdUI
         taskSize += 9;
     }
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 10, 2);
+    m_remoteTaskManager->initTaskBuffer(buffer, 10, 2);
     bdBool ok = buffer->writeString(fileName, 128);
     if (ownerID)
     {
@@ -93,7 +93,7 @@ bdRemoteTaskRef bdStorage::removeFile(const bdNChar8* const fileName, const bdUI
     }
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("storage", "Failed to start task: Error %i", startTaskResult);
@@ -103,7 +103,7 @@ bdRemoteTaskRef bdStorage::removeFile(const bdNChar8* const fileName, const bdUI
     {
         bdLogWarn("storage", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStorage::getFile(const bdNChar8* const fileName, bdFileData* const fileData, const bdUInt64 ownerUID)
@@ -120,12 +120,12 @@ bdRemoteTaskRef bdStorage::getFile(const bdNChar8* const fileName, bdFileData* c
     }
     bdUInt taskSize = fileNameLen + 73;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 10, 3);
+    m_remoteTaskManager->initTaskBuffer(buffer, 10, 3);
     bdBool ok = buffer->writeString(fileName, 128);
     ok = ok == buffer->writeUInt64(ownerUID);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("storage", "Failed to start task: Error %i", startTaskResult);
@@ -139,7 +139,7 @@ bdRemoteTaskRef bdStorage::getFile(const bdNChar8* const fileName, bdFileData* c
     {
         bdLogWarn("storage", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStorage::getPublisherFile(const bdNChar8* const fileName, bdFileData* const fileData)
@@ -156,11 +156,11 @@ bdRemoteTaskRef bdStorage::getPublisherFile(const bdNChar8* const fileName, bdFi
     }
     bdUInt taskSize = fileNameLen + 64;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 10, 7);
+    m_remoteTaskManager->initTaskBuffer(buffer, 10, 7);
     bdBool ok = buffer->writeString(fileName, 128);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("storage", "Failed to start task: Error %i", startTaskResult);
@@ -174,5 +174,5 @@ bdRemoteTaskRef bdStorage::getPublisherFile(const bdNChar8* const fileName, bdFi
     {
         bdLogWarn("storage", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }

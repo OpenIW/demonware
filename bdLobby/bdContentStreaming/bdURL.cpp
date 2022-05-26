@@ -16,15 +16,14 @@ bdURL::bdURL()
 
 bdURL::~bdURL()
 {
-    delete this;
 }
 
 bdBool bdURL::deserialize(bdByteBufferRef buffer)
 {
     bdBool ok = buffer->readString(m_url, sizeof(m_url));
-    ok = ok == buffer->readUInt16(&m_serverType);
+    ok = ok == buffer->readUInt16(m_serverType);
     ok = ok == buffer->readString(m_serverIndex, sizeof(m_serverIndex));
-    ok = ok == buffer->readUInt64(&m_fileID);
+    ok = ok == buffer->readUInt64(m_fileID);
     return ok;
 }
 

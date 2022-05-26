@@ -18,13 +18,13 @@ bdPendingBufferTransfer::bdPendingBufferTransfer(bdTaskByteBufferRef buffer, bdU
 {
 }
 
-bdPendingBufferTransfer::bdPendingBufferTransfer(const bdPendingBufferTransfer* other)
-    : bdReferencable(), m_buffer(&other->m_buffer), m_txPtr(other->m_txPtr), m_txAvail(other->m_txAvail)
+bdPendingBufferTransfer::bdPendingBufferTransfer(const bdPendingBufferTransfer& other)
+    : bdReferencable(), m_buffer(other.m_buffer), m_txPtr(other.m_txPtr), m_txAvail(other.m_txAvail)
 {
 }
 
 bdPendingBufferTransfer::bdPendingBufferTransfer(bdByteBufferRef buffer, bdUInt totalSize)
-    : bdReferencable(), m_buffer(*buffer), m_txPtr(buffer->getData()), m_txAvail(m_txPtr ? totalSize : 0)
+    : bdReferencable(), m_buffer(buffer), m_txPtr(buffer->getData()), m_txAvail(m_txPtr ? totalSize : 0)
 {
 }
 
@@ -108,12 +108,12 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
         writePtr = message->getHeaderStart();
         bdUInt offset = 0;
 
-        bdBool ok = bdBytePacker::appendBasicType<bdUInt>(writePtr, 5u, 0, &offset, &sizePrefix);
-        ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 5u, offset, &offset, &isEncrypted);
+        bdBool ok = bdBytePacker::appendBasicType<bdUInt>(writePtr, 5u, 0, offset, sizePrefix);
+        ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 5u, offset, offset, isEncrypted);
         if (ok)
         {
-            bdPendingBufferTransfer tx(&bdTaskByteBufferRef(*message), messageSize + 5);
-            m_outgoingBuffers.enqueue(&tx);
+            bdPendingBufferTransfer tx(bdTaskByteBufferRef(message), messageSize + 5);
+            m_outgoingBuffers.enqueue(tx);
         }
         pump();
         return ok;
@@ -135,31 +135,31 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
     writePtr = message->getHeaderStart();
     bdUInt offset = 0;
 
-    bdBool ok = bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, 0, &offset, &sizePrefix);
-    ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 13, offset, &offset, &isEncrypted);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, offset, &offset, &m_messageCount);
+    bdBool ok = bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, 0, offset, sizePrefix);
+    ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 13, offset, offset, isEncrypted);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, offset, offset, m_messageCount);
     bdAssert(message->getData() == (writePtr + offset + signatureSize), "Remote task serialization error");
     writePtr += offset;
     offset = 0;
-    ok = ok == bdBytePacker::appendBuffer(writePtr, cypherSize, offset, &offset, signature, signatureSize);
+    ok = ok == bdBytePacker::appendBuffer(writePtr, cypherSize, offset, offset, signature, signatureSize);
     bdUInt payloadOffset = offset + 1;
     offset += messageSize;
     bdUInt padding = cypherSize - (messageSize + signatureSize);
     for (bdUInt i = 0; i < padding; ++i)
     {
         bdByte8 cnt = m_messageCount;
-        bdBytePacker::appendBasicType<bdByte8>(writePtr, cypherSize, offset, &offset, &cnt);
+        bdBytePacker::appendBasicType<bdByte8>(writePtr, cypherSize, offset, offset, cnt);
     }
     hmac.process(&writePtr[payloadOffset], padding + messageSize - 1);
-    hmac.getData(signature, &signatureSize);
-    bdBytePacker::appendBuffer(writePtr, cypherSize, 0, &offset, signature, signatureSize);
+    hmac.getData(signature, signatureSize);
+    bdBytePacker::appendBuffer(writePtr, cypherSize, 0, offset, signature, signatureSize);
     ok = ok == m_cypher.encrypt(initialVector, writePtr, writePtr, cypherSize);
 
     ++m_messageCount;
     if (ok)
     {
-        bdPendingBufferTransfer tx(&bdTaskByteBufferRef(*message), sizePrefix + 4);
-        m_outgoingBuffers.enqueue(&tx);
+        bdPendingBufferTransfer tx(bdTaskByteBufferRef(message), sizePrefix + 4);
+        m_outgoingBuffers.enqueue(tx);
     }
     pump();
     return ok;
@@ -168,25 +168,25 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
 bdBool bdLobbyConnection::send(bdUByte8* buffer, bdUInt bufferSize, bdBool encrypt)
 {
     bdTaskByteBufferRef message(new bdTaskByteBuffer(buffer, bufferSize, false));
-    return sendTask(&bdTaskByteBufferRef(message), bufferSize, encrypt);
+    return sendTask(bdTaskByteBufferRef(message), bufferSize, encrypt);
 }
 
 void bdLobbyConnection::sendRaw(bdUByte8* buffer, const bdUInt32 bufferSize)
 {
     bdByteBufferRef message(new bdByteBuffer(buffer, bufferSize, false));
-    bdPendingBufferTransfer tx(&bdByteBufferRef(message), bufferSize);
-    m_outgoingBuffers.enqueue(&tx);
+    bdPendingBufferTransfer tx(bdByteBufferRef(message), bufferSize);
+    m_outgoingBuffers.enqueue(tx);
     pump();
 }
 
 void bdLobbyConnection::sendRaw(bdByteBufferRef buffer, const bdUInt32 bufferSize)
 {
-    bdPendingBufferTransfer tx(&bdByteBufferRef(buffer), bufferSize);
-    m_outgoingBuffers.enqueue(&tx);
+    bdPendingBufferTransfer tx(bdByteBufferRef(buffer), bufferSize);
+    m_outgoingBuffers.enqueue(tx);
     pump();
 }
 
-bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8* type, bdByteBufferRef* payload)
+bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8& type, bdByteBufferRef& payload)
 {
     bdUByte8* readPtr;
     bdUByte8 initialVector[24];
@@ -208,18 +208,18 @@ bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8* type, bdByteBufferRef* 
             bdUInt32 signature = 0;
             bdUInt plainTextSize = m_messageSize - 5;
             bdAssert(m_recvMessage->getSize() == (plainTextSize - plaintextHeaderSize), "Invalid recv'd message");
-            bdBool ok = bdBytePacker::removeBasicType<bdUInt32>(readPtr, validBytes, 0, &offset, &IVseed);
+            bdBool ok = bdBytePacker::removeBasicType<bdUInt32>(readPtr, validBytes, 0, offset, IVseed);
             readPtr += offset;
             bdCryptoUtils::calculateInitialVector(IVseed, initialVector);
             ok = ok == m_cypher.decrypt(initialVector, readPtr, readPtr, plainTextSize);
-            ok = ok == bdBytePacker::removeBasicType<bdUInt32>(readPtr, validBytes, 0, &offset, &signature);
+            ok = ok == bdBytePacker::removeBasicType<bdUInt32>(readPtr, validBytes, 0, offset, signature);
             if (signature == 0xDEADBEEF)
             {
-                ok = ok == bdBytePacker::removeBasicType<bdUByte8>(readPtr, validBytes, offset, &offset, &msgType);
+                ok = ok == bdBytePacker::removeBasicType<bdUByte8>(readPtr, validBytes, offset, offset, msgType);
                 if (ok)
                 {
-                    *type = msgType;
-                    *payload = *m_recvMessage;
+                    type = msgType;
+                    payload = *m_recvMessage;
                 }
             }
             else
@@ -232,10 +232,10 @@ bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8* type, bdByteBufferRef* 
         {
             bdUInt payloadSize = m_messageSize - 2;
             bdAssert(m_recvMessage->getSize() == payloadSize, "Invalid recv'd message");
-            if (bdBytePacker::removeBasicType<bdUByte8>(readPtr, validBytes, 0, &offset, &msgType))
+            if (bdBytePacker::removeBasicType<bdUByte8>(readPtr, validBytes, 0, offset, msgType))
             {
-                *type = msgType;
-                *payload = *m_recvMessage;
+                type = msgType;
+                payload = *m_recvMessage;
             }
         }
         m_recvState = BD_READ_INIT;
@@ -244,13 +244,13 @@ bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8* type, bdByteBufferRef* 
     return false;
 }
 
-bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8* type, bdBitBufferRef* payload)
+bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8& type, bdBitBufferRef& payload)
 {
     bdByteBufferRef buffer;
 
-    if (getMessageToDispatch(type, &buffer) && buffer.notNull())
+    if (getMessageToDispatch(type, buffer) && buffer.notNull())
     {
-        *payload = new bdBitBuffer(buffer->getData(), buffer->getDataSize() * CHAR_BIT, true);
+        payload = new bdBitBuffer(buffer->getData(), buffer->getDataSize() * CHAR_BIT, true);
         return true;
     }
     return false;
@@ -262,11 +262,11 @@ void bdLobbyConnection::setSessionKey(const bdUByte8* const sesssionKey)
     m_cypher.init(m_sessionKey, sizeof(m_sessionKey));
 }
 
-bdBool bdLobbyConnection::connect(bdAuthInfo* authInfo)
+bdBool bdLobbyConnection::connect(bdAuthInfo& authInfo)
 {
     m_status = BD_CONNECTING;
-    setSessionKey(authInfo->m_sessionKey);
-    bdSocketStatusCode status = m_socket.connect(&bdAddr(m_addr->getPublicAddr())); // I THINK THIS IS CORRECT
+    setSessionKey(authInfo.m_sessionKey);
+    bdSocketStatusCode status = m_socket.connect(bdAddr(m_addr->getPublicAddr()));
     if (status == BD_NET_SUCCESS)
     {
         m_status = BD_CONNECTED;
@@ -312,7 +312,7 @@ bdBool bdLobbyConnection::pump()
     if (m_status == BD_CONNECTING)
     {
         sockError = BD_NET_SUCCESS;
-        if (m_socket.isWritable(&sockError))
+        if (m_socket.isWritable(sockError))
         {
             if (sockError == BD_NET_SUCCESS)
             {
@@ -336,8 +336,8 @@ bdBool bdLobbyConnection::pump()
     }
     while (m_status == BD_CONNECTED && !m_outgoingBuffers.isEmpty())
     {
-        bdPendingBufferTransfer* tx = m_outgoingBuffers.peek();
-        bdInt sentStatus = m_socket.send(tx->getData(), tx->getAvail());
+        bdPendingBufferTransfer tx = m_outgoingBuffers.peek();
+        bdInt sentStatus = m_socket.send(tx.getData(), tx.getAvail());
         if (sentStatus <= 0)
         {
             switch (sentStatus)
@@ -377,7 +377,7 @@ bdBool bdLobbyConnection::pump()
             return m_status == BD_CONNECTED;
         }
         m_keepAliveTimer.start();
-        if (!tx->updateTransfer(sentStatus))
+        if (!tx.updateTransfer(sentStatus))
         {
             m_outgoingBuffers.dequeue();
         }
@@ -412,12 +412,12 @@ void bdLobbyConnection::callListenersConnect(const bdBool success)
         m_lastReceivedTimer.start();
         if (m_connectionListener)
         {
-            m_connectionListener->onConnect(&bdLobbyConnectionRef(this));
+            m_connectionListener->onConnect(bdLobbyConnectionRef(this));
         }
     }
     else if (m_connectionListener)
     {
-        m_connectionListener->onConnectFailed(&bdLobbyConnectionRef(this));
+        m_connectionListener->onConnectFailed(bdLobbyConnectionRef(this));
     }
 }
 
@@ -425,7 +425,7 @@ void bdLobbyConnection::callListenersDisconnect()
 {
     if (m_connectionListener)
     {
-        m_connectionListener->onDisconnect(&bdLobbyConnectionRef(this));
+        m_connectionListener->onDisconnect(bdLobbyConnectionRef(this));
     }
 }
 
@@ -522,7 +522,7 @@ bdInt bdLobbyConnection::recvMessageSize()
     if (m_recvCount == BD_MSG_SIZE_BUFFER_SIZE)
     {
         bdUInt offset = 0;
-        bdBytePacker::removeBasicType<bdUInt>(m_msgSizeBuffer, sizeof(m_msgSizeBuffer), 0, &offset, &m_messageSize);
+        bdBytePacker::removeBasicType<bdUInt>(m_msgSizeBuffer, sizeof(m_msgSizeBuffer), 0, offset, m_messageSize);
         if (m_messageSize)
         {
             if (m_messageSize <= m_maxRecvMessageSize)
@@ -556,7 +556,7 @@ bdInt bdLobbyConnection::recvEncryptType()
     {
         return sockStatus;
     }
-    bdAssert(m_recvMessage == BD_NULL && m_recvTransfer == BD_NULL, "BD_READ_ENCRYPT state error");
+    bdAssert(*m_recvMessage == BD_NULL && *m_recvTransfer == BD_NULL, "BD_READ_ENCRYPT state error");
     bdUInt headerRemaining = m_recvEncryptType == 1 || m_recvEncryptType == 2 ? 9 : 1;
     bdUInt headerSize = headerRemaining + 1;
     bdAssert(m_messageSize >= headerSize, "Message body too small.");
@@ -565,13 +565,13 @@ bdInt bdLobbyConnection::recvEncryptType()
     bdUByte8* preHeaderSpace = m_recvMessage->getHeaderStart();
     bdUInt preHeaderOffset = 0;
     bdBool ok = false;
-    if (bdBytePacker::appendBasicType<bdUInt>(preHeaderSpace, plaintextHeaderSize, preHeaderOffset, &preHeaderOffset, &m_messageSize))
+    if (bdBytePacker::appendBasicType<bdUInt>(preHeaderSpace, plaintextHeaderSize, preHeaderOffset, preHeaderOffset, m_messageSize))
     {
-        ok = bdBytePacker::appendBasicType<bdUByte8>(preHeaderSpace, plaintextHeaderSize, preHeaderOffset, &preHeaderOffset, &m_recvEncryptType);
+        ok = bdBytePacker::appendBasicType<bdUByte8>(preHeaderSpace, plaintextHeaderSize, preHeaderOffset, preHeaderOffset, m_recvEncryptType);
     }
     bdAssert(ok, "Pointer arithmetic failure");
     m_recvMessage->setHeaderSize(headerRemaining);
-    m_recvTransfer = new bdPendingBufferTransfer(&bdTaskByteBufferRef(&m_recvMessage), m_messageSize - 1);
+    m_recvTransfer = new bdPendingBufferTransfer(bdTaskByteBufferRef(m_recvMessage), m_messageSize - 1);
     m_recvState = BD_READ_MESSAGE;
     return sockStatus;
 }

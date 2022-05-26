@@ -53,7 +53,7 @@ bdBool bdReliableSendWindow::add(bdDataChunkRef chunk)
     }
 }
 
-void bdReliableSendWindow::getDataToSend(bdPacket* packet)
+void bdReliableSendWindow::getDataToSend(bdPacket& packet)
 {
     bdReliableSendWindow::bdMessageFrame* frameSlot;
     bdInt serializedSize;
@@ -61,7 +61,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
     bdBool neededFastRetransmit = false;
     bdBool haveDataToSend = false;
 
-    for (bdSequenceNumber i = m_lastAcked + &bdSequenceNumber(1); i < &m_nextFree; ++i)
+    for (bdSequenceNumber i = m_lastAcked + bdSequenceNumber(1); i < m_nextFree; ++i)
     {
         bdUInt index = i.getValue() % 128;
         if (m_frame[index].m_chunk.isNull())
@@ -69,7 +69,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
             continue;
         }
         frameSlot = &m_frame[index];
-        bdSequenceNumber frameSeqNum(&m_lastAcked, frameSlot->m_chunk->getSequenceNumber(), 16);
+        bdSequenceNumber frameSeqNum(m_lastAcked, frameSlot->m_chunk->getSequenceNumber(), 16);
         if (frameSeqNum.getValue() != i.getValue())
         {
             bdLogError("bdConnection/windows", "Window error");
@@ -112,7 +112,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
         }
     }
     bdBool full = false;
-    for (bdSequenceNumber i = m_lastAcked + &bdSequenceNumber(1); i < &m_nextFree && !full; ++i)
+    for (bdSequenceNumber i = m_lastAcked + bdSequenceNumber(1); i < m_nextFree && !full; ++i)
     {
         frameSlot = &m_frame[i.getValue() % 128];
         if (!*frameSlot->m_chunk)
@@ -127,7 +127,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
             {
                 if (frameSlot->m_timer.getElapsedTimeInSeconds() > m_timeoutPeriod && m_flightSize < m_congestionWindow)
                 {
-                    if (packet->addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(&chunk))))
+                    if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                     {
                         bdLogInfo("bdConnection/windows", "sent retransmit (rto timeout) %u", chunk->getSequenceNumber());
                         frameSlot->m_missingCount = 0;
@@ -145,7 +145,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
             }
             else
             {
-                if (packet->addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(&chunk))))
+                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     bdLogInfo("bdConnection/windows", "sent retransmit (fast retransmit) %u", chunk->getSequenceNumber());
                     frameSlot->m_missingCount = 0;
@@ -166,7 +166,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
             serializedSize = chunk->getSerializedSize();
             if (m_remoteReceiveWindowCredit - m_flightSize > chunk->getSerializedSize())
             {
-                if (packet->addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(&chunk))))
+                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     ++frameSlot->m_sendCount;
                     frameSlot->m_timer.start();
@@ -182,7 +182,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket* packet)
             }
             if (m_flightSize < m_congestionWindow && serializedSize < 1288)
             {
-                if (packet->addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(&chunk))))
+                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     bdLogInfo("bdConnection/windows", "sent 1 new packet %u (rule b)", chunk->getSequenceNumber());
                     ++frameSlot->m_sendCount;
@@ -263,15 +263,14 @@ void bdReliableSendWindow::increaseCongestionWindow(const bdUWord bytesAcked)
     }
 }
 
-bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
+bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32& rtt)
 {
-    bdSAckChunk::bdGapAckBlock* block;
     bdReliableSendWindow::bdMessageFrame* frameSlot;
-    bdSequenceNumber ack(&m_lastAcked, chunk->getCumulativeAck(), 16);
+    bdSequenceNumber ack(m_lastAcked, chunk->getCumulativeAck(), 16);
     bdBool validAck = true;
-    bdSequenceNumber lastSent(m_nextFree - &bdSequenceNumber(1));
+    bdSequenceNumber lastSent(m_nextFree - bdSequenceNumber(1));
 
-    if (ack > &lastSent)
+    if (ack > lastSent)
     {
         bdLogWarn("bdConnection/windows", "Acking unsent chunk.");
         validAck = false;
@@ -289,16 +288,16 @@ bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
     bdUInt ackIndex = ack.getValue() % 128;
     if (*m_frame[ackIndex].m_chunk && m_frame[ackIndex].m_sendCount == 1)
     {
-        *rtt = m_frame[ackIndex].m_timer.getElapsedTimeInSeconds();
+        rtt = m_frame[ackIndex].m_timer.getElapsedTimeInSeconds();
     }
     else
     {
-        *rtt = 0;
+        rtt = 0;
     }
     m_remoteReceiveWindowCredit = chunk->getWindowCredit();
     m_flightSize = 0;
     bdUInt count = 0;
-    for (bdSequenceNumber i(ack + &bdSequenceNumber(1)); count < 128; ++i)
+    for (bdSequenceNumber i(ack + bdSequenceNumber(1)); count < 128; ++i)
     {
         frameSlot = &m_frame[i.getValue() % 128];
         if (!*frameSlot->m_chunk)
@@ -309,7 +308,7 @@ bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
         ++count;
     }
     bdUInt bytesAcked = 0;
-    for (bdSequenceNumber i(ack + &bdSequenceNumber(1)); i < &ack; ++i)
+    for (bdSequenceNumber i(ack + bdSequenceNumber(1)); i < ack; ++i)
     {
         frameSlot = &m_frame[i.getValue() % 128];
         if (frameSlot->m_chunk.notNull())
@@ -324,18 +323,18 @@ bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
             validAck = false;
         }
     }
-    bdLinkedList<bdSAckChunk::bdGapAckBlock>* blocks = chunk->getGapList();
-    bdSequenceNumber lastSeq(ack + &bdSequenceNumber(1));
+    bdLinkedList<bdSAckChunk::bdGapAckBlock> blocks = chunk->getGapList();
+    bdSequenceNumber lastSeq(ack + bdSequenceNumber(1));
     for (;;)
     {
-        if (!blocks->getSize())
+        if (!blocks.getSize())
         {
             break;
         }
-        block = blocks->getHead();
-        bdSequenceNumber startSeq(ack + &bdSequenceNumber(block->m_start));
-        bdSequenceNumber endSeq(ack + &bdSequenceNumber(block->m_end));
-        for (bdSequenceNumber i(lastSeq); i <= &endSeq; ++i)
+        bdSAckChunk::bdGapAckBlock block = blocks.getHead();
+        bdSequenceNumber startSeq(ack + bdSequenceNumber(block.m_start));
+        bdSequenceNumber endSeq(ack + bdSequenceNumber(block.m_end));
+        for (bdSequenceNumber i(lastSeq); i <= endSeq; ++i)
         {
             frameSlot = &m_frame[i.getValue() % 128];
             if (frameSlot->m_chunk.isNull())
@@ -348,7 +347,7 @@ bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
                 bdLogWarn("bdConnection/windows", "Send count should be > 0");
                 validAck = false;
             }
-            if (i < &startSeq)
+            if (i < startSeq)
             {
                 ++frameSlot->m_missingCount;
                 if (frameSlot->m_gapAcked)
@@ -367,8 +366,8 @@ bdBool bdReliableSendWindow::handleAck(bdSAckChunkRef chunk, bdFloat32* rtt)
                 bytesAcked += frameSlot->m_chunk->getSerializedSize();
             }
         }
-        lastSeq = endSeq + &bdSequenceNumber(1);
-        blocks->removeHead();
+        lastSeq = endSeq + bdSequenceNumber(1);
+        blocks.removeHead();
     }
     increaseCongestionWindow(bytesAcked);
     m_lastAcked = ack;
@@ -379,7 +378,7 @@ bdBool bdReliableSendWindow::isEmpty()
 {
     bdReliableSendWindow::bdMessageFrame* frameSlot;
     bdBool empty = true;
-    for (bdSequenceNumber i(m_lastAcked); i < &m_nextFree && empty; ++i)
+    for (bdSequenceNumber i(m_lastAcked); i < m_nextFree && empty; ++i)
     {
         frameSlot = &m_frame[i.getValue() % 128];
         if (frameSlot->m_chunk.notNull())

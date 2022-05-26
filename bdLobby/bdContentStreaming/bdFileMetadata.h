@@ -36,5 +36,5 @@ public:
     void resetArrays();
     virtual bdBool deserialize(bdByteBufferRef buffer);
     virtual bdUInt sizeOf();
-    bdFileMetaData* operator=(const bdFileMetaData* other);
+    bdFileMetaData* operator=(const bdFileMetaData& other);
 };

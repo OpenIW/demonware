@@ -17,12 +17,12 @@ bdBool bdNATTypeDiscoveryPacketReply::serialize(void* data, const bdUInt size, c
     bdBool status = true;
 
     newOffset = offset;
-    AppendBasicType(status, bdUByte8, data, size, newOffset, newOffset, &m_type);
+    AppendBasicType(status, bdUByte8, data, size, newOffset, newOffset, m_type);
     if (m_protocolVersion == 1)
     {
         SkipBytes(status, data, size, newOffset, newOffset, 1u);
     }
-    AppendBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
+    AppendBasicType(status, bdUInt16, data, size, newOffset, newOffset, m_protocolVersion);
     Serialize(status, m_mappedAddr, data, size, newOffset, newOffset);
     if (m_protocolVersion == 1)
     {
@@ -46,18 +46,18 @@ bdBool bdNATTypeDiscoveryPacketReply::deserialize(const void* data, const bdUInt
     bdBool status = true;
 
     newOffset = offset;
-    RemoveBasicType(status, bdUByte8, data, size, newOffset, newOffset, &m_type);
+    RemoveBasicType(status, bdUByte8, data, size, newOffset, newOffset, m_type);
     if (m_type < 0x14 || m_type > 0x1D)
     {
         newOffset = offset;
         return false;
     }
-    RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
+    RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, m_protocolVersion);
     if (m_protocolVersion != 2)
     {
         RewindBytes(status, data, size, newOffset, newOffset, 2u);
         SkipBytes(status, data, size, newOffset, newOffset, 2u);
-        RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, &m_protocolVersion);
+        RemoveBasicType(status, bdUInt16, data, size, newOffset, newOffset, m_protocolVersion);
         if (m_protocolVersion != 1)
         {
             newOffset = offset;

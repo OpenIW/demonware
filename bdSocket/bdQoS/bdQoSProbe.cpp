@@ -30,7 +30,7 @@ void bdQoSProbe::bdQoSProbeEntryWrapper::operator delete(void* p)
 {
 }
 
-bdQoSProbe::bdQoSProbeEntryWrapper& bdQoSProbe::bdQoSProbeEntryWrapper::operator=(bdQoSProbe::bdQoSProbeEntryWrapper& other)
+bdQoSProbe::bdQoSProbeEntryWrapper& bdQoSProbe::bdQoSProbeEntryWrapper::operator=(const bdQoSProbe::bdQoSProbeEntryWrapper& other)
 {
     m_addr = other.m_addr;
     m_id = other.m_id;
@@ -156,8 +156,8 @@ bdBool bdQoSProbe::probe(bdCommonAddrRef addr, const bdSecurityID& id, const bdS
     }
     else
     {
-        bdArray<bdQoSProbe::bdQoSProbeEntryWrapper> value(1u, &entry);
-        m_probesResolving.put(addr, &value);
+        bdArray<bdQoSProbe::bdQoSProbeEntryWrapper> value(1u, entry);
+        m_probesResolving.put(addr, value);
     }
     return m_natTrav->connect(bdCommonAddrRef(addr), this, false);
 }
@@ -170,7 +170,7 @@ void bdQoSProbe::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAd
         return;
     }
     bdArray<bdQoSProbe::bdQoSProbeEntryWrapper> entries(0u);
-    m_probesResolving.get(&remote, &entries);
+    m_probesResolving.get(remote, entries);
     for (bdUInt i = 0; i < entries.getSize(); ++i)
     {
         bdMemcpy(&entries[i].m_realAddr, &realAddr, sizeof(entries[i].m_realAddr));
@@ -192,7 +192,7 @@ void bdQoSProbe::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
     bdCommonAddrInfo::getBriefInfo(bdCommonAddrRef(remote.m_ptr), addrStr, sizeof(addrStr));
     bdLogInfo("bdSocket/qos", " NAT addr discovery failed to %s . QoS has therefore failed", addrStr);
     bdArray<bdQoSProbe::bdQoSProbeEntryWrapper> entries(0u);
-    m_probesResolving.get(remote, &entries);
+    m_probesResolving.get(remote, entries);
     for (bdUInt i = 0; i < entries.getSize(); ++i)
     {
         entries[i].m_listener->onQoSProbeFailed(bdCommonAddrRef(entries[i].m_addr));
@@ -399,7 +399,7 @@ bdUInt bdQoSProbe::shrinkSecId(const bdSecurityID& id)
     bdUInt tmp = 0;
     bdUInt result = 0;
 
-    bdBytePacker::removeBasicType<bdUInt>(id.ab, sizeof(id), 0, tmp, &result);
+    bdBytePacker::removeBasicType<bdUInt>(id.ab, sizeof(id), 0, tmp, result);
     return result;
 }
 

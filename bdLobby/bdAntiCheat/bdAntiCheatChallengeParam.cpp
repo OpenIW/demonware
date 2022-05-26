@@ -2,10 +2,25 @@
 
 #include "bdLobby/bdLobby.h"
 
-bdAntiCheatChallengeParam::bdAntiCheatChallengeParam(bdAntiCheatChallengeParam* other)
-    : m_size(other->m_size), m_data(bdAllocate<bdUByte8>(m_size))
+void* bdAntiCheatChallengeParam::operator new(bdUWord nbytes, void* p)
 {
-    bdMemcpy(m_data, other->m_data, m_size);
+    return p;
+}
+
+void* bdAntiCheatChallengeParam::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
+
+void bdAntiCheatChallengeParam::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+bdAntiCheatChallengeParam::bdAntiCheatChallengeParam(const bdAntiCheatChallengeParam& other)
+    : m_size(other.m_size), m_data(bdAllocate<bdUByte8>(m_size))
+{
+    bdMemcpy(m_data, other.m_data, m_size);
 }
 
 bdAntiCheatChallengeParam::bdAntiCheatChallengeParam(const bdUByte8* data, bdUInt32 size)
@@ -25,21 +40,6 @@ bdAntiCheatChallengeParam::~bdAntiCheatChallengeParam()
     {
         bdDeallocate<bdUByte8>(m_data);
     }
-}
-
-bdAntiCheatChallengeParam* bdAntiCheatChallengeParam::operator=(const bdAntiCheatChallengeParam* other)
-{
-    return NULL;
-}
-
-bdBool bdAntiCheatChallengeParam::operator==(bdAntiCheatChallengeParam* other)
-{
-    return bdBool();
-}
-
-bdBool bdAntiCheatChallengeParam::operator!=(bdAntiCheatChallengeParam* other)
-{
-    return bdBool();
 }
 
 bdBool bdAntiCheatChallengeParam::deserialize(bdByteBufferRef buffer)

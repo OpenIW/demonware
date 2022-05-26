@@ -28,14 +28,14 @@ bdRemoteTaskRef bdContentStreaming::upload(const bdUInt16 fileSlot, bdUploadInte
     {
         return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preUpload(fileName, fileSlot, fileSize, category, m_URLs);
+    m_remoteTask = _preUpload(fileName, fileSlot, fileSize, category, m_URLs);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startUpload();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -46,14 +46,14 @@ bdRemoteTaskRef bdContentStreaming::upload(const bdUInt16 fileSlot, void* fileDa
     {
         return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preUpload(fileName, fileSlot, fileSize, category, m_URLs);
+    m_remoteTask = _preUpload(fileName, fileSlot, fileSize, category, m_URLs);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startUpload();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -64,14 +64,14 @@ bdRemoteTaskRef bdContentStreaming::copyFromPooledStorage(bdUInt64 pooledFileID,
     {
         return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preCopy(pooledFileID, 15);
+    m_remoteTask = _preCopy(pooledFileID, 15);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startCopy();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -82,14 +82,14 @@ bdRemoteTaskRef bdContentStreaming::copyFromUserStorage(bdUInt64 userFileID, con
     {
         return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preCopy(userFileID, 20);
+    m_remoteTask = _preCopy(userFileID, 20);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startCopy();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -97,16 +97,16 @@ bdRemoteTaskRef bdContentStreaming::download(const bdUInt64 fileID, bdDownloadIn
 {
     if (!initDownload(NULL, 0, downloadHandler, fileMetaData, startByte, endByte))
     {
-        return &bdRemoteTaskRef();
+        return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preDownloadByFileID(fileID, 0x40000000, m_downloadMetaData);
+    m_remoteTask = _preDownloadByFileID(fileID, 0x40000000, m_downloadMetaData);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startDownload();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -163,14 +163,14 @@ bdRemoteTaskRef bdContentStreaming::removeFile(const bdUInt16 fileSlot)
     {
         return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preDeleteFile(fileSlot, m_URLs);
+    m_remoteTask = _preDeleteFile(fileSlot, m_URLs);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startDelete();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -178,15 +178,15 @@ bdRemoteTaskRef bdContentStreaming::getFileMetaDataByID(const bdUInt numFileIDs,
 {
     bdRemoteTaskRef task;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(9 * numFileIDs + 69, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 1);
     buffer->writeUInt32(numFileIDs);
     for (bdUInt i = 0; i < numFileIDs; ++i)
     {
         buffer->writeUInt64(fileIDs[i]);
     }
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(fileDescriptor, numFileIDs);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::uploadUserSummaryMetaData(bdUInt64 fileID, void* summaryData, bdUInt summaryDataSize, void* metaData, bdUInt metaDataSize, bdUInt numTags, bdTag* tags)
@@ -197,14 +197,14 @@ bdRemoteTaskRef bdContentStreaming::uploadUserSummaryMetaData(bdUInt64 fileID, v
     }
     m_taskData.m_fileID = fileID;
     m_uploadSummary = true;
-    m_remoteTask = &_preUploadSummary();
+    m_remoteTask = _preUploadSummary();
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startUpload();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 
@@ -228,7 +228,7 @@ bdRemoteTaskRef bdContentStreaming::listFilesByOwner(const bdUInt64 ownerID, con
         taskSize += bdStrnlen(fileName, 128) + 2;
     }
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 2);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 2);
     buffer->writeUInt64(ownerID);
     buffer->writeUInt32(startDate);
     buffer->writeUInt16(category);
@@ -238,9 +238,9 @@ bdRemoteTaskRef bdContentStreaming::listFilesByOwner(const bdUInt64 ownerID, con
     {
         buffer->writeString(fileName, 128 + 1);
     }
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(fileDescriptors, maxNumResults);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::listFilesByOwners(bdUInt64* ownerIDs, bdUInt numOwners, const bdUInt startDate, const bdUInt16 category, bdFileMetaData* fileDescriptors,
@@ -265,7 +265,7 @@ bdRemoteTaskRef bdContentStreaming::_preUpload(const bdNChar8* filename, const b
     bdUInt taskSize = (filename ? bdStrnlen(filename, 128) + 2 : 0) + 112;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 5);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 5);
     buffer->writeString(filename, 128 + 1);
     buffer->writeUInt16(fileSlot);
     buffer->writeUInt32(fileSize);
@@ -274,9 +274,9 @@ bdRemoteTaskRef bdContentStreaming::_preUpload(const bdNChar8* filename, const b
     {
         buffer->writeBlob(m_checksum, 32);
     }
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(uploadURLs, 3);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_preUploadSummary()
@@ -285,7 +285,7 @@ bdRemoteTaskRef bdContentStreaming::_preUploadSummary()
     bdUInt taskSize = m_thumbDataSize + (16 * m_taskData.m_numTags) + 94;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 17);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 17);
     buffer->writeUInt64(m_taskData.m_fileID);
     buffer->writeInt32(m_taskData.m_fileSize);
     buffer->writeBlob(m_thumbData, m_thumbDataSize);
@@ -300,9 +300,9 @@ bdRemoteTaskRef bdContentStreaming::_preUploadSummary()
     {
         buffer->writeBlob(m_checksum, 32u);
     }
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(m_URLs, 3);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_postUploadFile()
@@ -313,7 +313,7 @@ bdRemoteTaskRef bdContentStreaming::_postUploadFile()
     taskSize += (m_taskData.m_fileName[0] ? bdStrnlen(m_taskData.m_fileName, 128) + 2 : 0) + 6;
     taskSize += (m_URLs[m_httpSite].m_serverIndex[0] ? bdStrnlen(m_URLs[m_httpSite].m_serverIndex, 128) + 2 : 0) + 8 + m_thumbDataSize + 5 + 16 * m_taskData.m_numTags + 11;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 6);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 6);
     buffer->writeString(m_taskData.m_fileName, 128 + 1);
     buffer->writeUInt16(m_taskData.m_fileSlot);
     buffer->writeUInt16(m_URLs[m_httpSite].m_serverType);
@@ -328,9 +328,9 @@ bdRemoteTaskRef bdContentStreaming::_postUploadFile()
         buffer->writeUInt64(m_taskData.m_tags[i].m_secTag);
     }
     buffer->writeArrayEnd();
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(m_uploadFileID, 1u);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_postUploadSummary()
@@ -339,11 +339,11 @@ bdRemoteTaskRef bdContentStreaming::_postUploadSummary()
     bdUInt taskSize = 78;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 18);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 18);
     buffer->writeUInt64(m_taskData.m_fileID);
     buffer->writeUInt32(m_taskData.m_fileSize);
-    m_remoteTaskManager->startTask(&task, &buffer);
-    return &task;
+    m_remoteTaskManager->startTask(task, buffer);
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_preCopy(const bdUInt64 fileID, const bdUByte8 taskID)
@@ -352,12 +352,12 @@ bdRemoteTaskRef bdContentStreaming::_preCopy(const bdUInt64 fileID, const bdUByt
     bdUInt taskSize = 76;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, taskID);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, taskID);
     buffer->writeUInt64(fileID);
     buffer->writeUInt16(m_taskData.m_fileSlot);
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(m_preCopyResults, 3);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_postCopy()
@@ -370,7 +370,7 @@ bdRemoteTaskRef bdContentStreaming::_postCopy()
         13 + m_thumbDataSize + 5 + 16 * m_taskData.m_numTags + 11;
 
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, 1));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 16);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 16);
     buffer->writeString(m_taskData.m_fileName, 128 + 1);
     buffer->writeUInt16(m_taskData.m_fileSlot);
     buffer->writeUInt16(m_preCopyResults[0].m_source->m_serverType);
@@ -386,9 +386,9 @@ bdRemoteTaskRef bdContentStreaming::_postCopy()
         buffer->writeUInt64(m_taskData.m_tags[i].m_secTag);
     }
     buffer->readArrayEnd();
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(m_uploadFileID, 1u);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_preDownloadFileBySlot(bdUInt64 fileID, bdUInt16 fileSlot, bdUInt fileSize, bdFileMetaData* fileMetaData)
@@ -402,12 +402,12 @@ bdRemoteTaskRef bdContentStreaming::_preDownloadByFileID(bdUInt64 fileID, bdUInt
     bdUInt taskSize = 78;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 9);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 9);
     buffer->writeUInt64(fileID);
     buffer->writeUInt32(fileSize);
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(fileMetaData, 1);
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreaming::_preDownloadPublisherFile(bdUInt64, bdUInt, bdFileMetaData*)
@@ -431,9 +431,9 @@ bdRemoteTaskRef bdContentStreaming::_preDeleteFile(bdUInt16 fileSlot, bdURL* del
     bdUInt taskSize = 67;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
 
-    m_remoteTaskManager->initTaskBuffer(&buffer, 50, 8);
+    m_remoteTaskManager->initTaskBuffer(buffer, 50, 8);
     buffer->writeUInt16(fileSlot);
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     task->setTaskResult(deleteURLs, 2);
-    return &task;
+    return task;
 }

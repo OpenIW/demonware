@@ -23,7 +23,7 @@ bdProfileInfo::~bdProfileInfo()
 
 bdBool bdProfileInfo::deserialize(bdByteBufferRef buffer)
 {
-    bdBool status = buffer->readUInt64(&m_entityID);
+    bdBool status = buffer->readUInt64(m_entityID);
     bdAssert(status, "Deserialization failed.");
     return status;
 }
@@ -33,7 +33,7 @@ bdUInt bdProfileInfo::sizeOf()
     return sizeof(bdProfileInfo);
 }
 
-void bdProfileInfo::serialize(bdByteBuffer* buffer)
+void bdProfileInfo::serialize(bdByteBuffer& buffer)
 {
-    buffer->writeUInt64(m_entityID);
+    buffer.writeUInt64(m_entityID);
 }

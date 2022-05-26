@@ -8,6 +8,6 @@ public:
     bdUInt32 m_groupCount;
 
     virtual bdBool deserialize(bdByteBufferRef buffer);
-    virtual void serialize(bdByteBuffer* buffer);
+    virtual void serialize(bdByteBuffer& buffer);
     virtual bdUInt sizeOf();
 };

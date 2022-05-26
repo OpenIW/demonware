@@ -54,10 +54,10 @@ void bdContentStreamingBase::abortHTTPOperation()
     }
 }
 
-void bdContentStreamingBase::checkProgress(bdUInt* bytesTransfered, bdFloat32* dataRate)
+void bdContentStreamingBase::checkProgress(bdUInt& bytesTransfered, bdFloat32& dataRate)
 {
-    *bytesTransfered = m_http.getTransferProgress();
-    *dataRate = m_http.getTransferSpeed();
+    bytesTransfered = m_http.getTransferProgress();
+    dataRate = m_http.getTransferSpeed();
 }
 
 bdInt bdContentStreamingBase::getLastHTTPError()
@@ -257,7 +257,7 @@ void bdContentStreamingBase::handleHTTPFailed()
         setState(FAILED, BD_CONTENTSTREAMING_HTTP_ERROR);
         break;
     case 'h':
-        bdLogError("lobby/contentStreamingBase", "HTTP COPY failed for site %s", m_preCopyResults[this->m_httpSite].m_source->m_url);
+        bdLogError("lobby/contentStreamingBase", "HTTP COPY failed for site %s", m_preCopyResults[m_httpSite].m_source->m_url);
         setState(FAILED, BD_CONTENTSTREAMING_HTTP_ERROR);
         m_overallTask->setNumResults(0);
         break;
@@ -274,9 +274,9 @@ bdRemoteTaskRef bdContentStreamingBase::_postUpload()
         bdLogWarn("sim", "Upload completed with %d bytes sent. Expected %d", actualUploaded, m_taskData.m_fileSize);
     }
     m_taskData.m_fileSize = actualUploaded;
-    bdRemoteTaskRef task(&(m_uploadSummary ? _postUploadSummary() : _postUploadFile()));
+    bdRemoteTaskRef task((m_uploadSummary ? _postUploadSummary() : _postUploadFile()));
     m_uploadSummary = false;
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdContentStreamingBase::_postUploadFile()
@@ -332,7 +332,7 @@ bdBool bdContentStreamingBase::initUpload(const bdUInt16 fileSlot, const void* f
     }
     for (bdUInt i = 0; i < numTags; ++i)
     {
-        m_taskData.m_tags[i] = &tags[i];
+        m_taskData.m_tags[i] = tags[i];
     }
     m_sendChecksum = false;
     if (m_uploadData && m_taskData.m_fileSize)
@@ -426,7 +426,7 @@ bdRemoteTaskRef bdContentStreamingBase::start(bdUInt16 operation)
     m_overallTask = new bdRemoteTask();
     m_overallTask->setStatus(bdRemoteTask::BD_PENDING);
     setState(PRE_HTTP_OPERATION, BD_NO_ERROR);
-    return &bdRemoteTaskRef(m_overallTask);
+    return bdRemoteTaskRef(m_overallTask);
 }
 
 void bdContentStreamingBase::setState(bdContentStreamingBase::bdStatus newState, bdLobbyErrorCode errorCode)

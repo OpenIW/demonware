@@ -35,7 +35,7 @@ inline void bdLinkedList<T>::clear()
 }
 
 template<typename T>
-inline T& bdLinkedList<T>::forward(Position& position)
+inline T& bdLinkedList<T>::forward(Position& position) const
 {
     position = reinterpret_cast<Node*>(position)->m_next;
     return reinterpret_cast<Node*>(position)->m_data;
@@ -51,27 +51,33 @@ inline void bdLinkedList<T>::addTail(const T& value)
 }
 
 template<typename T>
-inline T& bdLinkedList<T>::getHead()
+inline T& bdLinkedList<T>::getHead() const
 {
-    return this->m_head->m_data;
+    return m_head->m_data;
 }
 
 template<typename T>
-inline Position bdLinkedList<T>::getHeadPosition()
+inline Position bdLinkedList<T>::getHeadPosition() const
 {
-    return this->m_head;
+    return m_head;
 }
 
 template<typename T>
-inline bdUInt bdLinkedList<T>::getSize()
+inline bdUInt bdLinkedList<T>::getSize() const
 {
-    return this->m_size;
+    return m_size;
 }
 
 template<typename T>
-inline Position bdLinkedList<T>::getTailPosition()
+inline T& bdLinkedList<T>::getAt(const Position position) const
 {
-    return this->m_tail;
+    return *reinterpret_cast<T*>(position);
+}
+
+template<typename T>
+inline Position bdLinkedList<T>::getTailPosition() const
+{
+    return m_tail;
 }
 
 template<typename T>
@@ -156,5 +162,5 @@ inline void bdLinkedList<T>::removeHead()
     Position headPosition;
 
     headPosition = getHeadPosition();
-    removeAt(&headPosition);
+    removeAt(headPosition);
 }

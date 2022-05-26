@@ -23,7 +23,7 @@ bdTimeStamp::~bdTimeStamp()
 
 bdBool bdTimeStamp::deserialize(bdByteBufferRef buffer)
 {
-    return buffer->readUInt32(&m_timeStamp);
+    return buffer->readUInt32(m_timeStamp);
 }
 
 bdUInt bdTimeStamp::sizeOf()

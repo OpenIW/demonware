@@ -12,7 +12,7 @@ void* bdAntiCheatChallenges::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
-bdAntiCheatChallenges::bdAntiCheatChallenges(bdAntiCheatChallenges* other)
+bdAntiCheatChallenges::bdAntiCheatChallenges(bdAntiCheatChallenges& other)
 {
 }
 
@@ -31,11 +31,6 @@ bdBool bdAntiCheatChallenges::deserialize(bdByteBufferRef buffer)
 }
 
 bdAntiCheatChallenge* bdAntiCheatChallenges::getChallengeByIndex(bdUInt index)
-{
-    return NULL;
-}
-
-bdAntiCheatChallenges* bdAntiCheatChallenges::operator=(bdAntiCheatChallenges* other)
 {
     return NULL;
 }

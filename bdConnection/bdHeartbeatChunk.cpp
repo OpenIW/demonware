@@ -16,27 +16,29 @@ bdHeartbeatChunk::bdHeartbeatChunk() : bdChunk(BD_CT_HEARTBEAT), m_flags(BD_CA_N
 {
 }
 
-bdUInt bdHeartbeatChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdHeartbeatChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     bdUInt offset = bdChunk::serialize(data, size);
     bdUInt16 length = 0;
 
-    bdBool ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, &offset, reinterpret_cast<bdUByte8*>(&m_flags));
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &length);
+    bdBool ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, offset, m_flags);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, length);
     return offset;
 }
 
-bdBool bdHeartbeatChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdHeartbeatChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
-    bdUInt bytesRead = *offset;
+    bdUInt bytesRead = offset;
 
-    bdBool ok = bdChunk::deserialize(data, size, &bytesRead);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, &bytesRead, reinterpret_cast<bdUByte8*>(&m_flags));
+    bdBool ok = bdChunk::deserialize(data, size, bytesRead);
+    bdUByte8 flags = 0;
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(reinterpret_cast<const void*>(data), size, bytesRead, bytesRead, flags);
+    m_flags = static_cast<bdHeartbeatFlags>(flags);
     bdUInt16 length = 0;
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &length);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, length);
     if (ok)
     {
-        *offset = bytesRead;
+        offset = bytesRead;
     }
     return ok;
 }

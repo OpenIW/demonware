@@ -212,7 +212,7 @@ bdBool bdNATTypeDiscoveryClient::sendForTest3()
     return false;
 }
 
-bdBool bdNATTypeDiscoveryClient::sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& const serverAddr)
+bdBool bdNATTypeDiscoveryClient::sendNATTypeDiscoveryPacket(bdNATTypeDiscoveryPacket::bdNATTypeDiscoveryPacketRequest packetType, bdAddr& serverAddr)
 {
     bdInt lenDataSent;
     bdUByte8 buffer[1288];

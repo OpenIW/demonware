@@ -116,10 +116,10 @@ bdBool bdQoSReplyPacket::deserialize(const void* data, const bdUInt size, const 
     bdBool ok;
 
     newOffset = offset;
-    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_id);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt64>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::removeBasicType<bdBool>(data, size, newOffset, newOffset, &m_enabledMode);
+    ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, newOffset, newOffset, m_id);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt64>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::removeBasicType<bdBool>(data, size, newOffset, newOffset, m_enabledMode);
 
     if (size - newOffset != m_dataSize)
     {
@@ -153,11 +153,11 @@ bdBool bdQoSReplyPacket::serialize(void* data, const bdUInt size, const bdUInt o
     bdBool ok;
 
     newOffset = offset;
-    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_id);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt64>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::appendBasicType<bdBool>(data, size, newOffset, newOffset, &m_enabledMode);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, &m_dataSize);
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, m_id);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt64>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::appendBasicType<bdBool>(data, size, newOffset, newOffset, m_enabledMode);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, newOffset, newOffset, m_dataSize);
     if (m_dataSize)
     {
         ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, m_data, m_dataSize);

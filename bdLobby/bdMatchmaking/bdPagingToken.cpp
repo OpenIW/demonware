@@ -50,9 +50,9 @@ bdBool bdPagingToken::processResult(bdTaskResult* lastResultSet, bdUInt numResul
     return true;
 }
 
-const bdSecurityID* bdPagingToken::getSessionID() const
+const bdSecurityID& bdPagingToken::getSessionID() const
 {
-    return &m_sessionID;
+    return m_sessionID;
 }
 
 bdUInt bdPagingToken::getNumResultsPerPage() const

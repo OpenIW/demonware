@@ -78,7 +78,7 @@ public:
         hash = m_hashClass.getHash(key);
         for (n = m_map[getHashIndex(hash)]; n; n = n->m_next)
         {
-            if (key == &n->m_key)
+            if (key == n->m_key)
             {
                 ++m_numIterators;
                 return n;
@@ -95,7 +95,7 @@ public:
     bdBool remove(Iterator& iterator);
     void clear();
     void resize(const bdUInt newSize);
-    bdBool get(const keyType& key, const dataType& value);
+    bdBool get(const keyType& key, dataType& value);
     bdBool put(const keyType& key, const dataType& value);
     void createMap(const bdUInt initialCapacity, const bdFloat32 loadFactor);
     bdUInt getHashIndex(const bdUInt hash);

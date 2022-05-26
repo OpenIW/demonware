@@ -104,11 +104,11 @@ void bdGetHostByName::cancelLookup()
     m_status = BD_LOOKUP_CANCELLED;
 }
 
-bdInAddr* bdGetHostByName::getAddressAt(bdUInt index) const
+bdInAddr bdGetHostByName::getAddressAt(bdUInt index) const
 {
     if (index < m_numAddresses)
     {
-        return &bdInAddr(m_addresses[index]);
+        return bdInAddr(m_addresses[index]);
     }
     if (index >= 4)
     {
@@ -118,7 +118,7 @@ bdInAddr* bdGetHostByName::getAddressAt(bdUInt index) const
     {
         bdLogWarn("gethostbyname", "No address at index %u , blank bdInAddr returned");
     }
-    return &bdInAddr(m_addresses[index]);
+    return bdInAddr(m_addresses[index]);
 }
 
 const bdUInt bdGetHostByName::getNumAddresses() const

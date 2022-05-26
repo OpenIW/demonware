@@ -23,7 +23,7 @@ public:
     bdHTTPClient();
     ~bdHTTPClient();
 protected:
-    bdBool performOperation(bdStreamSocket* socket);
+    bdBool performOperation(bdStreamSocket& socket);
 public:
     void performOperation();
     bdBool httpGet(bdNChar8* const serverName, bdNChar8* const downloadURL, void* const getBuffer, bdUInt bufferSize, bdDownloadInterceptor* downloadInterceptor, bdUInt port,
@@ -43,7 +43,7 @@ public:
     bdUInt64 getResponseCode();
     bdInt64 getSocketErrorCode();
     void setSocketErrorCode(bdInt64);
-    bdHTTPBuffer* getInternalBuffer();
+    bdHTTPBuffer& getInternalBuffer();
     bdHTTPClient::BD_HTTP_OPERATION getOperation();
     bdUInt64 getExpectedContentSize();
     void setBytesTransfered(bdUInt64 bytes);
@@ -58,11 +58,11 @@ public:
     bdBool initHttpOperation(const bdNChar8* serverName, bdUInt port);
     bdBool validateRequestInput(const bdNChar8* serverName, const bdNChar8* requestPath, const void* inputBuffer, bdInt64 bufferSize, bdBool validInterceptor);
     bdBool resolveHostIP(bdAddr*);
-    bdBool sendPayload(bdStreamSocket* sock, bdStopwatch* httpTime);
-    bdInt writePayloadData(bdStreamSocket* sock, bdUInt* totalSent);
-    bdBool recvResponseHeader(bdStreamSocket* sock, bdUInt* bytesDownloaded);
-    bdBool recvResponsePayload(bdStreamSocket*, bdUInt);
-    bdSocketStatusCode readUntilStr(bdStreamSocket* socket, const bdNChar8* endString, bdNChar8* recvData, bdUInt maxSize, bdUInt* bufSize, bdInt* endSize);
+    bdBool sendPayload(bdStreamSocket& sock, bdStopwatch& httpTime);
+    bdInt writePayloadData(bdStreamSocket& sock, bdUInt& totalSent);
+    bdBool recvResponseHeader(bdStreamSocket& sock, bdUInt& bytesDownloaded);
+    bdBool recvResponsePayload(bdStreamSocket&, bdUInt);
+    bdSocketStatusCode readUntilStr(bdStreamSocket& socket, const bdNChar8* endString, bdNChar8* recvData, bdUInt maxSize, bdUInt* bufSize, bdInt& endSize);
 protected:
     bdNChar8 m_serverName[128];
     bdPort m_port;

@@ -27,8 +27,6 @@ include_directories(
     ../libtommath
 )
 
-add_definitions(-DLTC_SOURCE)
-
 add_library(libtomcrypt STATIC 
     src/ciphers/des.c
     src/ciphers/aes/aes.c

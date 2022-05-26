@@ -17,10 +17,10 @@ public:
     void* operator new(bdUWord nbytes);
     bdCookieEchoChunk();
     bdCookieEchoChunk(bdByteBufferRef cookieBuffer);
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
-    bdBool getCookie(bdCookieRef* cookie);
+    bdBool getCookie(bdCookieRef& cookie);
 
     const bdCookieEchoFlags getFlags() const;
 };

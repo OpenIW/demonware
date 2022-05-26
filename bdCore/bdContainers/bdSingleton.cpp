@@ -30,7 +30,7 @@ bdBool bdSingletonRegistryImpl::add(const bdSingletonDestroyFunction destroyFunc
     bdBool added = !m_cleaningUp;
     if (added)
     {
-        m_destroyFunctions.pushBack(&destroyFunction);
+        m_destroyFunctions.pushBack(destroyFunction);
     }
     return added;
 }

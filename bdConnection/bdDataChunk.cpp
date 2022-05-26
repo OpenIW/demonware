@@ -38,7 +38,7 @@ bdDataChunk::~bdDataChunk()
 {
 }
 
-bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     bdUByte8* payloadData;
     bdUInt offset = bdChunk::serialize(data, size);
@@ -48,10 +48,10 @@ bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size)
     {
         return offset;
     }
-    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, &offset, reinterpret_cast<bdUByte8*>(&m_flags));
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, offset, m_flags);
     bdUByte8 type = m_message->getType();
-    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, &offset, &type);
-    ok = ok == bdBytePacker::appendBasicType<bdSeqNumber>(data, size, offset, &offset, &m_seqNum);
+    ok = ok == bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, offset, type);
+    ok = ok == bdBytePacker::appendBasicType<bdSeqNumber>(data, size, offset, offset, m_seqNum);
     bdUInt16 payloadSize = 0;
     if ((m_flags & BD_DC_ENC_DATA) != 0)
     {
@@ -65,7 +65,7 @@ bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size)
                 payloadSize = encPayload->getDataSize();
             }
         }
-        ok = ok == bdBytePacker::appendEncodedUInt16(data, size, offset, &offset, payloadSize);
+        ok = ok == bdBytePacker::appendEncodedUInt16(data, size, offset, offset, payloadSize);
     }
     if ((m_flags & BD_DC_UNENC_DATA) != 0)
     {
@@ -76,12 +76,12 @@ bdUInt bdDataChunk::serialize(bdUByte8* data, const bdUInt32 size)
         {
             unencPayloadSize = unencPayload->getDataSize();
         }
-        ok = ok == bdBytePacker::appendEncodedUInt16(data, size, offset, &offset, unencPayloadSize);
+        ok = ok == bdBytePacker::appendEncodedUInt16(data, size, offset, offset, unencPayloadSize);
     }
     if (payloadSize)
     {
         payloadData = m_message->getPayload()->getData();
-        ok = ok == bdBytePacker::appendBuffer(data, size, offset, &offset, payloadData, payloadSize);
+        ok = ok == bdBytePacker::appendBuffer(data, size, offset, offset, payloadData, payloadSize);
     }
     return ok ? offset : 0;
 }
@@ -103,7 +103,7 @@ bdUInt bdDataChunk::serializeUnencrypted(bdUByte8* data, const bdUInt32 size)
     {
         unEncData = unEncPayload->getData();
         unEncDataSize = unEncPayload->getDataSize();
-        if (bdBytePacker::appendBuffer(data, size, 0, &offset, unEncData, unEncDataSize))
+        if (bdBytePacker::appendBuffer(data, size, 0, offset, unEncData, unEncDataSize))
         {
             bytesWritten = offset;
         }
@@ -111,28 +111,28 @@ bdUInt bdDataChunk::serializeUnencrypted(bdUByte8* data, const bdUInt32 size)
     return bytesWritten;
 }
 
-bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
     bdUInt unencOffset = 0;
-    return deserialize(data, size, offset, NULL, NULL, &unencOffset);
+    return deserialize(data, size, offset, NULL, NULL, unencOffset);
 }
 
-bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt* unencOffset)
+bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt& unencOffset)
 {
     bdUInt16 unencPayloadSize;
     bdUInt16 payloadSize;
 
-    bdUInt bytesRead = *offset;
-    bdUInt unencBytesRead = *unencOffset;
+    bdUInt bytesRead = offset;
+    bdUInt unencBytesRead = unencOffset;
 
-    bdBool ok = bdChunk::deserialize(data, size, &bytesRead);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, &bytesRead, &m_flags);
+    bdBool ok = bdChunk::deserialize(data, size, bytesRead);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, bytesRead, m_flags);
     bdUByte8 type8 = 0;
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, &bytesRead, &type8);
-    ok = ok == bdBytePacker::removeBasicType<bdSeqNumber>(data, size, bytesRead, &bytesRead, &m_seqNum);
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, bytesRead, type8);
+    ok = ok == bdBytePacker::removeBasicType<bdSeqNumber>(data, size, bytesRead, bytesRead, m_seqNum);
     if ((m_flags & BD_DC_ENC_DATA) != 0)
     {
-        ok = ok == bdBytePacker::removeEncodedUInt16(data, size, bytesRead, &bytesRead, &payloadSize);
+        ok = ok == bdBytePacker::removeEncodedUInt16(data, size, bytesRead, bytesRead, payloadSize);
         if (payloadSize > size - bytesRead)
         {
             bdLogError("bdDataChunk",
@@ -143,7 +143,7 @@ bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, b
     }
     if ((m_flags & BD_DC_UNENC_DATA) != 0)
     {
-        ok = ok == bdBytePacker::removeEncodedUInt16(data, size, bytesRead, &bytesRead, &unencPayloadSize);
+        ok = ok == bdBytePacker::removeEncodedUInt16(data, size, bytesRead, bytesRead, unencPayloadSize);
         if (unencPayloadSize > size - bytesRead)
         {
             bdLogError("bdDataChunk",
@@ -158,8 +158,8 @@ bdBool bdDataChunk::deserialize(const bdUByte8* const data, const bdUInt size, b
         ok = m_message.notNull();
         bytesRead += payloadSize;
         unencBytesRead += unencPayloadSize;
-        *offset = bytesRead;
-        *unencOffset = unencBytesRead;
+        offset = bytesRead;
+        unencOffset = unencBytesRead;
     }
     return ok;
 }

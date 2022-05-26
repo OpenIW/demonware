@@ -72,7 +72,7 @@ public:
     void prepareGetDescriptionRequest();
     bdBool parseDescriptionResponse();
     bdBool connectToDevice();
-    bdBool pumpSendRequest(bdBool* isComplete);
+    bdBool pumpSendRequest(bdBool& isComplete);
     bdBool setLocalConnectedAddr();
     bdBool pumpReceive();
     void prepareGetExternalIPRequest();
@@ -81,18 +81,18 @@ public:
     void preparePortUnMappingRequest();
     void setupReceive();
     void prepareCreatePortMappingRequest();
-    bdBool extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** value, bdUInt* valueLen);
+    bdBool extractTag(const bdByte8* tag, bdByte8* buffer, bdByte8** value, bdUInt& valueLen);
     void genUPnPCommand(const bdByte8* const command, const bdByte8* const arguments);
-    bdBool extractURLBase(bdByte8** baseLoc, bdUInt* baseLen);
-    bdBool extractServiceType(bdBool* serviceType);
-    bdBool extractControlURL(bdByte8** controlLoc, bdUInt* controlLen);
-    bdBool extractExternalAddress(bdInetAddr* externalAddress);
+    bdBool extractURLBase(bdByte8** baseLoc, bdUInt& baseLen);
+    bdBool extractServiceType(bdBool& serviceType);
+    bdBool extractControlURL(bdByte8** controlLoc, bdUInt& controlLen);
+    bdBool extractExternalAddress(bdInetAddr& externalAddress);
     void prepareGetMappingsRequest();
     bdBool parseGetMappingsResponse(bdBool* mappingExists, bdBool* mappingIsMine);
     bdBool extractMappingOwner(bdInetAddr* owner, bdByte8* addrLoc, bdUInt addrLen);
 
-    bdAddr* getDeviceAddr();
-    bdAddr* getExternalAddr();
+    bdAddr getDeviceAddr();
+    bdAddr getExternalAddr();
     const bdUPnPPortStatus getPortStatus() const;
     const bdUPnPDeviceState getDeviceState() const;
 };

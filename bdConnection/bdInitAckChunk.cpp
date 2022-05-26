@@ -21,7 +21,7 @@ bdInitAckChunk::bdInitAckChunk(bdUInt32 initTag, bdCookieRef cookie, const bdWor
 {
 }
 
-bdUInt bdInitAckChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdInitAckChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     bdUInt offset = 0;
     if (m_cookie.isNull())
@@ -29,37 +29,39 @@ bdUInt bdInitAckChunk::serialize(bdUByte8* data, const bdUInt32 size)
         return offset;
     }
     offset = bdChunk::serialize(data, size);
-    bdBool ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, &offset, reinterpret_cast<bdUByte8*>(&m_flags));
+    bdBool ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, offset, m_flags);
     bdUInt oldOffset = offset;
     offset += 2;
-    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, offset, &offset, &m_initTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt32>(data, size, offset, offset, m_initTag);
     bdUInt cookieLength = m_cookie->serialize(data ? &data[offset] : NULL, size - offset);
     bdUInt16 length16 = static_cast<bdUInt16>(cookieLength);
     bdAssert(cookieLength == length16, "Cookie is too big to bit in 16 bits.");
     offset += cookieLength;
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, oldOffset, &oldOffset, &length16);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, oldOffset, oldOffset, length16);
     return offset;
 }
 
-bdBool bdInitAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdInitAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
-    bdUInt bytesRead = *offset;
+    bdUInt bytesRead = offset;
     bdBool ok = true;
     bdUInt16 length = 0;
 
-    if (size - *offset <= 4)
+    if (size - offset <= 4)
     {
         return ok;
     }
-    ok = bdChunk::deserialize(data, size, &bytesRead);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, &bytesRead, reinterpret_cast<bdUByte8*>(&m_flags));
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &length);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, bytesRead, &bytesRead, &m_initTag);
+    ok = bdChunk::deserialize(data, size, bytesRead);
+    bdUByte8 flags;
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, bytesRead, flags);
+    m_flags = static_cast<bdInitAckChunkFlags>(m_flags);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, length);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(data, size, bytesRead, bytesRead, m_initTag);
     m_cookieBuffer = new bdByteBuffer(length, false);
-    ok = ok == bdBytePacker::removeBuffer(data, size, bytesRead, &bytesRead, const_cast<bdUByte8*>(m_cookieBuffer->getData()), length);
+    ok = ok == bdBytePacker::removeBuffer(data, size, bytesRead, bytesRead, const_cast<bdUByte8*>(m_cookieBuffer->getData()), length);
     if (ok)
     {
-        *offset = bytesRead;
+        offset = bytesRead;
     }
     return ok;
 }
@@ -69,11 +71,11 @@ bdUInt bdInitAckChunk::getSerializedSize()
     return serialize(NULL, NULL);
 }
 
-bdBool bdInitAckChunk::getCookie(bdByteBufferRef* cookie)
+bdBool bdInitAckChunk::getCookie(bdByteBufferRef& cookie)
 {
     if (*m_cookieBuffer)
     {
-        cookie = &m_cookieBuffer;
+        cookie = m_cookieBuffer;
     }
     return m_cookieBuffer.notNull();
 }

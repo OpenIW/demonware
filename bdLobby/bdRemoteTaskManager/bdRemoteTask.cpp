@@ -38,11 +38,11 @@ void bdRemoteTask::handleTaskReply(bdByteBufferRef buffer)
     bdUByte8 taskId;
 
     bdUInt32 error = 4;
-    bdBool ok = buffer->readUInt64(&m_transactionID);
+    bdBool ok = buffer->readUInt64(m_transactionID);
     if (ok)
     {
         bdLogInfo("remote task", "Received task reply (transaction ID: %llu).", m_transactionID);
-        ok = buffer->readUInt32(&error);
+        ok = buffer->readUInt32(error);
     }
     if (ok)
     {
@@ -58,8 +58,8 @@ void bdRemoteTask::handleTaskReply(bdByteBufferRef buffer)
         else
         {
             m_errorCode = BD_NO_ERROR;
-            ok = ok == buffer->readUByte8(&taskId);
-            ok = ok == deserializeTaskReply(&bdByteBufferRef(&buffer));
+            ok = ok == buffer->readUByte8(taskId);
+            ok = ok == deserializeTaskReply(bdByteBufferRef(buffer));
             m_status = BD_DONE;
         }
     }
@@ -75,7 +75,7 @@ void bdRemoteTask::handleAsyncTaskReply(bdByteBufferRef buffer)
 {
     bdUInt32 error = 4;
     bdLogInfo("remote task", "Received asynchronous task reply (transaction ID: %llu).", m_transactionID);
-    bdBool ok = buffer->readUInt32(&error);
+    bdBool ok = buffer->readUInt32(error);
     if (ok)
     {
         if (error)
@@ -96,7 +96,7 @@ void bdRemoteTask::handleAsyncTaskReply(bdByteBufferRef buffer)
         else
         {
             m_errorCode = BD_NO_ERROR;
-            ok = ok == deserializeTaskReply(&bdByteBufferRef(&buffer));
+            ok = ok == deserializeTaskReply(bdByteBufferRef(buffer));
             m_status = BD_DONE;
         }
     }
@@ -115,14 +115,14 @@ bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
 
     if (buffer->inspectDataType() == BD_BB_UNSIGNED_CHAR8_TYPE)
     {
-        ok = buffer->readUByte8(&taskResponseType);
+        ok = buffer->readUByte8(taskResponseType);
     }
-    ok = ok == buffer->readUInt32(&m_numResults);
+    ok = ok == buffer->readUInt32(m_numResults);
     if (ok)
     {
         if (m_numResults)
         {
-            ok = ok == buffer->readUInt32(&m_totalNumResults);
+            ok = ok == buffer->readUInt32(m_totalNumResults);
             if (ok)
             {
                 if (m_taskResult)
@@ -131,7 +131,7 @@ bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
                     bdUInt numResultsToRead = 0;
                     for (bdUInt i = 0; i < (m_numResults >= m_maxNumResults ? m_maxNumResults : m_numResults); ++i)
                     {
-                        m_taskResult[i].deserialize(&bdByteBufferRef(&buffer));
+                        m_taskResult[i].deserialize(bdByteBufferRef(buffer));
                     }
                     if (m_taskResultProcessor)
                     {
@@ -142,7 +142,7 @@ bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
                 {
                     for (bdUInt i = 0; i < (m_numResults >= m_maxNumResults ? m_maxNumResults : m_numResults) && ok; ++i)
                     {
-                        ok = ok == m_taskResultList[i]->deserialize(&bdByteBufferRef(&buffer));
+                        ok = ok == m_taskResultList[i]->deserialize(bdByteBufferRef(buffer));
                     }
                 }
                 else

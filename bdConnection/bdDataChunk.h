@@ -21,10 +21,10 @@ public:
     bdDataChunk();
     bdDataChunk(bdMessageRef data, const bdDataChunk::bdDataFlags flags);
     virtual ~bdDataChunk();
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
     bdUInt serializeUnencrypted(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
-    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt* unencOffset);
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
+    bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset, const bdUByte8* const unencData, const bdUInt unencSize, bdUInt& unencOffset);
     virtual bdUInt getSerializedSize();
     void setSequenceNumber(bdSeqNumber seqNum);
 

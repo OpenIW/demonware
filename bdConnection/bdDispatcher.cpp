@@ -25,11 +25,11 @@ void bdDispatcher::process(bdConnectionRef connection)
     bdMessageRef message;
     while (connection->getMessageToDispatch(&message))
     {
-        bdReceivedMessage rmessage(&bdMessageRef(&message), &bdConnectionRef(&connection));
+        bdReceivedMessage rmessage(&bdMessageRef(message), &bdConnectionRef(connection));
         bdBool accepted = 0;
         for (bdUInt i = 0; !accepted && i < m_interceptors.getSize(); ++i)
         {
-            accepted = (*m_interceptors[i])->accept(&rmessage);
+            accepted = m_interceptors[i]->accept(&rmessage);
         }
     }
 }
@@ -38,18 +38,18 @@ void bdDispatcher::registerInterceptor(bdDispatchInterceptor* const interceptor)
 {
     bdUInt index;
 
-    if (m_interceptors.findFirst(&interceptor, &index))
+    if (m_interceptors.findFirst(interceptor, index))
     {
         bdLogWarn("dispatcher", "Same listener registered multiple times.");
     }
-    m_interceptors.pushBack(&interceptor);
+    m_interceptors.pushBack(interceptor);
 }
 
 void bdDispatcher::unregisterInterceptor(bdDispatchInterceptor* const interceptor)
 {
     bdUInt index;
 
-    if (!m_interceptors.findFirst(&interceptor, &index))
+    if (!m_interceptors.findFirst(interceptor, index))
     {
         bdLogWarn("dispatcher", "Attempt to unregister unknown listener.");
     }

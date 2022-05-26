@@ -10,7 +10,7 @@ bdBool bdTaskResult::deserialize(bdByteBufferRef)
     return false;
 }
 
-void bdTaskResult::serialize(bdByteBuffer* buffer)
+void bdTaskResult::serialize(bdByteBuffer& buffer)
 {
 }
 

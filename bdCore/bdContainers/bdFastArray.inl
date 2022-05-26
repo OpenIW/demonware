@@ -47,7 +47,7 @@ template<typename T>
 inline T* bdFastArray<T>::uninitializedCopy(const bdFastArray<T>& a)
 {
     T* data = NULL;
-    if (a->getCapacity())
+    if (a.getCapacity())
     {
         data = bdAllocate<T>(a.getCapacity());
         copyArrayArray(data, a.getData(), a.getSize());

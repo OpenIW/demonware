@@ -66,7 +66,7 @@ bdBool bdByteBuffer::getStringLength(bdUInt& length)
     return bdBool();
 }
 
-bdUByte8* bdByteBuffer::getData()
+bdUByte8* bdByteBuffer::getData() const
 {
     return m_data;
 }
@@ -123,7 +123,7 @@ bdBitBufferDataType bdByteBuffer::inspectDataType()
         }
         offset = 0;
         dataTypeTemp = 0;
-        if (bdBytePacker::removeBasicType<bdUByte8>(m_readPtr, maxReadSize, 0, &offset, &dataTypeTemp))
+        if (bdBytePacker::removeBasicType<bdUByte8>(m_readPtr, maxReadSize, 0, offset, dataTypeTemp))
         {
             dataType = static_cast<bdBitBufferDataType>(dataTypeTemp);
         }
@@ -211,7 +211,7 @@ bdBool bdByteBuffer::read(void* data, bdUInt size)
     }
     else
     {
-        ok = bdBytePacker::removeBuffer(m_readPtr, maxReadSize, 0, &temp, data, size);
+        ok = bdBytePacker::removeBuffer(m_readPtr, maxReadSize, 0, temp, data, size);
         m_readPtr += size;
     }
     return ok;
@@ -533,7 +533,7 @@ bdBool bdByteBuffer::write(const void* data, const bdUInt size)
             bdLogError("core/bytebuffer", "Could not write data to buffer. Insufficient space.");
             return ok;
         }
-        ok = bdBytePacker::appendBuffer(m_writePtr, maxWriteSize, 0, &temp, data, size);
+        ok = bdBytePacker::appendBuffer(m_writePtr, maxWriteSize, 0, temp, data, size);
         if (ok)
         {
             m_writePtr += temp;
@@ -572,7 +572,7 @@ bdBool bdByteBuffer::writeUByte8(bdUByte8 b)
 
     if (writeDataType(BD_BB_UNSIGNED_CHAR8_TYPE))
     {
-        ok = write<bdUByte8>(&b);
+        ok = write<bdUByte8>(b);
     }
     return ok;
 }
@@ -583,7 +583,7 @@ bdBool bdByteBuffer::writeBool(bdBool b)
 
     if (writeDataType(BD_BB_BOOL_TYPE))
     {
-        ok = write<bdBool>(&b);
+        ok = write<bdBool>(b);
     }
     return ok;
 }
@@ -606,7 +606,7 @@ bdBool bdByteBuffer::writeNChar8(bdNChar8 c)
 
     if (writeDataType(BD_BB_SIGNED_CHAR8_TYPE))
     {
-        ok = write<bdNChar8>(&c);
+        ok = write<bdNChar8>(c);
     }
     return ok;
 }
@@ -617,7 +617,7 @@ bdBool bdByteBuffer::writeByte8(bdByte8 b)
 
     if (writeDataType(BD_BB_SIGNED_CHAR8_TYPE))
     {
-        ok = write<bdByte8>(&b);
+        ok = write<bdByte8>(b);
     }
     return ok;
 }
@@ -628,7 +628,7 @@ bdBool bdByteBuffer::writeInt16(bdInt16 i)
 
     if (writeDataType(BD_BB_SIGNED_INTEGER16_TYPE))
     {
-        ok = write<bdInt16>(&i);
+        ok = write<bdInt16>(i);
     }
     return ok;
 }
@@ -639,7 +639,7 @@ bdBool bdByteBuffer::writeUInt16(bdUInt16 u)
 
     if (writeDataType(BD_BB_UNSIGNED_INTEGER16_TYPE))
     {
-        ok = write<bdUInt16>(&u);
+        ok = write<bdUInt16>(u);
     }
     return ok;
 }
@@ -654,7 +654,7 @@ bdBool bdByteBuffer::writeInt32(bdInt i)
     }
     if (writeDataType(BD_BB_SIGNED_INTEGER32_TYPE))
     {
-        ok = write<bdInt>(&i);
+        ok = write<bdInt>(i);
     }
     return ok;
 }
@@ -669,7 +669,7 @@ bdBool bdByteBuffer::writeUInt32(bdUInt u)
     }
     if (writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE))
     {
-        ok = write<bdUInt>(&u);
+        ok = write<bdUInt>(u);
     }
     return ok;
 }
@@ -684,7 +684,7 @@ bdBool bdByteBuffer::writeInt64(bdInt64 i)
     }
     if (writeDataType(BD_BB_SIGNED_INTEGER64_TYPE))
     {
-        ok = write<bdInt64>(&i);
+        ok = write<bdInt64>(i);
     }
     return ok;
 }
@@ -699,7 +699,7 @@ bdBool bdByteBuffer::writeUInt64(bdUInt64 u)
     }
     if (writeDataType(BD_BB_UNSIGNED_INTEGER64_TYPE))
     {
-        ok = write<bdUInt64>(&u);
+        ok = write<bdUInt64>(u);
     }
     return ok;
 }
@@ -714,7 +714,7 @@ bdBool bdByteBuffer::writeFloat32(bdFloat32 f)
     }
     if (writeDataType(BD_BB_FLOAT32_TYPE))
     {
-        ok = write<bdFloat32>(&f);
+        ok = write<bdFloat32>(f);
     }
     return ok;
 }
@@ -729,7 +729,7 @@ bdBool bdByteBuffer::writeFloat64(bdFloat64 f)
     }
     if (writeDataType(BD_BB_FLOAT64_TYPE))
     {
-        ok = write<bdFloat64>(&f);
+        ok = write<bdFloat64>(f);
     }
     return ok;
 }
@@ -763,7 +763,7 @@ bdBool bdByteBuffer::writeString(const bdNChar8* const s, const bdUWord maxLen)
     if (addNullTerminator)
     {
         null = 0;
-        ok = ok && write<bdUByte8>(&null);
+        ok = ok && write<bdUByte8>(null);
     }
     return ok;
 }

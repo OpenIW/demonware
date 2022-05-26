@@ -22,7 +22,7 @@ public:
         bdBool m_lone;
 
         bdControlChunkStore(bdChunkRef chunk, bdBool lone);
-        bdControlChunkStore(bdUnicastConnection::bdControlChunkStore* other);
+        bdControlChunkStore(const bdUnicastConnection::bdControlChunkStore& other);
     };
 protected:
     bdConnectionStatistics m_stats;
@@ -50,7 +50,6 @@ protected:
 public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
-    bdUnicastConnection(bdUnicastConnection* other);
     bdUnicastConnection(bdAddressMap* addrMap);
     bdUnicastConnection(bdCommonAddrRef dest, bdAddressMap* addrMap);
     ~bdUnicastConnection();
@@ -63,18 +62,18 @@ public:
     bdFloat32 GetAvgRTT();
     bdBool receive(bdUByte8* buffer, const bdUInt bufferSize);
     bdUInt getDataToSend(bdUByte8* const buffer, const bdUInt bufferSize);
-    bdBool getMessageToDispatch(bdMessageRef* message);
-    bdBool handleData(bdReference<bdChunk>* chunk);
-    bdBool handleSAck(bdReference<bdChunk>* chunk);
-    bdBool handleInit(bdReference<bdChunk>* chunk);
-    bdBool handleInitAck(bdReference<bdChunk>* chunk, const bdUInt vtag);
-    bdBool handleCookieEcho(bdReference<bdChunk>* chunk, const bdUInt vtag);
-    bdBool handleCookieAck(bdReference<bdChunk>* chunk, const bdUInt vtag);
-    bdBool handleHeartbeat(bdReference<bdChunk>* chunk);
-    bdBool handleHeartbeatAck(bdReference<bdChunk>* chunk);
-    bdBool handleShutdown(bdReference<bdChunk>* chunk);
-    bdBool handleShutdownAck(bdReference<bdChunk>* chunk);
-    bdBool handleShutdownComplete(bdReference<bdChunk>* chunk);
+    bdBool getMessageToDispatch(bdMessageRef& message);
+    bdBool handleData(bdChunkRef& chunk);
+    bdBool handleSAck(bdChunkRef& chunk);
+    bdBool handleInit(bdChunkRef& chunk);
+    bdBool handleInitAck(bdChunkRef& chunk, const bdUInt vtag);
+    bdBool handleCookieEcho(bdChunkRef& chunk, const bdUInt vtag);
+    bdBool handleCookieAck(bdChunkRef& chunk, const bdUInt vtag);
+    bdBool handleHeartbeat(bdChunkRef& chunk);
+    bdBool handleHeartbeatAck(bdChunkRef& chunk);
+    bdBool handleShutdown(bdChunkRef& chunk);
+    bdBool handleShutdownAck(bdChunkRef& chunk);
+    bdBool handleShutdownComplete(bdChunkRef& chunk);
     bdBool sendInit();
     bdBool sendInitAck(bdReference<bdInitChunk> chunk);
     bdBool sendCookieEcho(bdReference<bdInitAckChunk> chunk);

@@ -27,11 +27,11 @@ bdUInt bdPacket::serialize(bdUByte8* outBuffer, const bdUInt outSize)
     bdUInt serializedNumBytes;
     bdUInt bytesWritten;
     bdUInt outOffset = 2;
-    bdBool ok = bdBytePacker::appendBasicType<bdUInt>(outBuffer, outSize, outOffset, &outOffset, &m_tag);
+    bdBool ok = bdBytePacker::appendBasicType<bdUInt>(outBuffer, outSize, outOffset, outOffset, m_tag);
     bdUInt bytesRemaining = outSize - outOffset;
     bdUInt encDataSize = outOffset - 2;
 
-    for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(&chunkPos))
+    for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(chunkPos))
     {
         bdChunkRef chunk(reinterpret_cast<bdChunkRef*>(chunkPos));
         serializedNumBytes = chunk->getSerializedSize();
@@ -45,12 +45,12 @@ bdUInt bdPacket::serialize(bdUByte8* outBuffer, const bdUInt outSize)
         encDataSize += bytesWritten;
         outOffset += bytesWritten;
     }
-    for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(&chunkPos))
+    for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(chunkPos))
     {
         bdChunkRef chunk(reinterpret_cast<bdChunkRef*>(chunkPos));
         if (chunk->getType() == 2)
         {
-            bdDataChunkRef dataChunk(reference_cast<bdDataChunk,bdChunk>(bdChunkRef(&chunk)));
+            bdDataChunkRef dataChunk(reference_cast<bdDataChunk,bdChunk>(bdChunkRef(chunk)));
             bytesWritten = dataChunk->serializeUnencrypted(&outBuffer[outOffset], outSize - outOffset);
             outOffset += bytesWritten;
         }
@@ -66,7 +66,7 @@ bdUInt bdPacket::serialize(bdUByte8* outBuffer, const bdUInt outSize)
         else
         {
             bdUInt newOffset = 0;
-            if (bdBytePacker::appendBasicType<bdUInt16>(outBuffer, outSize, 0, &newOffset, &encDataSize16))
+            if (bdBytePacker::appendBasicType<bdUInt16>(outBuffer, outSize, 0, newOffset, encDataSize16))
             {
                 totalBytesWritten = outOffset;
             }
@@ -86,7 +86,7 @@ bdBool bdPacket::deserialize(const bdUByte8* inData, const bdUInt inSize)
 
     if (inData && inSize > 6)
     {
-        ok = bdBytePacker::removeBasicType<bdUInt16>(inData, inSize, encOffset, &encOffset, &encSize);
+        ok = bdBytePacker::removeBasicType<bdUInt16>(inData, inSize, encOffset, encOffset, encSize);
     }
     if (encSize > inSize - encOffset)
     {
@@ -99,7 +99,7 @@ bdBool bdPacket::deserialize(const bdUByte8* inData, const bdUInt inSize)
     unencOffset = 0;
     encOffset = 0;
 
-    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(encData, encSize, encOffset, &encOffset, &m_tag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt32>(encData, encSize, encOffset, encOffset, m_tag);
     for (bdUInt iterations = 0; encOffset < encSize && ok && iterations < 100; ++iterations)
     {
         type = bdChunk::getType(&encData[encOffset], encSize - encOffset);
@@ -162,11 +162,11 @@ bdBool bdPacket::deserialize(const bdUByte8* inData, const bdUInt inSize)
         if (type == BD_CT_DATA)
         {
             bdDataChunkRef dataChunk(reference_cast<bdDataChunk, bdChunk>(bdChunkRef(chunk)));
-            ok = ok == dataChunk->deserialize(encData, encSize, &encOffset, unencData, unencSize, &unencOffset);
+            ok = ok == dataChunk->deserialize(encData, encSize, encOffset, unencData, unencSize, unencOffset);
         }
         else
         {
-            ok = ok == chunk->deserialize(encData, encSize, &encOffset);
+            ok = ok == chunk->deserialize(encData, encSize, encOffset);
         }
 
         if (!ok)
@@ -192,7 +192,7 @@ bdBool bdPacket::addChunk(bdChunkRef chunk)
     return false;
 }
 
-bdBool bdPacket::getNextChunk(bdChunkRef* chunk)
+bdBool bdPacket::getNextChunk(bdChunkRef& chunk)
 {
     if (!m_chunks.isEmpty())
     {

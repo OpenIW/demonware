@@ -11,26 +11,25 @@ void bdCommonAddr::operator delete(void* p)
     bdMemory::deallocate(p);
 }
 
-bdBool bdCommonAddr::operator==(bdCommonAddr& other)
+bdBool bdCommonAddr::operator==(bdCommonAddr& other) const
 {
-    bdAddr* myAddr;
     bdAddr localAddr = m_localAddrs.getSize() ? bdAddr(m_localAddrs[0]) : bdAddr();
     bdAddr otherLocalAddr = other.m_localAddrs.getSize() ? bdAddr(other.m_localAddrs[0]) : bdAddr();
 
     if (m_hash == other.m_hash)
     {
-        myAddr = m_publicAddr.getAddress().isValid() ? &m_publicAddr : &localAddr;
-        return other.m_publicAddr.getAddress().isValid() ? myAddr == &other.m_publicAddr : myAddr == &otherLocalAddr;
+        bdAddr myAddr = m_publicAddr.getAddress().isValid() ? m_publicAddr : localAddr;
+        return other.m_publicAddr.getAddress().isValid() ? myAddr == other.m_publicAddr : myAddr == otherLocalAddr;
     }
     return false;
 }
 
-bdBool bdCommonAddr::operator!=(bdCommonAddr& other)
+bdBool bdCommonAddr::operator!=(bdCommonAddr& other) const
 {
     return m_hash != other.m_hash;
 }
 
-bdBool bdCommonAddr::operator<(bdCommonAddr& other)
+bdBool bdCommonAddr::operator<(bdCommonAddr& other) const
 {
     return m_hash < other.m_hash;
 }
@@ -117,7 +116,7 @@ void bdCommonAddr::calculateHash()
     }
     if (status)
     {
-        status = bdBytePacker::removeBasicType<bdUInt>(hash, sizeof(hash), 0, offset, &m_hash);
+        status = bdBytePacker::removeBasicType<bdUInt>(hash, sizeof(hash), 0, offset, m_hash);
     }
     bdAssert(status, "Failed to calculate hash.");
 }
@@ -154,7 +153,7 @@ bdBool bdCommonAddr::deserialize(bdCommonAddrRef me, const bdUByte8* buffer)
     }
     status = status == other->m_publicAddr.deserialize(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, offset);
     bdByte8 tmpByte = 0;
-    status = status == bdBytePacker::removeBasicType<bdByte8>(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, offset, &tmpByte);
+    status = status == bdBytePacker::removeBasicType<bdByte8>(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, offset, tmpByte);
     if (status)
     {
         other->m_natType = static_cast<bdNATType>(tmpByte);
@@ -224,7 +223,7 @@ void bdCommonAddr::serialize(bdUByte8* buffer)
     if (status)
     {
         var = m_natType;
-        status = bdBytePacker::appendBasicType<bdNChar8>(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, offset, &var);
+        status = bdBytePacker::appendBasicType<bdNChar8>(buffer, BD_COMMON_ADDR_SERIALIZED_SIZE, offset, offset, var);
     }
     bdAssert(status && offset == BD_COMMON_ADDR_SERIALIZED_SIZE, "bdCommonAddr::serialize, wrong size.");
 }

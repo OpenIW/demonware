@@ -28,15 +28,15 @@ bdSessionID::~bdSessionID()
 {
 }
 
-void bdSessionID::serialize(bdByteBuffer* buffer) const
+void bdSessionID::serialize(bdByteBuffer& buffer) const
 {
-    buffer->writeBlob(m_sessionID.ab, sizeof(m_sessionID.ab));
+    buffer.writeBlob(m_sessionID.ab, sizeof(m_sessionID.ab));
 }
 
 bdBool bdSessionID::deserialize(bdByteBufferRef buffer)
 {
     bdUInt readSize = 8;
-    return buffer->readBlob(m_sessionID.ab, &readSize);
+    return buffer->readBlob(m_sessionID.ab, readSize);
 }
 
 bdUInt bdSessionID::sizeOf()

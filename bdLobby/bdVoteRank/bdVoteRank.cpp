@@ -16,11 +16,11 @@ bdRemoteTaskRef bdVoteRank::submitRating(bdRatingInfo* ratings, const bdUInt num
         taskSize += ratings[i].sizeOf();
     }
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 55, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 55, 1);
     for (bdUInt i = 0; i < numRatings; ++i)
     {
-        ratings[i].serialize(*buffer);
+        ratings[i].serialize(**buffer);
     }
-    m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->startTask(task, buffer);
     return &task;
 }

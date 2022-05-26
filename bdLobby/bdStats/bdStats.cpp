@@ -23,21 +23,21 @@ bdRemoteTaskRef bdStats::writeStats(bdStatsInfo** stats, const bdUInt numStats)
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(0, true));
     for (bdUInt i = 0; i < numStats; ++i)
     {
-        stats[i]->serialize(*buffer);
+        stats[i]->serialize(**buffer);
     }
     buffer->write(NULL, 64);
     buffer->allocateBuffer();
-    m_remoteTaskManager->initTaskBuffer(&buffer, 4, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 4, 1);
     for (bdUInt i = 0; i < numStats; ++i)
     {
-        stats[i]->serialize(*buffer);
+        stats[i]->serialize(**buffer);
     }
-    bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+    bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
     if (startTaskResult)
     {
         bdLogWarn("stats", "Failed to start task: Error %i", startTaskResult);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStats::readStatsByRank(const bdUInt leaderBoardID, const bdUInt64 firstRank, bdStatsInfo* stats, const bdUInt maxResults)
@@ -45,13 +45,13 @@ bdRemoteTaskRef bdStats::readStatsByRank(const bdUInt leaderBoardID, const bdUIn
     bdRemoteTaskRef task;
     bdUInt taskSize = 83;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 4, 4);
+    m_remoteTaskManager->initTaskBuffer(buffer, 4, 4);
     bdBool ok = buffer->writeUInt32(leaderBoardID);
     ok = ok == buffer->writeUInt64(firstRank);
     ok = ok == buffer->writeUInt32(maxResults);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("stats", "Failed to start task: Error %i", startTaskResult);
@@ -65,7 +65,7 @@ bdRemoteTaskRef bdStats::readStatsByRank(const bdUInt leaderBoardID, const bdUIn
     {
         bdLogWarn("stats", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStats::readStatsByPivot(const bdUInt leaderBoardID, const bdUInt64 entityID, bdStatsInfo* stats, const bdUInt maxResults)
@@ -73,13 +73,13 @@ bdRemoteTaskRef bdStats::readStatsByPivot(const bdUInt leaderBoardID, const bdUI
     bdRemoteTaskRef task;
     bdUInt taskSize = 83;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 4, 5);
+    m_remoteTaskManager->initTaskBuffer(buffer, 4, 5);
     bdBool ok = buffer->writeUInt32(leaderBoardID);
     ok = ok == buffer->writeUInt64(entityID);
     ok = ok == buffer->writeUInt32(maxResults);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("stats", "Failed to start task: Error %i", startTaskResult);
@@ -93,7 +93,7 @@ bdRemoteTaskRef bdStats::readStatsByPivot(const bdUInt leaderBoardID, const bdUI
     {
         bdLogWarn("stats", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, bdUInt64* entityIDs, const bdUInt numEntityIDs, bdStatsInfo* stats)
@@ -101,7 +101,7 @@ bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, bdUInt6
     bdRemoteTaskRef task;
     bdUInt taskSize = 9 * numEntityIDs + 69;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 4, 3);
+    m_remoteTaskManager->initTaskBuffer(buffer, 4, 3);
     bdBool ok = buffer->writeUInt32(leaderBoardID);
     for (bdUInt i = 0; i < numEntityIDs; ++i)
     {
@@ -110,7 +110,7 @@ bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, bdUInt6
 
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("stats", "Failed to start task: Error %i", startTaskResult);
@@ -124,5 +124,5 @@ bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, bdUInt6
     {
         bdLogWarn("stats", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }

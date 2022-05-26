@@ -26,9 +26,9 @@ protected:
 public:
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
-    bdBool operator==(bdCommonAddr& other);
-    bdBool operator!=(bdCommonAddr& other);
-    bdBool operator<(bdCommonAddr& other);
+    bdBool operator==(bdCommonAddr& other) const;
+    bdBool operator!=(bdCommonAddr& other) const;
+    bdBool operator<(bdCommonAddr& other) const;
 
     bdCommonAddr();
     bdCommonAddr(const bdAddr& publicAddr);

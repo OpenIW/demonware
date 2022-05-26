@@ -34,8 +34,8 @@ protected:
     bdChunk::bdChunkData m_headerData;
 public:
     bdChunk(const bdChunkTypes type) : bdReferencable(), m_type(type) {};
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
     const bdChunkTypes getType() const;
     const bdBool isControl() const;

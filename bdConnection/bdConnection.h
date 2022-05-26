@@ -69,10 +69,10 @@ public:
     virtual ~bdConnection();
     void registerListener(bdConnectionListener* const listener);
     void unregisterListener(bdConnectionListener* const listener);
-    void setAddressHandle(const bdAddrHandleRef* addr);
+    void setAddressHandle(const bdAddrHandleRef& addr);
     void setTransmissionRate(const bdUInt bytesPerSecond);
     bdUInt getTransmissionRate() const;
-    const bdAddrHandleRef* getAddressHandle() const;
+    const bdAddrHandleRef& getAddressHandle() const;
     bdCommonAddrRef getAddress() const;
     virtual bdBool receive(const bdUByte8*, const bdUInt) { return false; };
     virtual bdBool send(const bdMessageRef, const bdBool) { return false; };

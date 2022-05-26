@@ -53,13 +53,13 @@ bdBool bdDTLSInitAck::serialize(void* data, const bdUInt size, const bdUInt offs
 
     newOffset = offset;
     ok = bdDTLSHeader::serialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, &m_signature);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTieTag);
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTieTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt>(data, size, newOffset, newOffset, m_signature);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_initTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_localTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_peerTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_localTieTag);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_peerTieTag);
     ok = ok == m_peerAddr.serialize(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset);
     ok = ok == bdBytePacker::appendBuffer(reinterpret_cast<bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)
@@ -75,13 +75,13 @@ bdBool bdDTLSInitAck::deserialize(const void* data, const bdUInt size, const bdU
 
     newOffset = offset;
     ok = bdDTLSHeader::deserialize(data, size, newOffset, newOffset);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_timestamp);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, &m_signature);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_initTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_localTieTag);
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_peerTieTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, m_timestamp);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt>(data, size, newOffset, newOffset, m_signature);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_initTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_localTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_peerTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_localTieTag);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_peerTieTag);
     ok = ok == m_peerAddr.deserialize(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset);
     ok = ok == bdBytePacker::removeBuffer(reinterpret_cast<const bdUByte8*>(data), size, newOffset, newOffset, &m_secID, sizeof(bdSecurityID));
     if (!ok)

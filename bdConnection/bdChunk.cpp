@@ -2,18 +2,20 @@
 
 #include "bdConnection/bdConnection.h"
 
-bdUInt bdChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     bdUInt offset = 0;
-    bdBytePacker::appendBasicType<bdUByte8>(data, size, 0u, &offset, reinterpret_cast<bdUByte8*>(&m_type));
+    bdBytePacker::appendBasicType<bdUByte8>(data, size, 0u, offset, m_type);
     return offset;
 }
 
-bdBool bdChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
-    if (size - *offset > 4)
+    if (size - offset > 4)
     {
-        return bdBytePacker::removeBasicType<bdUByte8>(data, size, *offset, offset, reinterpret_cast<bdUByte8*>(&m_type));
+        bdUByte8 type = 0;
+        return bdBytePacker::removeBasicType<bdUByte8>(data, size, offset, offset, type);
+        m_type = static_cast<bdChunkTypes>(type);
     }
     return false;
 }
@@ -37,7 +39,7 @@ bdChunkTypes bdChunk::getType(const bdUByte8* const data, const bdUInt size)
 {
     bdUInt offset = 0;
     bdUByte8 tmp = 0;
-    bdBool ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, 0, &offset, &tmp);
+    bdBool ok = bdBytePacker::removeBasicType<bdUByte8>(data, size, 0, offset, tmp);
     if (ok)
     {
         return static_cast<bdChunkTypes>(tmp);

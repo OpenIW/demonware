@@ -11,13 +11,13 @@ public:
     static bdBool skipBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt bytes);
     static bdBool rewindBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt bytes);
     template <typename varType>
-    static bdBool removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType* var);
+    static bdBool removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType& var);
     template <typename varType>
-    static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType* var);
+    static bdBool appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType& var);
 };
 
 template<typename varType>
-bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType* var)
+bdBool bdBytePacker::removeBasicType(void const* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, varType& var)
 {
     bdBool read;
     varType nvar;
@@ -26,17 +26,17 @@ bdBool bdBytePacker::removeBasicType(const void* buffer, const bdUInt bufferSize
     if (read)
     {
         buffer = &nvar;
-        bdBitOperations::endianSwap<varType>(&nvar, var);
+        bdBitOperations::endianSwap<varType>(nvar, var);
     }
     return read;
 }
 
 template<typename varType>
-bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType* var)
+bdBool bdBytePacker::appendBasicType(void* buffer, const bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, const varType& var)
 {
     varType nvar;
 
-    bdBitOperations::endianSwap<varType>(var, &nvar);
+    bdBitOperations::endianSwap<varType>(var, nvar);
     return appendBuffer(reinterpret_cast<bdUByte8*>(buffer), bufferSize, offset, newOffset, &nvar, sizeof(varType));
 }
 

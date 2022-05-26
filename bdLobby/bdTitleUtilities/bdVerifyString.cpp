@@ -24,7 +24,7 @@ bdVerifyString::~bdVerifyString()
 bdBool bdVerifyString::deserialize(bdByteBufferRef buffer)
 {
     bdUInt verified = 0;
-    bdBool ok = buffer->readUInt32(&verified);
+    bdBool ok = buffer->readUInt32(verified);
     m_verified = ok && !verified;
     return ok;
 }

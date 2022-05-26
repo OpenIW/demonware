@@ -162,7 +162,7 @@ bdBool bdDTLSAssociation::calculateSharedKey(const bdUByte8* const pubKey, const
     return true;
 }
 
-bdInt bdDTLSAssociation::sendTo(bdAddr& const addr, const void* data, const bdUInt length, const bdSecurityID& secID)
+bdInt bdDTLSAssociation::sendTo(bdAddr& addr, const void* data, const bdUInt length, const bdSecurityID& secID)
 {
     bdInt val = -1;
     if (m_state == BD_DTLS_ESTABLISHED)
@@ -234,7 +234,7 @@ bdInt bdDTLSAssociation::receiveFrom(bdAddr& addr, const void* data, const bdUIn
     return val;
 }
 
-bdInt bdDTLSAssociation::handleInit(bdAddr& const addr, const void* data, const bdUInt size)
+bdInt bdDTLSAssociation::handleInit(bdAddr& addr, const void* data, const bdUInt size)
 {
     bdUInt tempUInt;
     bdDTLSInit init;
@@ -252,7 +252,7 @@ bdInt bdDTLSAssociation::handleInit(bdAddr& const addr, const void* data, const 
     return -2;
 }
 
-bdInt bdDTLSAssociation::handleInitAck(bdAddr& const addr, const void* data, const bdUInt size)
+bdInt bdDTLSAssociation::handleInitAck(bdAddr& addr, const void* data, const bdUInt size)
 {
     bdUInt tmpUInt;
 
@@ -280,7 +280,7 @@ bdInt bdDTLSAssociation::handleInitAck(bdAddr& const addr, const void* data, con
     return -2;
 }
 
-bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& const addr, const void* data, const bdUInt size)
+bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& addr, const void* data, const bdUInt size)
 {
     bdDTLSCookieEcho cookieEcho;
     bdUInt tmpUInt;
@@ -302,12 +302,11 @@ bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& const addr, const void* data, 
     bdUInt16 peerTieTag = cookieEcho.getCookie().getPeerTieTag();
 
     bdSecurityID secID;
-    bdMemcpy(&secID, cookieEcho.getSecID(), sizeof(secID));
+    bdMemcpy(secID.ab, cookieEcho.getSecID(), sizeof(secID));
 
-    bdCommonAddr* p = new bdCommonAddr();
-    bdCommonAddrRef commonAddr(p);
+    bdCommonAddrRef commonAddr(new bdCommonAddr());
 
-    if (!commonAddr->deserialize(bdCommonAddrRef(&m_localCommonAddr), cookieEcho.getCa()))
+    if (!commonAddr->deserialize(bdCommonAddrRef(m_localCommonAddr), cookieEcho.getCa()))
     {
         return -2;
     }
@@ -363,7 +362,7 @@ bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& const addr, const void* data, 
                     bdLogWarn("bdSocket/dtls", "Failed to generate shared secret.");
                     return -2;
                 }
-                m_addrMap->getAddrHandle(bdCommonAddrRef(&commonAddr), &secID, &m_addrHandle);
+                m_addrMap->getAddrHandle(bdCommonAddrRef(commonAddr), secID, m_addrHandle);
                 m_addrHandle->setRealAddr(addr);
                 bdMemcpy(&m_addr, &addr, sizeof(addr));
                 sendCookieAck(addr, cookieEcho);
@@ -382,7 +381,7 @@ bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& const addr, const void* data, 
             reset();
             m_localTag = localTag;
             m_peerTag = peerTag;
-            m_addrMap->getAddrHandle(bdCommonAddrRef(&commonAddr), &secID, &m_addrHandle);
+            m_addrMap->getAddrHandle(bdCommonAddrRef(commonAddr), secID, m_addrHandle);
             m_addrHandle->setRealAddr(addr);
             bdMemcpy(&m_addr, &addr, sizeof(addr));
             sendCookieAck(addr, cookieEcho);
@@ -417,7 +416,7 @@ bdInt bdDTLSAssociation::handleCookieEcho(bdAddr& const addr, const void* data, 
             bdLogWarn("bdSocket/dtls", "Failed to generate shared secret");
             return -2;
         }
-        if (!m_addrMap->getAddrHandle(bdCommonAddrRef(&commonAddr), &secID, &m_addrHandle))
+        if (!m_addrMap->getAddrHandle(bdCommonAddrRef(commonAddr), secID, m_addrHandle))
         {
             return -2;
         }
@@ -477,7 +476,7 @@ bdInt bdDTLSAssociation::handleCookieAck(const void* data, const bdUInt size)
     return -2;
 }
 
-bdInt bdDTLSAssociation::handleError(bdAddr& const addr, const void* data, const bdUInt size)
+bdInt bdDTLSAssociation::handleError(bdAddr& addr, const void* data, const bdUInt size)
 {
     bdUInt tmpUInt;
     bdNChar8 addrStr[22];
@@ -499,7 +498,7 @@ bdInt bdDTLSAssociation::handleError(bdAddr& const addr, const void* data, const
     return -1;
 }
 
-bdInt bdDTLSAssociation::handleData(bdAddr& const addr, const bdUByte8* data, const bdUInt size, bdAddrHandleRef& addrHandle, bdUByte8* buffer, const bdUInt bufferSize)
+bdInt bdDTLSAssociation::handleData(bdAddr& addr, const bdUByte8* data, const bdUInt size, bdAddrHandleRef& addrHandle, bdUByte8* buffer, const bdUInt bufferSize)
 {
     bdUInt payloadSize;
     bdUInt dataHeaderSize;
@@ -550,7 +549,7 @@ void bdDTLSAssociation::sendInit()
     bdLogInfo("bdSocket/dtls", "sending init: m_localTag: %X", m_localTag);
 }
 
-void bdDTLSAssociation::sendInitAck(bdAddr& const addr, const bdDTLSInit& init)
+void bdDTLSAssociation::sendInitAck(bdAddr& addr, const bdDTLSInit& init)
 {
     bdUInt16 localTieTag;
     bdUInt16 peerTieTag;
@@ -599,7 +598,7 @@ void bdDTLSAssociation::sendInitAck(bdAddr& const addr, const bdDTLSInit& init)
     bdLogInfo("bdSocket/dtls", "sending init ack: m_localTag/localTag/m_peerTag: %d/%d/%d", m_localTag, localTag, m_peerTag);
 }
 
-void bdDTLSAssociation::sendCookieEcho(bdAddr& const addr)
+void bdDTLSAssociation::sendCookieEcho(bdAddr& addr)
 {
     bdUByte8 buffer[1288];
     bdUInt tmpUInt;
@@ -624,7 +623,7 @@ void bdDTLSAssociation::sendCookieEcho(bdAddr& const addr)
     m_cookieTimer.start();
 }
 
-void bdDTLSAssociation::sendCookieAck(bdAddr& const addr, const bdDTLSCookieEcho& cookie)
+void bdDTLSAssociation::sendCookieAck(bdAddr& addr, const bdDTLSCookieEcho& cookie)
 {
     bdUByte8 buffer[1288];
     bdUInt tmpUInt;
@@ -642,7 +641,7 @@ void bdDTLSAssociation::sendCookieAck(bdAddr& const addr, const bdDTLSCookieEcho
     bdLogInfo("bdSocket/dtls", "sending cookie ack: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
 }
 
-void bdDTLSAssociation::sendError(bdAddr& const addr, const bdSecurityID& secID, const bdDTLSError::bdDTLSErrorType& type)
+void bdDTLSAssociation::sendError(bdAddr& addr, const bdSecurityID& secID, const bdDTLSError::bdDTLSErrorType& type)
 {
     bdUInt tmpUInt;
     bdUByte8 buffer[1288];
@@ -653,7 +652,7 @@ void bdDTLSAssociation::sendError(bdAddr& const addr, const bdSecurityID& secID,
     bdLogInfo("bdSocket/dtls", "sending error: etype: %d", type);
 }
 
-bdInt bdDTLSAssociation::sendData(bdAddr& const addr, const void* data, const bdUInt length, const bdSecurityID& secID)
+bdInt bdDTLSAssociation::sendData(bdAddr& addr, const void* data, const bdUInt length, const bdSecurityID& secID)
 {
     bdUInt packetLength;
     bdUByte8 outData[1288];

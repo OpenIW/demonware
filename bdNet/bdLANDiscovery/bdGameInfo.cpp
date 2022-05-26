@@ -17,7 +17,7 @@ bdGameInfo::bdGameInfo()
 {
 }
 
-bdGameInfo::bdGameInfo(bdUInt titleID, const bdSecurityID* securityID, const bdSecurityKey* securityKey, bdCommonAddrRef hostAddr)
+bdGameInfo::bdGameInfo(bdUInt titleID, const bdSecurityID& securityID, const bdSecurityKey& securityKey, bdCommonAddrRef hostAddr)
     : bdReferencable(), m_titleId(titleID), m_secID(securityID), m_secKey(securityKey), m_hostAddr(hostAddr)
 {
 }
@@ -26,9 +26,9 @@ bdGameInfo::~bdGameInfo()
 {
 }
 
-void bdGameInfo::serialize(bdBitBuffer* bitBuffer)
+void bdGameInfo::serialize(bdBitBuffer& bitBuffer)
 {
-    bdUByte8 hostAddrBuffer[25];
+    bdUByte8 hostAddrBuffer[BD_COMMON_ADDR_SERIALIZED_SIZE];
 
     if (m_titleId == 666)
     {
@@ -36,14 +36,14 @@ void bdGameInfo::serialize(bdBitBuffer* bitBuffer)
     }
     if (m_hostAddr.notNull())
     {
-        bitBuffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
-        bitBuffer->writeBits(&m_titleId, CHAR_BIT * sizeof(m_titleId));
-        bitBuffer->writeDataType(BD_BB_FULL_TYPE);
-        bitBuffer->writeBits(&m_secID, CHAR_BIT * sizeof(m_secID));
-        bitBuffer->writeDataType(BD_BB_FULL_TYPE);
-        bitBuffer->writeBits(&m_secKey, CHAR_BIT * sizeof(m_secKey));
+        bitBuffer.writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+        bitBuffer.writeBits(&m_titleId, CHAR_BIT * sizeof(m_titleId));
+        bitBuffer.writeDataType(BD_BB_FULL_TYPE);
+        bitBuffer.writeBits(&m_secID, CHAR_BIT * sizeof(m_secID));
+        bitBuffer.writeDataType(BD_BB_FULL_TYPE);
+        bitBuffer.writeBits(&m_secKey, CHAR_BIT * sizeof(m_secKey));
         m_hostAddr->serialize(hostAddrBuffer);
-        bitBuffer->writeBits(hostAddrBuffer, 200u); // Check later
+        bitBuffer.writeBits(hostAddrBuffer, BD_COMMON_ADDR_SERIALIZED_SIZE * CHAR_BIT);
     }
     else
     {
@@ -51,7 +51,7 @@ void bdGameInfo::serialize(bdBitBuffer* bitBuffer)
     }
 }
 
-bdBool bdGameInfo::deserialize(const bdCommonAddrRef localAddr, bdBitBuffer* bitBuffer)
+bdBool bdGameInfo::deserialize(const bdCommonAddrRef localAddr, bdBitBuffer& bitBuffer)
 {
     bdSecurityID tempSecID;
     bdSecurityKey tempSecKey;
@@ -60,13 +60,13 @@ bdBool bdGameInfo::deserialize(const bdCommonAddrRef localAddr, bdBitBuffer* bit
     bdUInt tempTitleID;
     bdBool ok;
 
-    ok = bitBuffer->readDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
-    ok = ok == bitBuffer->readBits(&tempTitleID, CHAR_BIT * sizeof(tempTitleID));
-    ok = ok == bitBuffer->readDataType(BD_BB_FULL_TYPE);
-    ok = ok == bitBuffer->readBits(&tempSecID, CHAR_BIT * sizeof(tempSecID));
-    ok = ok == bitBuffer->readDataType(BD_BB_FULL_TYPE);
-    ok = ok == bitBuffer->readBits(&tempSecKey, CHAR_BIT * sizeof(tempSecKey));
-    ok = ok == bitBuffer->readBits(tempAddrBuffer, 200u);
+    ok = bitBuffer.readDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+    ok = ok == bitBuffer.readBits(&tempTitleID, CHAR_BIT * sizeof(tempTitleID));
+    ok = ok == bitBuffer.readDataType(BD_BB_FULL_TYPE);
+    ok = ok == bitBuffer.readBits(tempSecID.ab, CHAR_BIT * sizeof(tempSecID.ab));
+    ok = ok == bitBuffer.readDataType(BD_BB_FULL_TYPE);
+    ok = ok == bitBuffer.readBits(tempSecKey.ab, CHAR_BIT * sizeof(tempSecKey.ab));
+    ok = ok == bitBuffer.readBits(tempAddrBuffer, 200u);
 
     tempCommonAddr = new bdCommonAddr();
     if (!tempCommonAddr->deserialize(localAddr, tempAddrBuffer) || !ok)
@@ -86,14 +86,14 @@ void bdGameInfo::setHostAddr(const bdCommonAddrRef hostAddr)
     m_hostAddr = hostAddr;
 }
 
-void bdGameInfo::setSecurityID(const bdSecurityID* secID)
+void bdGameInfo::setSecurityID(const bdSecurityID& secID)
 {
-    m_secID = *secID;
+    m_secID = secID;
 }
 
-void bdGameInfo::setSecurityKey(const bdSecurityKey* secKey)
+void bdGameInfo::setSecurityKey(const bdSecurityKey& secKey)
 {
-    m_secKey = *secKey;
+    m_secKey = secKey;
 }
 
 void bdGameInfo::setTitleID(const bdUInt titleID)
@@ -110,17 +110,17 @@ const bdUInt bdGameInfo::getTitleID() const
     return m_titleId;
 }
 
-const bdSecurityKey* bdGameInfo::getSecurityKey() const
+const bdSecurityKey& bdGameInfo::getSecurityKey() const
 {
-    return &m_secKey;
+    return m_secKey;
 }
 
-const bdSecurityID* bdGameInfo::getSecurityID() const
+const bdSecurityID& bdGameInfo::getSecurityID() const
 {
-    return &m_secID;
+    return m_secID;
 }
 
-const bdCommonAddrRef* bdGameInfo::getHostAddr() const
+const bdCommonAddrRef bdGameInfo::getHostAddr() const
 {
-    return &bdCommonAddrRef(m_hostAddr);
+    return bdCommonAddrRef(m_hostAddr);
 }

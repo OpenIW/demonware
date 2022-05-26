@@ -64,34 +64,34 @@ bdNetImpl::~bdNetImpl()
     delete &m_params;
 }
 
-bdBool bdNetImpl::findFreePort(bdNetStartParams* params, bdAddr* addr)
+bdBool bdNetImpl::findFreePort(bdNetStartParams& params, bdAddr& addr)
 {
     bdSocketStatusCode bindResult;
-    bdPort basePort = addr->getPort();
+    bdPort basePort = addr.getPort();
     bdPort port = basePort;
     bdBool success = false;
 
-    if (!params->m_socket)
+    if (!params.m_socket)
     {
-        params->m_socket = new bdSocket();
+        params.m_socket = new bdSocket();
     }
     for (bdUInt i = 0; i < 100; ++i)
     {
-        if (params->m_socket->create(false, true) == 0)
+        if (params.m_socket->create(false, true) == 0)
         {
             bdLogWarn("bdNet/net", "Create socket failed ");
             break;
         }
-        bdAddr tryAddr(addr->getAddress(), port);
-        bindResult = params->m_socket->bind(&tryAddr);
+        bdAddr tryAddr(addr.getAddress(), port);
+        bindResult = params.m_socket->bind(tryAddr);
         if (bindResult == BD_NET_SUCCESS)
         {
-            params->m_gamePort = tryAddr.getPort();
-            bdLogInfo("bdNet/net", "Requested port %u, using port %u", port, params->m_gamePort);
+            params.m_gamePort = tryAddr.getPort();
+            bdLogInfo("bdNet/net", "Requested port %u, using port %u", port, params.m_gamePort);
             success = true;
             break;
         }
-        else if (bindResult == BD_NET_ADDRESS_IN_USE && (params->m_socket->close() & 1) != 0)
+        else if (bindResult == BD_NET_ADDRESS_IN_USE && (params.m_socket->close() & 1) != 0)
         {
             bdLogWarn("bdNet/net", "Socket bind failed, but subsequent close succeeded!");
         }
@@ -104,22 +104,22 @@ bdBool bdNetImpl::findFreePort(bdNetStartParams* params, bdAddr* addr)
     return success;
 }
 
-bdBool bdNetImpl::start(const bdNetStartParams* params)
+bdBool bdNetImpl::start(const bdNetStartParams& params)
 {
     if (m_status != BD_NET_STOPPED)
     {
         bdLogWarn("bdNet/net", "bdNet can only be started when in the uninitialized state. Call stop() to reset");
         return false;
     }
-    m_params = *params;
+    m_params = params;
     bdAddr addr;
-    if (!getBindAddr(&addr))
+    if (!getBindAddr(addr))
     {
         bdLogWarn("bdNet/net", "Failed to configure bind address");
         m_status = BD_NET_PARAMS_CONFIG_ERROR;
         return false;
     }
-    if (!findFreePort(&m_params, &addr))
+    if (!findFreePort(m_params, addr))
     {
         bdLogWarn("bdNet/net", "Failed to find a free port");
         m_status = BD_NET_BIND_FAILED;
@@ -137,12 +137,12 @@ bdBool bdNetImpl::start(const bdNetStartParams* params)
         bdArray<bdAddr> localAddresses(0u);
         for (bdUInt i = 0; i < m_params.m_localAddresses.getSize(); ++i)
         {
-            localAddresses.pushBack(&bdAddr(m_params.m_localAddresses[i], m_params.m_gamePort));
+            localAddresses.pushBack(bdAddr(m_params.m_localAddresses[i], m_params.m_gamePort));
         }
         bdAddr remAddr;
-        bdCommonAddrRef localCommonAddr(new bdCommonAddr(&localAddresses, &remAddr, BD_NAT_OPEN));
-        m_socketRouter->init(m_params.m_socket, &bdCommonAddrRef(&localCommonAddr), &bdSocketRouterConfig());
-        m_connectionStore.init(m_socketRouter, &bdConnectionStoreConfig());
+        bdCommonAddrRef localCommonAddr(new bdCommonAddr(localAddresses, remAddr, BD_NAT_OPEN));
+        m_socketRouter->init(m_params.m_socket, bdCommonAddrRef(localCommonAddr), bdSocketRouterConfig());
+        m_connectionStore.init(m_socketRouter, bdConnectionStoreConfig());
     }
     else
     {
@@ -150,13 +150,13 @@ bdBool bdNetImpl::start(const bdNetStartParams* params)
         m_currentNatTravAddrIndex = 0;
         m_currentNatTravHostIndex = 0;
         m_getHostByName = new bdGetHostByName();
-        if (!m_getHostByName->start(m_params.m_natTravHosts[m_currentNatTravHostIndex]->getBuffer(), m_params.m_hostNameLookupConfig))
+        if (!m_getHostByName->start(m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer(), m_params.m_hostNameLookupConfig))
         {
             bdLogWarn("bdNet/net", "Failed to start DNS lookup task.");
             m_status = BD_NET_INIT_FAILED;
             return false;
         }
-        if (!m_UPnP.init(m_params.m_gamePort, &m_params.m_localAddresses, &bdUPnPConfig(&m_params.m_UPnPConfig)))
+        if (!m_UPnP.init(m_params.m_gamePort, &m_params.m_localAddresses, bdUPnPConfig(m_params.m_UPnPConfig)))
         {
             bdLogError("bdNet/net", "UPnP module failed to start.");
             return false;
@@ -190,22 +190,22 @@ void bdNetImpl::pump()
         {
             if (m_upnpCollisionRetryCount <= 20)
             {
-                bdNetStartParams params(&m_params);
+                bdNetStartParams params(m_params);
                 params.m_socket = NULL;
                 bdLogInfo("bdNet/net", "UPnP Mapping collision found. New port Selected: %d", ++params.m_gamePort);
                 bdSingleton<bdNetImpl>::getInstance()->stop();
-                start(&params);
+                start(params);
             }
             else
             {
                 m_UPnP.startShutdown(bdUPnPDevice::BD_UPNP_DEVICE_SHUTDOWN_IMMEDIATE);
                 bdLogWarn("bdNet/net", "UPnP stopping after %u port collisions.", m_upnpCollisionRetryCount);
-                bdNetStartParams params(&m_params);
+                bdNetStartParams params(m_params);
                 params.m_socket = NULL;
                 params.m_gamePort = 3074;
                 params.m_UPnPConfig.m_runMode = bdUPnPConfig::BD_UPNP_EXTERNAL_IP_ONLY;
                 bdSingleton<bdNetImpl>::getInstance()->stop();
-                start(&params);
+                start(params);
             }
         }
     }
@@ -222,32 +222,32 @@ void bdNetImpl::pump()
             bdUInt numAddrs = m_getHostByName->getNumAddresses();
             for (bdUInt i = 0; i < numAddrs; ++i)
             {
-                bdInetAddr inAddr(m_getHostByName->getAddressAt(i)->inUn.m_iaddr);
-                bdAddr addr(&inAddr, m_params.m_natTravPort);
+                bdInetAddr inAddr(m_getHostByName->getAddressAt(i).inUn.m_iaddr);
+                bdAddr addr(inAddr, m_params.m_natTravPort);
                 bdUInt index = 0;
                 addr.toString(addrBuffer, sizeof(addrBuffer));
                 if (m_natTravAddrs.findFirst(&addr, &index))
                 {
-                    bdLogInfo("bdNet/net", "Duplicate IP %s for Host: %s ignored", addrBuffer, m_params.m_natTravHosts[m_currentNatTravHostIndex]->getBuffer());
+                    bdLogInfo("bdNet/net", "Duplicate IP %s for Host: %s ignored", addrBuffer, m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer());
                 }
                 else
                 {
                     bdLogInfo("bdNet/net", "Adding IP %s for Host: %s", addrBuffer);
-                    m_natTravAddrs.pushBack(&addr);
+                    m_natTravAddrs.pushBack(addr);
                 }
             }
             ++m_currentNatTravHostIndex;
         }
         else
         {
-            bdLogWarn("bdNet/net", "No IP found for Host: %s", m_params.m_natTravHosts[m_currentNatTravHostIndex]->getBuffer());
+            bdLogWarn("bdNet/net", "No IP found for Host: %s", m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer());
             ++m_currentNatTravHostIndex;
         }
 
         if (m_currentNatTravHostIndex < numNATHosts && status != bdGetHostByName::BD_LOOKUP_PENDING)
         {
             m_getHostByName->quit();
-            if (!m_getHostByName->start(m_params.m_natTravHosts[m_currentNatTravHostIndex]->getBuffer(), bdGetHostByNameConfig(m_params.m_hostNameLookupConfig.m_timeout)))
+            if (!m_getHostByName->start(m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer(), bdGetHostByNameConfig(m_params.m_hostNameLookupConfig.m_timeout)))
             {
                 bdLogWarn("bdNet/net", "Failed to start DNS lookup task.");
                 m_status = BD_NET_INIT_FAILED;
@@ -270,9 +270,9 @@ void bdNetImpl::pump()
         {
             bdAddr addr(m_natTravAddrs[m_currentNatTravAddrIndex]);
             m_ipDiscClient = new bdIPDiscoveryClient();
-            bdBool startIPDiscoveryResult = m_ipDiscClient->init(m_params.m_socket, &addr, bdIPDiscoveryConfig());
+            bdBool startIPDiscoveryResult = m_ipDiscClient->init(m_params.m_socket, addr, bdIPDiscoveryConfig());
             m_natTypeDiscClient = new bdNATTypeDiscoveryClient();
-            bdBool startNATDiscoveryResult = m_natTypeDiscClient->init(m_params.m_socket, &addr, bdNATTypeDiscoveryConfig());
+            bdBool startNATDiscoveryResult = m_natTypeDiscClient->init(m_params.m_socket, addr, bdNATTypeDiscoveryConfig());
             if (!startIPDiscoveryResult)
             {
                 bdLogWarn("bdNet/net", "Failed to start IP discovery");
@@ -288,15 +288,15 @@ void bdNetImpl::pump()
         {
             for (bdUInt i = 0; i < m_params.m_natTravHosts.getSize(); ++i)
             {
-                bdLogWarn("bdNet/net", "Failed to lookup address %s", m_params.m_natTravHosts[i]->getBuffer());
+                bdLogWarn("bdNet/net", "Failed to lookup address %s", m_params.m_natTravHosts[i].getBuffer());
             }
         }
     }
     bdAddr fromAddr;
-    bdInt recieved = m_params.m_socket->receiveFrom(&fromAddr, data, sizeof(data));
+    bdInt recieved = m_params.m_socket->receiveFrom(fromAddr, data, sizeof(data));
     if (m_ipDiscClient)
     {
-        m_ipDiscClient->pump(bdAddr(&fromAddr), data, recieved);
+        m_ipDiscClient->pump(bdAddr(fromAddr), data, recieved);
         if (m_ipDiscClient->getStatus() != bdIPDiscoveryClient::BD_IP_DISC_RUNNING)
         {
             finishedIPLookup = true;
@@ -304,7 +304,7 @@ void bdNetImpl::pump()
     }
     if (m_natTypeDiscClient)
     {
-        m_natTypeDiscClient->pump(bdAddr(&fromAddr), data, recieved);
+        m_natTypeDiscClient->pump(bdAddr(fromAddr), data, recieved);
         if (!m_natTypeDiscClient->isRunning())
         {
             finishedNATLookup = true;
@@ -317,14 +317,14 @@ void bdNetImpl::pump()
             bdArray<bdAddr> localAddresses(1);
             for (bdUInt i = 0; i < m_params.m_localAddresses.getSize(); ++i)
             {
-                localAddresses.pushBack(&bdAddr(m_params.m_localAddresses[i], m_params.m_gamePort));
+                localAddresses.pushBack(bdAddr(m_params.m_localAddresses[i], m_params.m_gamePort));
             }
             bdAddr publicAddr(m_ipDiscClient->getPublicAddress());
             bdNATType clientNAT = m_natTypeDiscClient->getNATType();
             bdAddr UPnPExternal;
-            if (m_UPnP.getExternalAddr(&UPnPExternal))
+            if (m_UPnP.getExternalAddr(UPnPExternal))
             {
-                if (UPnPExternal == &publicAddr)
+                if (UPnPExternal == publicAddr)
                 {
                     bdLogInfo("bdNet/net", "UPnP mapping confirmed.");
                 }
@@ -333,7 +333,7 @@ void bdNetImpl::pump()
                     bdLogInfo("bdNet/net", "External IP detected through STUN server does not match the one detected through UPnP. Possible Nested NATs.");
                 }
             }
-            bdCommonAddrRef localCommonAddr(new bdCommonAddr(&localAddresses, &publicAddr, clientNAT));
+            bdCommonAddrRef localCommonAddr(new bdCommonAddr(localAddresses, publicAddr, clientNAT));
             if (m_ipDiscClient)
             {
                 m_ipDiscClient->quit();
@@ -354,16 +354,16 @@ void bdNetImpl::pump()
                 }
                 m_natTypeDiscClient = NULL;
             }
-            bdArray<bdAddr> introducers(&m_natTravAddrs);
+            bdArray<bdAddr> introducers(m_natTravAddrs);
             if (m_currentNatTravAddrIndex)
             {
                 bdAddr tmpAddr(m_natTravAddrs[0]);
-                *introducers[0] = m_natTravAddrs[m_currentNatTravAddrIndex];
-                *introducers[m_currentNatTravAddrIndex] = &tmpAddr;
+                introducers[0] = m_natTravAddrs[m_currentNatTravAddrIndex];
+                introducers[m_currentNatTravAddrIndex] = tmpAddr;
             }
-            m_socketRouter->init(m_params.m_socket, bdCommonAddrRef(&localCommonAddr), &bdSocketRouterConfig());
-            m_socketRouter->setupIntroducers(&introducers);
-            m_connectionStore.init(m_socketRouter, &bdConnectionStoreConfig());
+            m_socketRouter->init(m_params.m_socket, bdCommonAddrRef(localCommonAddr), bdSocketRouterConfig());
+            m_socketRouter->setupIntroducers(introducers);
+            m_connectionStore.init(m_socketRouter, bdConnectionStoreConfig());
         }
         else
         {
@@ -385,7 +385,7 @@ void bdNetImpl::pump()
                 }
                 // init a new IPDiscoveryClient with the new IP
                 m_ipDiscClient = new bdIPDiscoveryClient();
-                bdBool startIPDiscoveryResult = m_ipDiscClient->init(m_params.m_socket, &addr, bdIPDiscoveryConfig());
+                bdBool startIPDiscoveryResult = m_ipDiscClient->init(m_params.m_socket, addr, bdIPDiscoveryConfig());
 
                 // quit and cleanup the old NATTypeDiscoveryClient
                 if (m_natTypeDiscClient)
@@ -400,7 +400,7 @@ void bdNetImpl::pump()
                 }
                 // init the new NATTypeDiscoveryClient with the new IP
                 m_natTypeDiscClient = new bdNATTypeDiscoveryClient();
-                bdBool startNATDiscoveryResult = m_natTypeDiscClient->init(m_params.m_socket, &addr, bdNATTypeDiscoveryConfig());
+                bdBool startNATDiscoveryResult = m_natTypeDiscClient->init(m_params.m_socket, addr, bdNATTypeDiscoveryConfig());
                 if (!startIPDiscoveryResult || !startNATDiscoveryResult)
                 {
                     bdLogWarn("bdNet/net", "Failed to start IP discovery");
@@ -412,7 +412,7 @@ void bdNetImpl::pump()
             {
                 for (bdUInt i = 0; i < m_params.m_natTravHosts.getSize(); ++i)
                 {
-                    bdLogWarn("bdNet/net", "Failed to do IP and NAT discovery using %s", m_params.m_natTravHosts[i]->getBuffer());
+                    bdLogWarn("bdNet/net", "Failed to do IP and NAT discovery using %s", m_params.m_natTravHosts[i].getBuffer());
                 }
                 m_status = BD_NET_ONLINE_FAILED;
             }
@@ -537,7 +537,7 @@ bdBool bdNetImpl::sendAll()
     return true;
 }
 
-bdBool bdNetImpl::getBindAddr(bdAddr* addr)
+bdBool bdNetImpl::getBindAddr(bdAddr& addr)
 {
     if (!m_params.m_useAnyIP)
     {
@@ -550,16 +550,16 @@ bdBool bdNetImpl::getBindAddr(bdAddr* addr)
             bdLogError("bdNet/net", "When binding to a specific IP, m_localAddresses should not be empty");
             return false;
         }
-        addr = &bdAddr(m_params.m_localAddresses[0], m_params.m_gamePort);
+        addr = bdAddr(m_params.m_localAddresses[0], m_params.m_gamePort);
         return true;
     }
-    addr = &bdAddr(&bdInetAddr::Any(), m_params.m_gamePort);
+    addr = bdAddr(bdInetAddr::Any(), m_params.m_gamePort);
     return true;
 }
 
-const bdNetStartParams* bdNetImpl::getParams() const
+const bdNetStartParams& bdNetImpl::getParams() const
 {
-    return &m_params;
+    return m_params;
 }
 
 bdNetImpl::bdNetStatus bdNetImpl::getStatus() const

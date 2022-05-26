@@ -31,11 +31,11 @@ bdRemoteTaskRef bdTitleUtilities::verifyString(const bdNChar8* const str, const 
     }
     bdUInt taskSize = strLen + 64;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 12, 1);
+    m_remoteTaskManager->initTaskBuffer(buffer, 12, 1);
     bdBool ok = buffer->writeString(str, length);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("title utilities", "Failed to start task: Error %i", startTaskResult);
@@ -49,7 +49,7 @@ bdRemoteTaskRef bdTitleUtilities::verifyString(const bdNChar8* const str, const 
     {
         bdLogWarn("title utilities", "Failed to write string %s into buffer", str);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdTitleUtilities::recordEvent(const bdNChar8* const eventStr, const bdUInt length, bdUInt category)
@@ -66,12 +66,12 @@ bdRemoteTaskRef bdTitleUtilities::recordEvent(const bdNChar8* const eventStr, co
     }
     bdUInt taskSize = strLen + 69;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 12, 3);
+    m_remoteTaskManager->initTaskBuffer(buffer, 12, 3);
     bdBool ok = buffer->writeString(eventStr, length);
     buffer->writeUInt32(category);
     if (ok)
     {
-        bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+        bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
         if (startTaskResult)
         {
             bdLogWarn("title utilities", "Failed to start task: Error %i", startTaskResult);
@@ -81,7 +81,7 @@ bdRemoteTaskRef bdTitleUtilities::recordEvent(const bdNChar8* const eventStr, co
     {
         bdLogWarn("title utilities", "Failed to write string %s into buffer", eventStr);
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdTitleUtilities::recordEventBin(const void* eventBlob, const bdUInt length, bdUInt category)
@@ -89,11 +89,11 @@ bdRemoteTaskRef bdTitleUtilities::recordEventBin(const void* eventBlob, const bd
     bdRemoteTaskRef task;
     bdUInt taskSize = length + 74;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 12, 5);
+    m_remoteTaskManager->initTaskBuffer(buffer, 12, 5);
     buffer->writeBlob(eventBlob, length);
     buffer->writeUInt32(category);
-    m_remoteTaskManager->startTask(&task, &buffer);
-    return &task;
+    m_remoteTaskManager->startTask(task, buffer);
+    return task;
 }
 
 bdRemoteTaskRef bdTitleUtilities::getServerTime(bdTimeStamp* timeStamp)
@@ -101,8 +101,8 @@ bdRemoteTaskRef bdTitleUtilities::getServerTime(bdTimeStamp* timeStamp)
     bdRemoteTaskRef task;
     bdUInt taskSize = 64;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
-    m_remoteTaskManager->initTaskBuffer(&buffer, 12, 6);
-    bdInt startTaskResult = m_remoteTaskManager->startTask(&task, &buffer);
+    m_remoteTaskManager->initTaskBuffer(buffer, 12, 6);
+    bdInt startTaskResult = m_remoteTaskManager->startTask(task, buffer);
     if (startTaskResult)
     {
         bdLogWarn("title utilities", "Failed to start task: Error %i", startTaskResult);
@@ -111,5 +111,5 @@ bdRemoteTaskRef bdTitleUtilities::getServerTime(bdTimeStamp* timeStamp)
     {
         task->setTaskResult(timeStamp, 1);
     }
-    return &task;
+    return task;
 }

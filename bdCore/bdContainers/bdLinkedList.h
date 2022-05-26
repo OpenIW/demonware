@@ -15,7 +15,7 @@ public:
         Node* m_next;
         Node* m_prev;
 
-        Node(T* data) : m_data(T(data))
+        Node(const T& data) : m_data(T(data))
         {
         }
         void operator delete(void* p)
@@ -35,12 +35,13 @@ public:
     ~bdLinkedList();
 
     void clear();
-    T& forward(Position& position);
+    T& forward(Position& position) const;
     void addTail(const T& value);
-    T& getHead();
-    Position getHeadPosition();
-    bdUInt getSize();
-    Position getTailPosition();
+    T& getHead() const;
+    Position getHeadPosition() const;
+    bdUInt getSize() const;
+    T& getAt(const Position position) const;
+    Position getTailPosition() const;
     void insertAfter(const Position position, const T& value);
     const bdBool isEmpty() const;
     void removeAt(Position& position);

@@ -7,8 +7,8 @@ bdUnicastConnection::bdControlChunkStore::bdControlChunkStore(bdChunkRef chunk, 
 {
 }
 
-bdUnicastConnection::bdControlChunkStore::bdControlChunkStore(bdUnicastConnection::bdControlChunkStore* other)
-    : m_chunk(&other->m_chunk), m_lone(other->m_lone)
+bdUnicastConnection::bdControlChunkStore::bdControlChunkStore(const bdUnicastConnection::bdControlChunkStore& other)
+    : m_chunk(&other.m_chunk), m_lone(other.m_lone)
 {
 }
 
@@ -20,10 +20,6 @@ void bdUnicastConnection::operator delete(void* p)
 void* bdUnicastConnection::operator new(bdUWord nbytes)
 {
     return bdMemory::allocate(nbytes);
-}
-
-bdUnicastConnection::bdUnicastConnection(bdUnicastConnection* other)
-{
 }
 
 bdUnicastConnection::bdUnicastConnection(bdAddressMap* addrMap)
@@ -38,7 +34,7 @@ bdUnicastConnection::bdUnicastConnection(bdAddressMap* addrMap)
 }
 
 bdUnicastConnection::bdUnicastConnection(bdCommonAddrRef dest, bdAddressMap* addrMap)
-    : bdConnection(&bdCommonAddrRef(&dest)), m_stats(), m_reliableSendWindow(NULL), m_reliableRecvWindow(NULL), m_unreliableSendWindow(), m_unreliableReceiveWindow(), m_outQueue(), m_sendTimer(), 
+    : bdConnection(bdCommonAddrRef(dest)), m_stats(), m_reliableSendWindow(NULL), m_reliableRecvWindow(NULL), m_unreliableSendWindow(), m_unreliableReceiveWindow(), m_outQueue(), m_sendTimer(), 
     m_receiveTimer(), m_state(BD_UC_CLOSED), m_initTimer(), m_cookieTimer(), m_shutdownTimer(), m_shutdownGuard(), m_initAckChunk(), m_addrMap(addrMap)
 {
     if (!m_addrMap)
@@ -112,14 +108,14 @@ bdBool bdUnicastConnection::send(bdReference<bdMessage> message, bdBool reliable
         bdLogWarn("bdConnection/connections", "Message size > BD_MAX_MESSAGE_SIZE (%u > %u).", payLoadSize, BD_MAX_MESSAGE_SIZE);
         return sent;
     }
-    bdDataChunkRef chunk(new bdDataChunk(&bdMessageRef(&message), static_cast<bdDataChunk::bdDataFlags>(!reliable)));
+    bdDataChunkRef chunk(new bdDataChunk(bdMessageRef(message), static_cast<bdDataChunk::bdDataFlags>(!reliable)));
     if (reliable)
     {
         if (!m_reliableSendWindow)
         {
             m_reliableSendWindow = new bdReliableSendWindow();
         }
-        sent = m_reliableSendWindow->add(&bdDataChunkRef(&chunk));
+        sent = m_reliableSendWindow->add(bdDataChunkRef(chunk));
         if (!sent)
         {
             bdLogWarn("bdConnection/connections", "Failed to add message to reliable send window.");
@@ -127,7 +123,7 @@ bdBool bdUnicastConnection::send(bdReference<bdMessage> message, bdBool reliable
     }
     else
     {
-        m_unreliableSendWindow.add(&bdDataChunkRef(&chunk));
+        m_unreliableSendWindow.add(bdDataChunkRef(chunk));
         sent = true;
     }
     return sent;
@@ -199,7 +195,7 @@ bdBool bdUnicastConnection::receive(bdUByte8* buffer, const bdUInt bufferSize)
         m_stats.addPacketsRecv(1);
         m_stats.addPacketSizeRecv(bufferSize);
         bdChunkRef chunk;
-        packet.getNextChunk(&chunk);
+        packet.getNextChunk(chunk);
         if (*chunk)
         {
             if (chunk->isControl())
@@ -207,16 +203,16 @@ bdBool bdUnicastConnection::receive(bdUByte8* buffer, const bdUInt bufferSize)
                 switch (chunk->getType())
                 {
                 case BD_CT_COOKIE_ECHO:
-                    handled = handleCookieEcho(&chunk, packet.getVerificationTag());
+                    handled = handleCookieEcho(chunk, packet.getVerificationTag());
                     break;
                 case BD_CT_COOKIE_ACK:
-                    handled = handleCookieAck(&chunk, packet.getVerificationTag());
+                    handled = handleCookieAck(chunk, packet.getVerificationTag());
                     break;
                 case BD_CT_INIT:
-                    handled = handleInit(&chunk);
+                    handled = handleInit(chunk);
                     break;
                 case BD_CT_INIT_ACK:
-                    handled = handleInitAck(&chunk, packet.getVerificationTag());
+                    handled = handleInitAck(chunk, packet.getVerificationTag());
                     break;
                 default:
                     break;
@@ -236,32 +232,32 @@ bdBool bdUnicastConnection::receive(bdUByte8* buffer, const bdUInt bufferSize)
                     switch (chunk->getType())
                     {
                     case BD_CT_DATA:
-                        handled = handleData(&chunk);
+                        handled = handleData(chunk);
                         dataHandled = handled || dataHandled;
                         break;
                     case BD_CT_SACK:
-                        handled = handleSAck(&chunk);
+                        handled = handleSAck(chunk);
                         break;
                     case BD_CT_HEARTBEAT:
-                        handled = handleHeartbeat(&chunk);
+                        handled = handleHeartbeat(chunk);
                         break;
                     case BD_CT_HEARTBEAT_ACK:
-                        handled = handleHeartbeatAck(&chunk);
+                        handled = handleHeartbeatAck(chunk);
                         break;
                     case BD_CT_SHUTDOWN:
-                        handled = handleShutdown(&chunk);
+                        handled = handleShutdown(chunk);
                         break;
                     case BD_CT_SHUTDOWN_ACK:
-                        handled = handleShutdownAck(&chunk);
+                        handled = handleShutdownAck(chunk);
                         break;
                     case BD_CT_SHUTDOWN_COMPLETE:
-                        handled = handleShutdownComplete(&chunk);
+                        handled = handleShutdownComplete(chunk);
                         break;
                     default:
                         break;
                     }
                 }
-            } while (packet.getNextChunk(&chunk));
+            } while (packet.getNextChunk(chunk));
         }
         if (handled)
         {
@@ -281,7 +277,6 @@ bdBool bdUnicastConnection::receive(bdUByte8* buffer, const bdUInt bufferSize)
 
 bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt bufferSize)
 {
-    bdUnicastConnection::bdControlChunkStore* chunkStore;
     bdUInt32 tagToUse;
 
     bdPacket packet(m_peerTag, bufferSize);
@@ -326,25 +321,25 @@ bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt b
     }
     while (!m_outQueue.isEmpty())
     {
-        chunkStore = m_outQueue.peek();
-        if (chunkStore->m_lone)
+        bdUnicastConnection::bdControlChunkStore chunkStore = m_outQueue.peek();
+        if (chunkStore.m_lone)
         {
             bdChunkRef chunk;
-            while (packet.getNextChunk(&chunk))
+            while (packet.getNextChunk(chunk))
             {
-                m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&chunk), false));
+                m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(chunk), false));
             }
             tagToUse = m_peerTag;
-            if (chunkStore->m_chunk->getType() == BD_CT_INIT_ACK)
+            if (chunkStore.m_chunk->getType() == BD_CT_INIT_ACK)
             {
-                tagToUse = bdInitAckChunkRef(reference_cast<bdInitAckChunk, bdChunk>(chunkStore->m_chunk))->getPeerTag();
+                tagToUse = bdInitAckChunkRef(reference_cast<bdInitAckChunk, bdChunk>(chunkStore.m_chunk))->getPeerTag();
             }
             bdPacket lpacket(tagToUse, bufferSize);
-            lpacket.addChunk(&bdChunkRef(&chunkStore->m_chunk));
+            lpacket.addChunk(bdChunkRef(chunkStore.m_chunk));
             m_outQueue.dequeue();
             return lpacket.serialize(buffer, bufferSize);
         }
-        if (!packet.addChunk(&bdChunkRef(&chunkStore->m_chunk)))
+        if (!packet.addChunk(bdChunkRef(chunkStore.m_chunk)))
         {
             break;
         }
@@ -357,13 +352,13 @@ bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt b
         {
             if (m_reliableRecvWindow)
             {
-                m_reliableRecvWindow->getDataToSend(&packet);
+                m_reliableRecvWindow->getDataToSend(packet);
             }
             if (m_reliableSendWindow)
             {
-                m_reliableSendWindow->getDataToSend(&packet);
+                m_reliableSendWindow->getDataToSend(packet);
             }
-            m_unreliableSendWindow.getDataToSend(&packet);
+            m_unreliableSendWindow.getDataToSend(packet);
         }
         else
         {
@@ -421,7 +416,7 @@ bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt b
     return dataToSend;
 }
 
-bdBool bdUnicastConnection::getMessageToDispatch(bdMessageRef* message)
+bdBool bdUnicastConnection::getMessageToDispatch(bdMessageRef& message)
 {
     bdBool messageGot = false;
     bdDataChunkRef chunk;
@@ -447,17 +442,17 @@ bdBool bdUnicastConnection::getMessageToDispatch(bdMessageRef* message)
     }
     if (messageGot)
     {
-        message = &newMessage;
+        message = newMessage;
     }
     return messageGot;
 }
 
-bdBool bdUnicastConnection::handleData(bdReference<bdChunk>* chunk)
+bdBool bdUnicastConnection::handleData(bdReference<bdChunk>& chunk)
 {
-    bdDataChunkRef dchunk(reference_cast<bdDataChunk, bdChunk>(&bdChunkRef(chunk)));
+    bdDataChunkRef dchunk(reference_cast<bdDataChunk, bdChunk>(bdChunkRef(chunk)));
     if ((dchunk->getFlags() & 1) != 0)
     {
-        return m_unreliableReceiveWindow.add(&bdDataChunkRef(&dchunk));
+        return m_unreliableReceiveWindow.add(bdDataChunkRef(&dchunk));
     }
     else
     {
@@ -465,7 +460,7 @@ bdBool bdUnicastConnection::handleData(bdReference<bdChunk>* chunk)
         {
             m_reliableRecvWindow = new bdReliableReceiveWindow();
         }
-        if (!m_reliableRecvWindow->add(&bdDataChunkRef(&dchunk)))
+        if (!m_reliableRecvWindow->add(bdDataChunkRef(dchunk)))
         {
             bdLogWarn("bdConnection/connections", "receive window full.");
             return false;
@@ -474,17 +469,17 @@ bdBool bdUnicastConnection::handleData(bdReference<bdChunk>* chunk)
     }
 }
 
-bdBool bdUnicastConnection::handleSAck(bdReference<bdChunk>* chunk)
+bdBool bdUnicastConnection::handleSAck(bdChunkRef& chunk)
 {
     bdFloat32 rtt;
     bdFloat32 rto;
-    bdSAckChunkRef schunk(reference_cast<bdSAckChunk, bdChunk>(&bdChunkRef(chunk)));
+    bdSAckChunkRef schunk(reference_cast<bdSAckChunk, bdChunk>(bdChunkRef(chunk)));
     if (!m_reliableSendWindow)
     {
         bdLogWarn("bdConnection/connections", "invalid stream id.");
         return false;
     }
-    if (!m_reliableSendWindow->handleAck(&bdSAckChunkRef(&schunk), &rtt))
+    if (!m_reliableSendWindow->handleAck(bdSAckChunkRef(schunk), rtt))
     {
         bdLogWarn("bdConnection/connections", "Unable to handle ack. disconnecting connection.");
         close();
@@ -524,9 +519,9 @@ bdBool bdUnicastConnection::handleSAck(bdReference<bdChunk>* chunk)
     return true;
 }
 
-bdBool bdUnicastConnection::handleInit(bdReference<bdChunk>* chunk)
+bdBool bdUnicastConnection::handleInit(bdChunkRef& chunk)
 {
-    bdInitChunkRef ichunk(reference_cast<bdInitChunk, bdChunk>(&bdChunkRef(chunk)));
+    bdInitChunkRef ichunk(reference_cast<bdInitChunk, bdChunk>(bdChunkRef(chunk)));
     bdSecurityID id;
 
     if (!m_addrMap)
@@ -534,11 +529,11 @@ bdBool bdUnicastConnection::handleInit(bdReference<bdChunk>* chunk)
         bdLogError("bdConnection/connections", "Addr map pointer not initialised.");
         return false;
     }
-    m_addrMap->addrToCommonAddr(&m_addrHandle, &m_addr, &id);
+    m_addrMap->addrToCommonAddr(m_addrHandle, m_addr, id);
     if (ichunk->getInitTag())
     {
         bdLogInfo("bdConnection/connections", "uc::handling init: m_localTag: %X", ichunk->getInitTag());
-        return sendInitAck(&bdInitChunkRef(&ichunk));
+        return sendInitAck(bdInitChunkRef(ichunk));
     }
     else
     {
@@ -547,7 +542,7 @@ bdBool bdUnicastConnection::handleInit(bdReference<bdChunk>* chunk)
     }
 }
 
-bdBool bdUnicastConnection::handleInitAck(bdReference<bdChunk>* chunk, const bdUInt vtag)
+bdBool bdUnicastConnection::handleInitAck(bdChunkRef& chunk, const bdUInt vtag)
 {
     if (m_state != BD_UC_COOKIE_WAIT)
     {
@@ -559,7 +554,7 @@ bdBool bdUnicastConnection::handleInitAck(bdReference<bdChunk>* chunk, const bdU
         return false;
     }
 
-    bdInitAckChunkRef iachunk(reference_cast<bdInitAckChunk, bdChunk>(&bdChunkRef(chunk)));
+    bdInitAckChunkRef iachunk(reference_cast<bdInitAckChunk, bdChunk>(bdChunkRef(chunk)));
     m_peerTag = iachunk->getInitTag();
     if (!m_peerTag)
     {
@@ -567,7 +562,7 @@ bdBool bdUnicastConnection::handleInitAck(bdReference<bdChunk>* chunk, const bdU
         return false;
     }
     bdLogInfo("bdConnection/connections", "uc::handling init ack: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
-    if (!sendCookieEcho(&bdInitAckChunkRef(&iachunk)))
+    if (!sendCookieEcho(bdInitAckChunkRef(iachunk)))
     {
         return false;
     }
@@ -576,11 +571,11 @@ bdBool bdUnicastConnection::handleInitAck(bdReference<bdChunk>* chunk, const bdU
     return true;
 }
 
-bdBool bdUnicastConnection::handleCookieEcho(bdReference<bdChunk>* chunk, const bdUInt vtag)
+bdBool bdUnicastConnection::handleCookieEcho(bdChunkRef& chunk, const bdUInt vtag)
 {
-    bdCookieEchoChunkRef cchunk(reference_cast<bdCookieEchoChunk, bdChunk>(&bdChunkRef(chunk)));
+    bdCookieEchoChunkRef cchunk(reference_cast<bdCookieEchoChunk, bdChunk>(bdChunkRef(chunk)));
     bdCookieRef cookie;
-    if (!cchunk->getCookie(&cookie))
+    if (!cchunk->getCookie(cookie))
     {
         return false;
     }
@@ -596,7 +591,7 @@ bdBool bdUnicastConnection::handleCookieEcho(bdReference<bdChunk>* chunk, const 
             bdLogError("bdConnection/connections", "Addr map pointer not initialised.");
             return false;
         }
-        m_addrMap->addrToCommonAddr(&m_addrHandle, &m_addr, &id);
+        m_addrMap->addrToCommonAddr(m_addrHandle, m_addr, id);
         m_localTag = localTag;
         m_peerTag = peerTag;
         bdLogInfo("bdConnection/connections", "uc::handling cookie echo: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
@@ -656,7 +651,7 @@ bdBool bdUnicastConnection::handleCookieEcho(bdReference<bdChunk>* chunk, const 
                 bdLogError("bdConnection/connections", "Addr map pointer not initialised.");
                 return false;
             }
-            m_addrMap->addrToCommonAddr(&m_addrHandle, &m_addr, &id);
+            m_addrMap->addrToCommonAddr(m_addrHandle, m_addr, id);
             m_localTag = localTag;
             m_peerTag = peerTag;
             m_state = BD_UC_ESTABLISHED;
@@ -668,7 +663,7 @@ bdBool bdUnicastConnection::handleCookieEcho(bdReference<bdChunk>* chunk, const 
     return false;
 }
 
-bdBool bdUnicastConnection::handleCookieAck(bdReference<bdChunk>* chunk, const bdUInt vtag)
+bdBool bdUnicastConnection::handleCookieAck(bdChunkRef& chunk, const bdUInt vtag)
 {
     if (vtag != m_localTag)
     {
@@ -688,19 +683,19 @@ bdBool bdUnicastConnection::handleCookieAck(bdReference<bdChunk>* chunk, const b
     return true;
 }
 
-bdBool bdUnicastConnection::handleHeartbeat(bdReference<bdChunk>* chunk)
+bdBool bdUnicastConnection::handleHeartbeat(bdChunkRef& chunk)
 {
     m_receiveTimer.start();
     return sendHeartbeatAck(reference_cast<bdInitChunk, bdChunk>(&bdChunkRef(chunk)));
 }
 
-bdBool bdUnicastConnection::handleHeartbeatAck(bdReference<bdChunk>*)
+bdBool bdUnicastConnection::handleHeartbeatAck(bdChunkRef&)
 {
     m_receiveTimer.start();
     return true;
 }
 
-bdBool bdUnicastConnection::handleShutdown(bdReference<bdChunk>*)
+bdBool bdUnicastConnection::handleShutdown(bdChunkRef&)
 {
     bdBool shutdown;
     if (m_state == BD_UC_SHUTDOWN_SENT)
@@ -727,7 +722,7 @@ bdBool bdUnicastConnection::handleShutdown(bdReference<bdChunk>*)
     return true;
 }
 
-bdBool bdUnicastConnection::handleShutdownAck(bdReference<bdChunk>*)
+bdBool bdUnicastConnection::handleShutdownAck(bdChunkRef& chunk)
 {
     if (m_state == BD_UC_SHUTDOWN_ACK_SENT)
     {
@@ -752,7 +747,7 @@ bdBool bdUnicastConnection::handleShutdownAck(bdReference<bdChunk>*)
     }
 }
 
-bdBool bdUnicastConnection::handleShutdownComplete(bdReference<bdChunk>*)
+bdBool bdUnicastConnection::handleShutdownComplete(bdChunkRef& chunk)
 {
     if (m_state == BD_UC_SHUTDOWN_ACK_SENT)
     {
@@ -782,7 +777,7 @@ bdBool bdUnicastConnection::sendInit()
     }
     m_initTimer.start();
     bdInitChunkRef chunk(new bdInitChunk(m_localTag, 15000));
-    m_outQueue.enqueue(&bdControlChunkStore(reference_cast<bdChunk, bdInitChunk>(&chunk), false));
+    m_outQueue.enqueue(bdControlChunkStore(reference_cast<bdChunk, bdInitChunk>(chunk), false));
     bdLogInfo("bdConnection/connections", "uc::sending init: m_localTag: %X", m_localTag);
     return true;
 }
@@ -818,8 +813,8 @@ bdBool bdUnicastConnection::sendInitAck(bdReference<bdInitChunk> chunk)
         return false;
     }
     bdCookieRef cookie(new bdCookie(localTag, peerTag, localTieTag, peerTieTag));
-    bdInitAckChunkRef iachunk(new bdInitAckChunk(localTag, &bdCookieRef(&cookie), 15000, peerTag));
-    m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(reference_cast<bdChunk, bdInitAckChunk>(&iachunk)), true));
+    bdInitAckChunkRef iachunk(new bdInitAckChunk(localTag, bdCookieRef(cookie), 15000, peerTag));
+    m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(reference_cast<bdChunk, bdInitAckChunk>(iachunk)), true));
     bdLogInfo("bdConnection/connections", "uc::sending init ack: m_localTag/localTag/m_peerTag: %X/%X/%X", m_localTag, localTag, m_peerTag);
     return true;
 }
@@ -832,10 +827,10 @@ bdBool bdUnicastConnection::sendCookieEcho(bdReference<bdInitAckChunk> chunk)
         return false;
     }
     bdByteBufferRef cookie;
-    if (chunk->getCookie(&cookie))
+    if (chunk->getCookie(cookie))
     {
-        bdCookieEchoChunkRef cookieEcho(new bdCookieEchoChunk(bdByteBufferRef(&cookie)));
-        m_outQueue.enqueue(&bdControlChunkStore(reference_cast<bdChunk,bdCookieEchoChunk>(&cookieEcho), false));
+        bdCookieEchoChunkRef cookieEcho(new bdCookieEchoChunk(bdByteBufferRef(cookie)));
+        m_outQueue.enqueue(bdControlChunkStore(reference_cast<bdChunk,bdCookieEchoChunk>(cookieEcho), false));
         bdLogInfo("bdConnection/connections", "uc::sending cookie echo: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
     }
     return true;
@@ -843,14 +838,14 @@ bdBool bdUnicastConnection::sendCookieEcho(bdReference<bdInitAckChunk> chunk)
 
 bdBool bdUnicastConnection::sendCookieAck()
 {
-    m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&bdChunkRef(new bdCookieAckChunk())), false));
+    m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(bdChunkRef(new bdCookieAckChunk())), false));
     bdLogInfo("bdConnection/connections", "uc::sending cookie ack: m_localTag/m_peerTag: %X/%X", m_localTag, m_peerTag);
     return true;
 }
 
 bdBool bdUnicastConnection::sendHeartbeat(bdReference<bdInitChunk> chunk)
 {
-    m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&bdChunkRef(new bdHeartbeatChunk())), false));
+    m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(bdChunkRef(new bdHeartbeatChunk())), false));
     return true;
 }
 
@@ -860,7 +855,7 @@ bdBool bdUnicastConnection::sendHeartbeatAck(bdReference<bdInitChunk> chunk)
     {
         if (windowsEmpty())
         {
-            m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&bdChunkRef(new bdHeartbeatAckChunk())), false));
+            m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(bdChunkRef(new bdHeartbeatAckChunk())), false));
         }
     }
     return true;
@@ -873,7 +868,7 @@ bdBool bdUnicastConnection::sendShutdown()
         return false;
     }
     bdLogInfo("bdConnection/connections", "uc::sending shutdown (%u/%u)", m_shutdownResends, 5);
-    m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&bdChunkRef(new bdShutdownChunk())), false));
+    m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(bdChunkRef(new bdShutdownChunk())), false));
     m_shutdownTimer.start();
     return true;
 }
@@ -885,7 +880,7 @@ bdBool bdUnicastConnection::sendShutdownAck()
         return false;
     }
     bdLogInfo("bdConnection/connections", "uc::sending shutdown ack (%u/%u)", m_shutdownResends, 5);
-    m_outQueue.enqueue(&bdControlChunkStore(&bdChunkRef(&bdChunkRef(new bdShutdownAckChunk())), false));
+    m_outQueue.enqueue(bdControlChunkStore(bdChunkRef(bdChunkRef(new bdShutdownAckChunk())), false));
     m_shutdownTimer.start();
     return true;
 }
@@ -894,8 +889,8 @@ bdBool bdUnicastConnection::sendShutdownComplete()
 {
     bdLogInfo("bdConnection/connections", "uc::sending shutdown complete");
     bdChunkRef chunk(new bdShutdownCompleteChunk());
-    bdControlChunkStore item(&bdChunkRef(&chunk), false);
-    m_outQueue.enqueue(&item);
+    bdControlChunkStore item(bdChunkRef(chunk), false);
+    m_outQueue.enqueue(item);
     return true;
 }
 
@@ -934,11 +929,11 @@ void bdUnicastConnection::callListenersConnect(const bdBool success)
     {
         if (success)
         {
-            (*m_listeners[i])->onConnect(&bdConnectionRef(this));
+            m_listeners[i]->onConnect(bdConnectionRef(this));
         }
         else
         {
-            (*m_listeners[i])->onConnectFailed(&bdConnectionRef(this));
+            m_listeners[i]->onConnectFailed(bdConnectionRef(this));
         }
     }
 }
@@ -947,12 +942,12 @@ void bdUnicastConnection::callListenersDisconnect()
 {
     bdUInt ignored;
 
-    bdFastArray<bdConnectionListener*> copy(&m_listeners);
+    bdFastArray<bdConnectionListener*> copy(m_listeners);
     for (bdUInt i = 0; i < copy.getSize(); ++i)
     {
-        if (m_listeners.findFirst(copy[i], &ignored))
+        if (m_listeners.findFirst(copy[i], ignored))
         {
-            (*copy[i])->onDisconnect(&bdConnectionRef(this));
+            copy[i]->onDisconnect(bdConnectionRef(this));
         }
     }
 }
@@ -961,7 +956,7 @@ void bdUnicastConnection::callListenersReconnect()
 {
     for (bdUInt i = 0; i < m_listeners.getSize(); ++i)
     {
-        (*m_listeners[i])->onReconnect(&bdConnectionRef(this));
+        m_listeners[i]->onReconnect(bdConnectionRef(this));
     }
 }
 

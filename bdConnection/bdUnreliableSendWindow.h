@@ -12,6 +12,6 @@ public:
     bdUnreliableSendWindow();
     virtual ~bdUnreliableSendWindow();
     void add(bdDataChunkRef chunk);
-    void getDataToSend(bdPacket* packet);
+    void getDataToSend(bdPacket& packet);
     void reset();
 };

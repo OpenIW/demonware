@@ -27,9 +27,9 @@ protected:
 public:
     bdConnectionStore();
     ~bdConnectionStore();
-    bdBool init(bdSocketRouter* socket, const bdConnectionStoreConfig* config);
+    bdBool init(bdSocketRouter* socket, const bdConnectionStoreConfig& config);
     bdBool flushAll();
-    bdUInt flush(bdConnection* connection);
+    bdUInt flush(bdConnection& connection);
     bdBool startShutdown(const bdConnectionStore::bdConnectionStoreShutdownType shutdownType);
     bdBool receiveAll();
     void dispatchAll();

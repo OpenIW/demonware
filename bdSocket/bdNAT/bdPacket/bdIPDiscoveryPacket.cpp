@@ -18,9 +18,9 @@ bdBool bdIPDiscoveryPacket::serialize(void* data, const bdUInt size, const bdUIn
 {
     newOffset = offset;
     bdBool appended = false;
-    if (bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type))
+    if (bdBytePacker::appendBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type))
     {
-        appended = bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+        appended = bdBytePacker::appendBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     }
     if (!appended)
     {
@@ -34,9 +34,9 @@ bdBool bdIPDiscoveryPacket::deserialize(const void* data, const bdUInt size, con
     bdBool status = false;
 
     newOffset = offset;
-    if (bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, &m_type))
+    if (bdBytePacker::removeBasicType<bdUByte8>(data, size, newOffset, newOffset, m_type))
     {
-        status = bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, &m_protocolVersion);
+        status = bdBytePacker::removeBasicType<bdUInt16>(data, size, newOffset, newOffset, m_protocolVersion);
     }
     if (m_protocolVersion != 1)
     {

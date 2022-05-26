@@ -28,7 +28,7 @@ const bdLANDiscoveryClient::bdStatus bdLANDiscoveryClient::getStatus() const
 
 void bdLANDiscoveryClient::registerListener(bdLANDiscoveryListener* listener)
 {
-    m_listeners.pushBack(&listener);
+    m_listeners.pushBack(listener);
 }
 
 void bdLANDiscoveryClient::stop()
@@ -42,7 +42,7 @@ void bdLANDiscoveryClient::unregisterListener(bdLANDiscoveryListener* listener)
     m_listeners.removeAllKeepOrder(listener);
 }
 
-bdBool bdLANDiscoveryClient::discover(const bdUInt titleID, const bdFloat32 timeout, const bdInetAddr* addr, const bdUInt16 discoveryPort)
+bdBool bdLANDiscoveryClient::discover(const bdUInt titleID, const bdFloat32 timeout, const bdInetAddr& addr, const bdUInt16 discoveryPort)
 {
     if (m_status == BD_UPLOAD)
     {
@@ -64,7 +64,7 @@ bdBool bdLANDiscoveryClient::discover(const bdUInt titleID, const bdFloat32 time
     bitBuffer->writeBits(m_nonce, CHAR_BIT * sizeof(m_nonce));
     bitBuffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
     bitBuffer->writeBits(&titleID, CHAR_BIT * sizeof(titleID));
-    if (m_socket.sendTo(&bdAddr(addr, discoveryPort), bitBuffer->getData(), bitBuffer->getDataSize()) >= 0)
+    if (m_socket.sendTo(bdAddr(addr, discoveryPort), bitBuffer->getData(), bitBuffer->getDataSize()) >= 0)
     {
         m_timer.start();
         m_status = BD_UPLOAD;

@@ -69,13 +69,7 @@ inline bdBool bdReference<T>::notNull() const
 }
 
 template<typename T>
-inline T* bdReference<T>::operator->()
-{
-    return m_ptr;
-}
-
-template<typename T>
-inline const T* bdReference<T>::operator->() const
+inline T* bdReference<T>::operator->() const
 {
     return m_ptr;
 }
@@ -103,7 +97,7 @@ inline void bdReference<T>::operator=(T* p)
 template<typename T>
 inline bdReference<T>& bdReference<T>::operator=(const bdReference<T>& other)
 {
-    if (other != this)
+    if (other.m_ptr != this->m_ptr)
     {
         if (m_ptr)
         {
@@ -121,11 +115,11 @@ inline bdReference<T>& bdReference<T>::operator=(const bdReference<T>& other)
             reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
         }
     }
-    return this;
+    return *this;
 }
 
 template<typename T>
-inline bdBool bdReference<T>::operator==(const bdReference<T>& other)
+inline bdBool bdReference<T>::operator==(const bdReference<T>& other) const
 {
     return m_ptr == other.m_ptr;
 }

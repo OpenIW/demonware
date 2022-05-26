@@ -31,7 +31,7 @@ protected:
 public:
     bdUPnP();
     ~bdUPnP();
-    bdBool init(bdPort gamePort, bdArray<bdInetAddr>* localAddrs, bdUPnPConfig* config);
+    bdBool init(bdPort gamePort, bdArray<bdInetAddr>* localAddrs, bdUPnPConfig config);
     void pump();
     void cleanup();
     void startShutdown(bdUPnPDevice::bdUPnPDeviceShutdownType shutdownType);
@@ -39,8 +39,8 @@ public:
     bdBool setupDiscoverySocket();
     bdBool handleDiscoveryResponse(bdUPnPDevice* discoveredDevice);
     bdBool checkForDiscoveredDevices(bdUPnPDevice* discoveredDevice);
-    bdBool extractDeviceInfo(bdAddr* deviceAddr, bdByte8** fetchLoc, bdUInt* fetchLen);
-    bdBool getExternalAddr(bdAddr* externalAddr);
+    bdBool extractDeviceInfo(bdAddr& deviceAddr, bdByte8** fetchLoc, bdUInt& fetchLen);
+    bdBool getExternalAddr(bdAddr& externalAddr);
 
     const bdBool isRunning() const;
     const bdUPnPDevice::bdUPnPPortStatus getPortStatus() const;

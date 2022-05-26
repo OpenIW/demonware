@@ -20,10 +20,10 @@ public:
     void* operator new(bdUWord nbytes);
     bdInitAckChunk();
     bdInitAckChunk(bdUInt32 initTag, bdCookieRef cookie, const bdWord windowCredit, bdUInt32 peerTag);
-    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size);
-    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset);
+    virtual bdUInt serialize(bdUByte8* data, const bdUInt32 size) const;
+    virtual bdBool deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset);
     virtual bdUInt getSerializedSize();
-    bdBool getCookie(bdByteBufferRef* cookie);
+    bdBool getCookie(bdByteBufferRef& cookie);
 
     const bdWord getWindowCredit() const;
     const bdUInt32 getInitTag() const;

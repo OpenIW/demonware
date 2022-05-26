@@ -11,7 +11,7 @@ public:
     bdLoopbackConnection(bdCommonAddrRef addr);
     ~bdLoopbackConnection();
     bdUInt getDataToSend();
-    bdBool getMessageToDispatch(bdMessageRef* message);
+    bdBool getMessageToDispatch(bdMessageRef& message);
     bdBool receive(const bdUByte8*, const bdUInt);
     bdBool send(bdMessageRef message);
     void updateStatus();

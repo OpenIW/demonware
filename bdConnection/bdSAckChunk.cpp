@@ -22,7 +22,7 @@ bdSAckChunk::bdSAckChunk(const bdWord windowCredit, bdSAckFlags flags)
 {
 }
 
-bdUInt bdSAckChunk::serialize(bdUByte8* data, const bdUInt32 size)
+bdUInt bdSAckChunk::serialize(bdUByte8* data, const bdUInt32 size) const
 {
     const bdSAckChunk::bdGapAckBlock* gap;
     Position pos;
@@ -33,67 +33,69 @@ bdUInt bdSAckChunk::serialize(bdUByte8* data, const bdUInt32 size)
     
     bdUInt offset = bdChunk::serialize(data, size);
 
-    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, &offset, reinterpret_cast<bdUByte8*>(&m_flags));
+    ok = bdBytePacker::appendBasicType<bdUByte8>(data, size, offset, offset, m_flags);
     bdUInt16 length = 0;
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &length);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, length);
     ++offset;
 
-    ok = ok == bdBytePacker::appendBasicType<bdSeqNumber>(data, size, offset, &offset, &m_cumulativeAck);
-    ok = ok == bdBytePacker::appendBasicType<bdWord>(data, size, offset, &offset, &m_windowCredit);
+    ok = ok == bdBytePacker::appendBasicType<bdSeqNumber>(data, size, offset, offset, m_cumulativeAck);
+    ok = ok == bdBytePacker::appendBasicType<bdWord>(data, size, offset, offset, m_windowCredit);
     numGaps = m_gaps.getSize();
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &numGaps);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, numGaps);
     bdUInt16 tmpZero = 0;
-    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &tmpZero);
+    ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, tmpZero);
 
-    for (pos = m_gaps.getHeadPosition(); pos; m_gaps.forward(&pos))
+    for (pos = m_gaps.getHeadPosition(); pos; m_gaps.forward(pos))
     {
-        gap = m_gaps.getAt(pos);
+        gap = &m_gaps.getAt(pos);
 
         start = gap->m_start;
-        ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &start);
+        ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, start);
 
         end = gap->m_end;
-        ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, &offset, &end);
+        ok = ok == bdBytePacker::appendBasicType<bdUInt16>(data, size, offset, offset, end);
     }
     return offset;
 }
 
-bdBool bdSAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt* offset)
+bdBool bdSAckChunk::deserialize(const bdUByte8* const data, const bdUInt size, bdUInt& offset)
 {
     Position pos;
     bdUInt16 end;
     bdUInt16 start;
     bdUInt16 numGaps;
-    bdUInt bytesRead = *offset;
+    bdUInt bytesRead = offset;
     bdBool ok = false;
 
-    ok = bdChunk::deserialize(data, size, &bytesRead);
-    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, &bytesRead, reinterpret_cast<bdUByte8*>(&m_flags));
+    ok = bdChunk::deserialize(data, size, bytesRead);
+    bdUByte8 flags = 0;
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(data, size, bytesRead, bytesRead, flags);
+    m_flags = static_cast<bdSAckFlags>(flags);
 
     bdUInt16 length = 0;
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &length);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, length);
     ++bytesRead;
 
-    ok = ok == bdBytePacker::removeBasicType<bdSeqNumber>(data, size, bytesRead, &bytesRead, &m_cumulativeAck);
-    ok = ok == bdBytePacker::removeBasicType<bdWord>(data, size, bytesRead, &bytesRead, &m_windowCredit);
+    ok = ok == bdBytePacker::removeBasicType<bdSeqNumber>(data, size, bytesRead, bytesRead, m_cumulativeAck);
+    ok = ok == bdBytePacker::removeBasicType<bdWord>(data, size, bytesRead, bytesRead, m_windowCredit);
     numGaps = 0;
-    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &numGaps);
+    ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, numGaps);
     bytesRead += 2;
     for (bdUInt numGapsRead = 0; numGapsRead < numGaps; ++numGapsRead)
     {
         start = 0;
-        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &start);
+        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, start);
 
         end = 0;
-        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, &bytesRead, &end);
+        ok = ok == bdBytePacker::removeBasicType<bdUInt16>(data, size, bytesRead, bytesRead, end);
 
         bdSAckChunk::bdGapAckBlock value(start, end);
-        m_gaps.addTail(&value);
+        m_gaps.addTail(value);
         bdLogInfo("bdConnection/chunks", "gap ack: %hu-%hu", start, end);
     }
     if (ok)
     {
-        *offset = bytesRead;
+        offset = bytesRead;
     }
     return ok;
 }
@@ -108,7 +110,7 @@ void bdSAckChunk::setCumulativeAck(bdUInt16 cumulativeAck)
     m_cumulativeAck = cumulativeAck;
 }
 
-void bdSAckChunk::addGap(const bdGapAckBlock* gap)
+void bdSAckChunk::addGap(const bdGapAckBlock& gap)
 {
     m_gaps.addTail(gap);
 }
@@ -118,9 +120,9 @@ void bdSAckChunk::setWindowCredit(bdWord windowCredit)
     m_windowCredit = windowCredit;
 }
 
-bdLinkedList<bdSAckChunk::bdGapAckBlock>* bdSAckChunk::getGapList()
+bdLinkedList<bdSAckChunk::bdGapAckBlock>& bdSAckChunk::getGapList()
 {
-    return &m_gaps;
+    return m_gaps;
 }
 
 const bdWord bdSAckChunk::getWindowCredit() const
@@ -133,9 +135,19 @@ const bdSeqNumber bdSAckChunk::getCumulativeAck() const
     return m_cumulativeAck;
 }
 
-bdSAckChunk::bdGapAckBlock::bdGapAckBlock(bdSAckChunk::bdGapAckBlock* other)
-    : m_start(other->m_start), m_end(other->m_end)
+bdSAckChunk::bdGapAckBlock::bdGapAckBlock(const bdSAckChunk::bdGapAckBlock& other)
+    : m_start(other.m_start), m_end(other.m_end)
 {
+}
+
+void bdSAckChunk::bdGapAckBlock::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdSAckChunk::bdGapAckBlock::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
 }
 
 bdSAckChunk::bdGapAckBlock::bdGapAckBlock()

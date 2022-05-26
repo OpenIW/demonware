@@ -29,14 +29,14 @@ bdBool bdLobbyService::connect(bdAddr lobbyServiceAddr, const bdAuthInfo* authIn
     }
     m_encryptedConnection = useEncryption;
     bdMemcpy(&m_authInfo, authInfo, sizeof(m_authInfo));
-    m_lobbyConnection = new bdLobbyConnection(&bdCommonAddrRef(new bdCommonAddr(&lobbyServiceAddr)), maxSendBufSize, maxRecvBufSize, this);
-    m_lobbyConnection->connect(&m_authInfo);
+    m_lobbyConnection = new bdLobbyConnection(bdCommonAddrRef(new bdCommonAddr(lobbyServiceAddr)), maxSendBufSize, maxRecvBufSize, this);
+    m_lobbyConnection->connect(m_authInfo);
     return true;
 }
 
 bdBool bdLobbyService::connect(bdAddr lobbyServiceAddr, const bdAuthInfo* authInfo, const bdBool useEncryption)
 {
-    return connect(&bdAddr(lobbyServiceAddr), authInfo, 0xFFFF, 0xFFFF, useEncryption);
+    return connect(bdAddr(lobbyServiceAddr), authInfo, 0xFFFF, 0xFFFF, useEncryption);
 }
 
 void bdLobbyService::disconnect()
@@ -60,7 +60,7 @@ void bdLobbyService::pump()
         bdUByte8 messageType = 0;
         for (;;)
         {
-            if (!m_lobbyConnection->getMessageToDispatch(&messageType, &message))
+            if (!m_lobbyConnection->getMessageToDispatch(messageType, message))
             {
                 break;
             }
@@ -70,7 +70,7 @@ void bdLobbyService::pump()
                 bdLogInfo("lobby service", "Received message of type: BD_LOBBY_SERVICE_TASK_REPLY");
                 if (m_taskManager)
                 {
-                    m_taskManager->handleLSGTaskReply(&bdByteBufferRef(&message));
+                    m_taskManager->handleLSGTaskReply(bdByteBufferRef(message));
                 }
                 else
                 {
@@ -80,10 +80,10 @@ void bdLobbyService::pump()
 
             case 2:
                 bdLogInfo("lobby service", "Received message of type: BD_LOBBY_SERVICE_PUSH_MESSAGE");
-                handlePushMessage(&bdByteBufferRef(&message));
+                handlePushMessage(bdByteBufferRef(message));
                 break;
             case 3:
-                if (message->readUInt32(&errorCode))
+                if (message->readUInt32(errorCode))
                 {
                     bdLogInfo("lobby service", "Received LSG error: %u", errorCode);
                 }
@@ -93,7 +93,7 @@ void bdLobbyService::pump()
                 }
                 break;
             case 4:
-                if (message->readUInt64(&connectionID))
+                if (message->readUInt64(connectionID))
                 {
                     if (m_taskManager)
                     {
@@ -114,7 +114,7 @@ void bdLobbyService::pump()
                 bdLogInfo("lobby service", "Received message of type: BD_LSG_SERVICE_TASK_REPLY");
                 if (m_taskManager && message.notNull())
                 {
-                    m_taskManager->handleTaskReply(&bdByteBufferRef(&message));
+                    m_taskManager->handleTaskReply(bdByteBufferRef(message));
                 }
                 else
                 {
@@ -415,7 +415,7 @@ void bdLobbyService::onConnect(bdLobbyConnectionRef connection)
     }
     bitBuffer->writeBits(m_authInfo.m_data, sizeof(m_authInfo.m_data) * CHAR_BIT);
     connection->send(bitBuffer->getData(), bitBuffer->getDataSize(), false);
-    m_taskManager = new bdRemoteTaskManager(&bdLobbyConnectionRef(*connection), m_encryptedConnection);
+    m_taskManager = new bdRemoteTaskManager(bdLobbyConnectionRef(connection), m_encryptedConnection);
     bdLogInfo("lobby service", "Connected to MatchMaking Service.");
 }
 
@@ -524,7 +524,7 @@ void bdLobbyService::cleanup()
 void bdLobbyService::handlePushMessage(bdByteBufferRef message)
 {
     bdUInt msgType = 0;
-    bdBool ok = message->readUInt32(&msgType);
+    bdBool ok = message->readUInt32(msgType);
     if (!ok)
     {
         bdLogWarn("lobby service", "Failed to deserialzie the EventType of Push Message");
@@ -532,7 +532,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
     }
     if (msgType == 20)
     {
-        m_taskManager->handleAsyncResult(&bdByteBufferRef(*message));
+        m_taskManager->handleAsyncResult(bdByteBufferRef(message));
     }
     else if (m_eventHandler)
     {
@@ -552,7 +552,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         {
             bdUInt64 friendUID;
             bdNChar8 friendName[65];
-            ok = message->readUInt64(&friendUID);
+            ok = message->readUInt64(friendUID);
             bdMemset(friendName, 0, sizeof(friendName));
             ok = ok == message->readString(friendName, 64);
             if (ok)
@@ -564,7 +564,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 6:
         {
             bdSessionInvite invite;
-            ok = invite.deserialize(&bdByteBufferRef(*message));
+            ok = invite.deserialize(bdByteBufferRef(message));
             if (ok)
             {
                 m_eventHandler->onSessionInvite(&invite);
@@ -580,16 +580,16 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         {
             bdUInt64 senderUID = 0;
             bdNChar8 senderName[64];
-            ok = message->readUInt64(&senderUID);
+            ok = message->readUInt64(senderUID);
             ok = ok == message->readString(senderName, sizeof(senderName));
 
             bdUInt64 channelID = 0;
-            ok = ok == message->readUInt64(&channelID);
+            ok = ok == message->readUInt64(channelID);
 
             bdUInt32 msgLength = 1024;
             bdUByte8 msg[1024];
             bdMemset(msg, 0, msgLength);
-            ok = ok == message->readBlob(msg, &msgLength);
+            ok = ok == message->readBlob(msg, msgLength);
 
             if (ok)
             {
@@ -603,9 +603,9 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             bdUInt64 userID;
             bdNChar8 userName[64];
             bdUInt64 channelID;
-            ok = message->readUInt64(&userID);
+            ok = message->readUInt64(userID);
             ok = ok == message->readString(userName, 64);
-            ok = ok == message->readUInt64(&channelID);
+            ok = ok == message->readUInt64(channelID);
             if (ok)
             {
                 m_eventHandler->onChatChannelUpdate(channelID, userID, userName, msgType == 9);
@@ -616,14 +616,14 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 12:
         {
             bdUInt64 senderUID = 0;
-            ok = message->readUInt64(&senderUID);
+            ok = message->readUInt64(senderUID);
 
             bdNChar8 senderName[65];
             bdMemset(senderName, 0, sizeof(senderName));
             ok = ok == message->readString(senderName, sizeof(senderName) - 1);
 
             bdUInt64 teamID = 0;
-            ok = ok == message->readUInt64(&teamID);
+            ok = ok == message->readUInt64(teamID);
 
             bdNChar8 teamName[65];
             bdMemset(teamName, 0, sizeof(teamName));
@@ -639,7 +639,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 13:
         {
             bdUInt64 senderID = 0;
-            ok = message->readUInt64(&senderID);
+            ok = message->readUInt64(senderID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
@@ -647,7 +647,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             
             bdUInt richPresenceSize = 1024;
             bdUByte8 richPresence[1024];
-            ok = ok == message->readBlob(richPresence, &richPresenceSize);
+            ok = ok == message->readBlob(richPresence, richPresenceSize);
 
             if (ok)
             {
@@ -659,10 +659,10 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 14:
         {
             bdUInt64 teamID = 0;
-            ok = message->readUInt64(&teamID);
+            ok = message->readUInt64(teamID);
 
             bdUInt64 senderID = 0;
-            ok = ok == message->readUInt64(&senderID);
+            ok = ok == message->readUInt64(senderID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
@@ -670,7 +670,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
 
             bdUInt richPresenceSize = 1024;
             bdUByte8 richPresence[1024];
-            ok = ok == message->readBlob(richPresence, &richPresenceSize);
+            ok = ok == message->readBlob(richPresence, richPresenceSize);
 
             if (ok)
             {
@@ -682,7 +682,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 15:
         {
             bdUInt64 senderID = 0;
-            ok = message->readUInt64(&senderID);
+            ok = message->readUInt64(senderID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
@@ -691,7 +691,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             bdUInt msgLength = 1024;
             bdUByte8 msg[1024];
             bdMemset(msg, 0, sizeof(msg));
-            ok = ok == message->readBlob(msg, &msgLength);
+            ok = ok == message->readBlob(msg, msgLength);
 
             if (ok)
             {
@@ -703,14 +703,14 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 16:
         {
             bdUInt64 senderID = 0;
-            ok = message->readUInt64(&senderID);
+            ok = message->readUInt64(senderID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
             ok = ok == message->readString(senderName, sizeof(senderName));
 
             bdUInt64 teamID = 0;
-            ok = ok == message->readUInt64(&teamID);
+            ok = ok == message->readUInt64(teamID);
 
             bdNChar8 teamName[65];
             bdMemset(teamName, 0, sizeof(teamName));
@@ -719,7 +719,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             bdUInt msgLength = 1024;
             bdUByte8 msg[1024];
             bdMemset(msg, 0, sizeof(msg));
-            ok = ok == message->readBlob(msg, &msgLength);
+            ok = ok == message->readBlob(msg, msgLength);
 
             if (ok)
             {
@@ -730,7 +730,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 17:
         {
             bdUInt64 userID = 0;
-            ok = message->readUInt64(&userID);
+            ok = message->readUInt64(userID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
@@ -738,7 +738,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
 
             bdSessionID sessionID;
             bdUInt length = 8;
-            ok = ok == message->readBlob(sessionID.m_sessionID.ab, &length);
+            ok = ok == message->readBlob(sessionID.m_sessionID.ab, length);
 
             if (ok)
             {
@@ -765,7 +765,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 21:
         {
             bdUInt64 senderUID = 0;
-            ok = message->readUInt64(&senderUID);
+            ok = message->readUInt64(senderUID);
 
             bdNChar8 senderName[64];
             bdMemset(senderName, 0, sizeof(senderName));
@@ -774,7 +774,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             bdUInt msgLength = 4096;
             bdUByte8 msg[4096];
             bdMemset(msg, 0, sizeof(msg));
-            ok = ok == message->readBlob(msg, &msgLength);
+            ok = ok == message->readBlob(msg, msgLength);
 
             if (ok)
             {
@@ -786,7 +786,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 29:
         {
             bdUInt64 recipientID = 0;
-            ok = message->readUInt64(&recipientID);
+            ok = message->readUInt64(recipientID);
 
             if (ok)
             {
@@ -798,7 +798,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
         case 30:
         {
             bdUInt64 recipientID = 0;
-            ok = message->readUInt64(&recipientID);
+            ok = message->readUInt64(recipientID);
 
             if (ok)
             {

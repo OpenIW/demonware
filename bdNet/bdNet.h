@@ -45,16 +45,16 @@ public:
     void* operator new (bdUWord nbytes);
     bdNetImpl();
     ~bdNetImpl();
-    static bdBool findFreePort(bdNetStartParams* params, bdAddr* addr);
-    bdBool start(const bdNetStartParams* params);
+    static bdBool findFreePort(bdNetStartParams& params, bdAddr& addr);
+    bdBool start(const bdNetStartParams& params);
     void pump();
     void stop();
     bdBool receiveAll();
     void dispatchAll();
     bdBool sendAll();
-    bdBool getBindAddr(bdAddr* addr);
+    bdBool getBindAddr(bdAddr& addr);
 
-    const bdNetStartParams* getParams() const;
+    const bdNetStartParams& getParams() const;
     bdNetStatus getStatus() const;
     bdSocketRouter* getSocketRouter() const;
     const bdConnectionStore* getConnectionStore() const;

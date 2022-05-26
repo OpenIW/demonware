@@ -13,7 +13,7 @@ bdConnectionStore::~bdConnectionStore()
     m_dispatcher.reset();
 }
 
-bdBool bdConnectionStore::init(bdSocketRouter* socket, const bdConnectionStoreConfig* config)
+bdBool bdConnectionStore::init(bdSocketRouter* socket, const bdConnectionStoreConfig& config)
 {
     if (m_status)
     {
@@ -26,8 +26,8 @@ bdBool bdConnectionStore::init(bdSocketRouter* socket, const bdConnectionStoreCo
         return false;
     }
     m_socket = socket;
-    m_addrMap = socket->getAddressMap();
-    m_config = *config;
+    m_addrMap = &socket->getAddressMap();
+    m_config = config;
     m_status = BD_CONNECTION_STORE_INITIALIZED;
     return true;
 
@@ -44,7 +44,7 @@ bdBool bdConnectionStore::flushAll()
         return false;
     }
     bdQueue<bdConnectionRef> toDisconnect;
-    for (void* Iterator = m_connectionMap.getIterator(); Iterator; m_connectionMap.next(&Iterator))
+    for (void* Iterator = m_connectionMap.getIterator(); Iterator; m_connectionMap.next(Iterator))
     {
         bdConnectionRef connection(m_connectionMap.getValue(Iterator));
         if (!connection->getAddress()->isLoopback())
@@ -61,7 +61,7 @@ bdBool bdConnectionStore::flushAll()
             case BD_SOCKET_CONNECTED:
                 for (flushIters = 0; flushIters < m_config.m_maxFlushIterations; ++flushIters)
                 {
-                    if (!flush(*connection))
+                    if (!flush(**connection))
                     {
                         break;
                     }
@@ -85,7 +85,7 @@ bdBool bdConnectionStore::flushAll()
         }
         else
         {
-            reference_cast<bdLoopbackConnection, bdConnection>(&bdConnectionRef(&connection))->updateStatus();
+            reference_cast<bdLoopbackConnection, bdConnection>(bdConnectionRef(connection))->updateStatus();
             if (connection->getStatus() == bdConnection::BD_DISCONNECTED)
             {
                 toDisconnect.enqueue(&connection);
@@ -97,15 +97,15 @@ bdBool bdConnectionStore::flushAll()
         bdConnectionRef connection(toDisconnect.peek());
         bdAddrHandleRef  addr(connection->getAddressHandle());
         connection->close();
-        if (!m_connectionMap.remove(&bdAddrHandleRefWrapper(&bdAddrHandleRef(&addr))))
+        if (!m_connectionMap.remove(bdAddrHandleRefWrapper(bdAddrHandleRef(addr))))
         {
-            bdAddressMap::addrToString(&addr, addrStr, 0x16uLL);
+            bdAddressMap::addrToString(addr, addrStr, 0x16uLL);
             bdLogWarn("bdConnection/connectionstor", "Failed to remove addr %s from connection map.", addrStr);
             success = false;
         }
-        if (!m_socket->disconnect(&addr))
+        if (!m_socket->disconnect(addr))
         {
-            bdAddressMap::addrToString(&addr, addrStr, 0x16uLL);
+            bdAddressMap::addrToString(addr, addrStr, 0x16uLL);
             bdLogWarn("bdConnection/connectionstor", "Failed to disconnect secure association for addr %s .", addrStr);
             success = false;
         }
@@ -118,19 +118,19 @@ bdBool bdConnectionStore::flushAll()
     return success;
 }
 
-bdUInt bdConnectionStore::flush(bdConnection* connection)
+bdUInt bdConnectionStore::flush(bdConnection& connection)
 {
     bdUByte8 data[1256];
 
-    bdUInt size = connection->getDataToSend(data, sizeof(data));
+    bdUInt size = connection.getDataToSend(data, sizeof(data));
     if (size)
     {
-        bdAddrHandleRef addrHandle(connection->getAddressHandle());
-        switch (m_socket->sendTo(&bdAddrHandleRef(&addrHandle), data, size))
+        bdAddrHandleRef addrHandle(connection.getAddressHandle());
+        switch (m_socket->sendTo(bdAddrHandleRef(addrHandle), data, size))
         {
         case BD_NET_ADDRESS_INVALID:
             bdLogInfo("bdConnection/connectionstore", "Invalid address. Closing connection.");
-            connection->close();
+            connection.close();
             break;
         case BD_NET_SUBSYTEM_ERROR:
             bdLogWarn("bdConnection/connectionstore", "net subsystem error!");
@@ -159,7 +159,7 @@ bdBool bdConnectionStore::startShutdown(const bdConnectionStore::bdConnectionSto
 
     if (shutdownType == BD_CONNECTION_STORE_SHUTDOWN_IMMEDIATE)
     {
-        for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(&it))
+        for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(it))
         {
             bdConnectionRef conn(m_connectionMap.getValue(it));
             conn->disconnect();
@@ -178,7 +178,7 @@ bdBool bdConnectionStore::startShutdown(const bdConnectionStore::bdConnectionSto
     {
         if (m_status == BD_CONNECTION_STORE_INITIALIZED || m_status == BD_CONNECTION_STORE_ERROR)
         {
-            for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(&it))
+            for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(it))
             {
                 bdConnectionRef conn(m_connectionMap.getValue(it));
                 conn->disconnect();
@@ -212,7 +212,7 @@ bdBool bdConnectionStore::receiveAll()
     for (bdUInt iterationCount = 0; receivedData && iterationCount < m_config.m_maxReceiveIterations; ++iterationCount)
     {
         bdAddrHandleRef address;
-        received = m_socket->receiveFrom(&address, data, sizeof(data));
+        received = m_socket->receiveFrom(address, data, sizeof(data));
         receivedData = received > 0;
         if (received < 0)
         {
@@ -246,7 +246,7 @@ bdBool bdConnectionStore::receiveAll()
             continue;
         }
         bdBool connRecv = false;
-        if (m_connectionMap.get(&bdAddrHandleRefWrapper(&bdAddrHandleRef(&address)), &receivedConnection))
+        if (m_connectionMap.get(bdAddrHandleRefWrapper(bdAddrHandleRef(address)), receivedConnection))
         {
             if (receivedConnection.notNull())
             {
@@ -255,7 +255,7 @@ bdBool bdConnectionStore::receiveAll()
         }
         if (connRecv)
         {
-            if (!(*receivedConnection->getAddressHandle())->getRealAddr()->getAddress()->isValid())
+            if (!receivedConnection->getAddressHandle()->getRealAddr().getAddress().isValid())
             {
                 receivedConnection->setAddressHandle(&address);
             }
@@ -271,14 +271,14 @@ bdBool bdConnectionStore::receiveAll()
             }
             if (newConnection.getStatus() != bdConnection::BD_CONNECTED)
             {
-                flush(&newConnection);
+                flush(newConnection);
                 continue;
             }
             bdConnectionRef establishedConnection(new bdUnicastConnection(m_addrMap));
             establishedConnection->setAddressHandle(&address);
             if (establishedConnection->receive(data, received) && establishedConnection->getStatus() == bdConnection::BD_CONNECTED)
             {
-                if (m_connectionMap.put(&bdAddrHandleRefWrapper(&bdAddrHandleRef(&address)), &establishedConnection))
+                if (m_connectionMap.put(bdAddrHandleRefWrapper(bdAddrHandleRef(address)), establishedConnection))
                 {
                     bdLogInfo("bdConnection/connectionstore", "New incoming connection created.");
                 }
@@ -293,7 +293,7 @@ void bdConnectionStore::dispatchAll()
     bdHashMap<bdAddrHandleRefWrapper, bdReference<bdConnection>, bdAddrHandleRefWrapper>::Iterator it;
 
     bdArray<bdConnectionRef> connections(m_connectionMap.getSize());
-    for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(&it))
+    for (it = m_connectionMap.getIterator(); it; m_connectionMap.next(it))
     {
         connections.pushBack(m_connectionMap.getValue(it));
     }
