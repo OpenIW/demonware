@@ -41,7 +41,7 @@ bdSocketStatusCode bdPlatformSocket::bind(bdInt& handle, bdInAddr addr, bdUInt16
     localAddr.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
     localAddr.sin_port = htons(port);
 
-    if (::bind(handle, (sockaddr*)&localAddr, sizeof(localAddr)))
+    if (::bind(handle, (sockaddr*)&localAddr, sizeof(localAddr)) != -1)
     {
         return BD_NET_SUCCESS;
     }

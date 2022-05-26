@@ -27,6 +27,9 @@ include_directories(.
     external/libtomcrypt/src/headers 
 )
 
+add_subdirectory(external/libtommath)
+add_subdirectory(external/libtomcrypt)
+
 add_definitions(-DLTM_DESC)
 
 add_compile_options(
@@ -51,6 +54,3 @@ target_compile_definitions(demonware PUBLIC
 target_link_libraries(demonware ws2_32.lib libtomcrypt libtommath)
 
 add_virtual_path(demonware)
-
-add_subdirectory(external/libtommath)
-add_subdirectory(external/libtomcrypt)
