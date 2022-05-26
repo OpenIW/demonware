@@ -104,7 +104,6 @@ int mp_exptmod_fast (mp_int * G, mp_int * X, mp_int * P, mp_int * Y, int redmode
      {
 #ifdef BN_MP_MONTGOMERY_REDUCE_C
         /* use slower baseline Montgomery method */
-        redux = mp_montgomery_reduce;
 #else
         err = MP_VAL;
         goto LBL_M;

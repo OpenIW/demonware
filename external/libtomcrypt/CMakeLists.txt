@@ -116,6 +116,7 @@ add_library(libtomcrypt STATIC
     src/pk/ecc/ltc_ecc_is_valid_idx.c
     src/pk/ecc/ltc_ecc_map.c
     src/pk/ecc/ltc_ecc_mulmod.c
+    src/pk/ecc/ltc_ecc_mul2add.c
     src/pk/ecc/ltc_ecc_points.c
     src/pk/ecc/ltc_ecc_projective_add_point.c
     src/pk/ecc/ltc_ecc_projective_dbl_point.c

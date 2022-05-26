@@ -192,21 +192,12 @@ typedef int ltm_prime_callback(unsigned char *dst, int len, void *dat);
 /* error code to char* string */
 char *mp_error_to_string(int code);
 
-/* ---> init and deinit bignum functions <--- */
-/* init a bignum */
-int mp_init(mp_int *a);
-
-/* free a bignum */
-void mp_clear(mp_int *a);
 
 /* init a null terminated series of arguments */
 int mp_init_multi(mp_int *mp, ...);
 
 /* clear a null terminated series of arguments */
 void mp_clear_multi(mp_int *mp, ...);
-
-/* exchange two ints */
-void mp_exch(mp_int *a, mp_int *b);
 
 /* shrink ram required for a bignum */
 int mp_shrink(mp_int *a);
@@ -225,26 +216,11 @@ int mp_init_size(mp_int *a, int size);
 /* set to zero */
 void mp_zero(mp_int *a);
 
-/* set to a digit */
-void mp_set(mp_int *a, mp_digit b);
-
-/* set a 32-bit const */
-int mp_set_int(mp_int *a, unsigned long b);
-
-/* get a 32-bit value */
-unsigned long mp_get_int(mp_int * a);
-
 /* initialize and set a digit */
 int mp_init_set (mp_int * a, mp_digit b);
 
 /* initialize and set 32-bit value */
 int mp_init_set_int (mp_int * a, unsigned long b);
-
-/* copy, b = a */
-int mp_copy(mp_int *a, mp_int *b);
-
-/* inits and copies, a = b */
-int mp_init_copy(mp_int *a, mp_int *b);
 
 /* trim unused digits */
 void mp_clamp(mp_int *a);
@@ -260,9 +236,6 @@ int mp_lshd(mp_int *a, int b);
 /* c = a / 2**b */
 int mp_div_2d(mp_int *a, int b, mp_int *c, mp_int *d);
 
-/* b = a/2 */
-int mp_div_2(mp_int *a, mp_int *b);
-
 /* c = a * 2**b */
 int mp_mul_2d(mp_int *a, int b, mp_int *c);
 
@@ -271,12 +244,6 @@ int mp_mul_2(mp_int *a, mp_int *b);
 
 /* c = a mod 2**d */
 int mp_mod_2d(mp_int *a, int b, mp_int *c);
-
-/* computes a = 2**b */
-int mp_2expt(mp_int *a, int b);
-
-/* Counts the number of lsbs which are zero before the first zero bit */
-int mp_cnt_lsb(mp_int *a);
 
 /* I Love Earth! */
 
@@ -295,49 +262,13 @@ int mp_and(mp_int *a, mp_int *b, mp_int *c);
 
 /* ---> Basic arithmetic <--- */
 
-/* b = -a */
-int mp_neg(mp_int *a, mp_int *b);
-
 /* b = |a| */
 int mp_abs(mp_int *a, mp_int *b);
-
-/* compare a to b */
-int mp_cmp(mp_int *a, mp_int *b);
 
 /* compare |a| to |b| */
 int mp_cmp_mag(mp_int *a, mp_int *b);
 
-/* c = a + b */
-int mp_add(mp_int *a, mp_int *b, mp_int *c);
-
-/* c = a - b */
-int mp_sub(mp_int *a, mp_int *b, mp_int *c);
-
-/* c = a * b */
-int mp_mul(mp_int *a, mp_int *b, mp_int *c);
-
-/* b = a*a  */
-int mp_sqr(mp_int *a, mp_int *b);
-
-/* a/b => cb + d == a */
-int mp_div(mp_int *a, mp_int *b, mp_int *c, mp_int *d);
-
-/* c = a mod b, 0 <= c < b  */
-int mp_mod(mp_int *a, mp_int *b, mp_int *c);
-
 /* ---> single digit functions <--- */
-
-/* compare against a single digit */
-int mp_cmp_d(mp_int *a, mp_digit b);
-
-/* c = a + b */
-int mp_add_d(mp_int *a, mp_digit b, mp_int *c);
-
-/* c = a - b */
-int mp_sub_d(mp_int *a, mp_digit b, mp_int *c);
-
-/* c = a * b */
-int mp_mul_d(mp_int *a, mp_digit b, mp_int *c);
 
 /* a/b => cb + d == a */
 int mp_div_d(mp_int *a, mp_digit b, mp_int *c, mp_digit *d);
@@ -348,9 +279,6 @@ int mp_div_3(mp_int *a, mp_int *c, mp_digit *d);
 /* c = a**b */
 int mp_expt_d(mp_int *a, mp_digit b, mp_int *c);
 
-/* c = a mod b, 0 <= c < b  */
-int mp_mod_d(mp_int *a, mp_digit b, mp_digit *c);
-
 /* ---> number theory <--- */
 
 /* d = a + b (mod c) */
@@ -359,23 +287,8 @@ int mp_addmod(mp_int *a, mp_int *b, mp_int *c, mp_int *d);
 /* d = a - b (mod c) */
 int mp_submod(mp_int *a, mp_int *b, mp_int *c, mp_int *d);
 
-/* d = a * b (mod c) */
-int mp_mulmod(mp_int *a, mp_int *b, mp_int *c, mp_int *d);
-
-/* c = a * a (mod b) */
-int mp_sqrmod(mp_int *a, mp_int *b, mp_int *c);
-
-/* c = 1/a (mod b) */
-int mp_invmod(mp_int *a, mp_int *b, mp_int *c);
-
-/* c = (a, b) */
-int mp_gcd(mp_int *a, mp_int *b, mp_int *c);
-
 /* produces value such that U1*a + U2*b = U3 */
 int mp_exteuclid(mp_int *a, mp_int *b, mp_int *U1, mp_int *U2, mp_int *U3);
-
-/* c = [a, b] or (a*b)/(a, b) */
-int mp_lcm(mp_int *a, mp_int *b, mp_int *c);
 
 /* finds one of the b'th root of a, such that |c|**b <= |a|
  *
@@ -402,16 +315,10 @@ int mp_reduce_setup(mp_int *a, mp_int *b);
  */
 int mp_reduce(mp_int *a, mp_int *b, mp_int *c);
 
-/* setups the montgomery reduction */
-int mp_montgomery_setup(mp_int *a, mp_digit *mp);
-
 /* computes a = B**n mod b without division or multiplication useful for
  * normalizing numbers in a Montgomery system.
  */
 int mp_montgomery_calc_normalization(mp_int *a, mp_int *b);
-
-/* computes x/R == x (mod N) via Montgomery Reduction */
-int mp_montgomery_reduce(mp_int *a, mp_int *m, mp_digit mp);
 
 /* returns 1 if a is a valid DR modulus */
 int mp_dr_is_modulus(mp_int *a);
@@ -439,9 +346,6 @@ int mp_reduce_2k_setup_l(mp_int *a, mp_int *d);
 
 /* reduces a modulo b where b is of the form 2**p - k [0 <= a] */
 int mp_reduce_2k_l(mp_int *a, mp_int *n, mp_int *d);
-
-/* d = a**b (mod c) */
-int mp_exptmod(mp_int *a, mp_int *b, mp_int *c, mp_int *d);
 
 /* ---> Primes <--- */
 
@@ -472,15 +376,6 @@ int mp_prime_miller_rabin(mp_int *a, mp_int *b, int *result);
  * such that Miller-Rabin gives a prob of failure lower than 2^-96 
  */
 int mp_prime_rabin_miller_trials(int size);
-
-/* performs t rounds of Miller-Rabin on "a" using the first
- * t prime bases.  Also performs an initial sieve of trial
- * division.  Determines if "a" is prime with probability
- * of error no more than (1/4)**t.
- *
- * Sets result to 1 if probably prime, 0 otherwise
- */
-int mp_prime_is_prime(mp_int *a, int t, int *result);
 
 /* finds the next prime after the number "a" using "t" trials
  * of Miller-Rabin.
@@ -516,12 +411,6 @@ int mp_prime_next_prime(mp_int *a, int t, int bbs_style);
  */
 int mp_prime_random_ex(mp_int *a, int t, int size, int flags, ltm_prime_callback cb, void *dat);
 
-/* ---> radix conversion <--- */
-int mp_count_bits(mp_int *a);
-
-int mp_unsigned_bin_size(mp_int *a);
-int mp_read_unsigned_bin(mp_int *a, const unsigned char *b, int c);
-int mp_to_unsigned_bin(mp_int *a, unsigned char *b);
 int mp_to_unsigned_bin_n (mp_int * a, unsigned char *b, unsigned long *outlen);
 
 int mp_signed_bin_size(mp_int *a);
@@ -529,8 +418,6 @@ int mp_read_signed_bin(mp_int *a, const unsigned char *b, int c);
 int mp_to_signed_bin(mp_int *a,  unsigned char *b);
 int mp_to_signed_bin_n (mp_int * a, unsigned char *b, unsigned long *outlen);
 
-int mp_read_radix(mp_int *a, const char *str, int radix);
-int mp_toradix(mp_int *a, char *str, int radix);
 int mp_toradix_n(mp_int * a, char *str, int radix, int maxlen);
 int mp_radix_size(mp_int *a, int radix, int *size);
 
