@@ -49,11 +49,11 @@ public:
     {
         return p;
     }
-    bdString(const bdString *s)
+    bdString(const bdString& s)
     {
         bdStringData *StringData;
 
-        this->m_string = s->m_string;
+        this->m_string = s.m_string;
         addReference(getStringData());
     }
     bdString(const char *s)
