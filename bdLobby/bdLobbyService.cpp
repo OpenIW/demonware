@@ -2,6 +2,16 @@
 
 #include "bdLobby/bdLobby.h"
 
+void* bdLobbyService::operator new(bdUWord p)
+{
+    return bdMemory::allocate(p);
+}
+
+void bdLobbyService::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
 bdLobbyService::bdLobbyService()
     : bdLobbyConnectionListener(), m_taskManager(NULL), m_profiles(NULL), m_messaging(NULL), m_matchMaking(NULL), m_statsManager(NULL), m_friendsManager(NULL),
     m_teamsManager(NULL), m_storageManager(NULL), m_contentUnlockManager(NULL), m_keyArchive(NULL), m_counter(NULL), m_group(NULL), m_contentStreamingManager(NULL),

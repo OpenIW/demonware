@@ -44,6 +44,8 @@ protected:
     bdBool m_encryptedConnection;
     bdLobbyErrorCode m_errorCode;
 public:
+    void* operator new(bdUWord p);
+    void operator delete(void* p);
     bdLobbyService();
     ~bdLobbyService();
     bdBool connect(bdAddr lobbyServiceAddr, const bdAuthInfo* authInfo, bdUInt maxSendBufSize, bdUInt maxRecvBufSize, const bdBool useEncryption);

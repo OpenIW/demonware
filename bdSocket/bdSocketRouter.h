@@ -48,8 +48,8 @@ public:
     void unregisterInterceptor(bdPacketInterceptor* const interceptor);
     bdInt getStatus(const bdAddrHandleRef addrHandle);
 
-    const bdQoSProbe& getQoSProber() const;
-    bdAddressMap& getAddressMap();
-    const bdSecurityKeyMap& getKeyMap() const;
+    bdQoSProbe* getQoSProber();
+    bdAddressMap* getAddressMap();
+    bdSecurityKeyMap* getKeyMap();
     const bdCommonAddrRef getLocalCommonAddr() const;
 };

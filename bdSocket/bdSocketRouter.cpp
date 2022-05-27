@@ -851,19 +851,19 @@ bdInt bdSocketRouter::getStatus(const bdAddrHandleRef addrHandle)
     return status;
 }
 
-const bdQoSProbe& bdSocketRouter::getQoSProber() const
+bdQoSProbe* bdSocketRouter::getQoSProber()
 {
-    return m_qosProber;
+    return &m_qosProber;
 }
 
-bdAddressMap& bdSocketRouter::getAddressMap()
+bdAddressMap* bdSocketRouter::getAddressMap()
 {
-    return m_addrMap;
+    return &m_addrMap;
 }
 
-const bdSecurityKeyMap& bdSocketRouter::getKeyMap() const
+bdSecurityKeyMap* bdSocketRouter::getKeyMap()
 {
-    return m_keyStore;
+    return &m_keyStore;
 }
 
 const bdCommonAddrRef bdSocketRouter::getLocalCommonAddr() const
