@@ -851,6 +851,11 @@ bdInt bdSocketRouter::getStatus(const bdAddrHandleRef addrHandle)
     return status;
 }
 
+bdSocketRouter::bdSocketRouterStatus bdSocketRouter::getStatus()
+{
+    return m_status;
+}
+
 bdQoSProbe* bdSocketRouter::getQoSProber()
 {
     return &m_qosProber;

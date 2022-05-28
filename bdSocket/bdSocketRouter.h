@@ -47,7 +47,7 @@ public:
     void registerInterceptor(bdPacketInterceptor* const interceptor);
     void unregisterInterceptor(bdPacketInterceptor* const interceptor);
     bdInt getStatus(const bdAddrHandleRef addrHandle);
-
+    bdSocketRouterStatus getStatus();
     bdQoSProbe* getQoSProber();
     bdAddressMap* getAddressMap();
     bdSecurityKeyMap* getKeyMap();

@@ -26,7 +26,7 @@ bdBool bdConnectionStore::init(bdSocketRouter* socket, const bdConnectionStoreCo
         return false;
     }
     m_socket = socket;
-    m_addrMap = &socket->getAddressMap();
+    m_addrMap = socket->getAddressMap();
     m_config = config;
     m_status = BD_CONNECTION_STORE_INITIALIZED;
     return true;
