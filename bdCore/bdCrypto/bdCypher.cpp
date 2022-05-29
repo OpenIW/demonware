@@ -14,7 +14,6 @@ bdCypher::bdCypher(bdUInt32 blockSize)
 
 bdCypher::~bdCypher()
 {
-    delete this;
 }
 
 void bdCypher::operator delete(void* p)

@@ -76,7 +76,9 @@ void bdGetHostByName::quit()
     {
         m_thread->join();
         m_thread->cleanup();
+        m_thread = NULL;
     }
+    m_status = BD_LOOKUP_UNINITIALIZED;
 }
 
 void bdGetHostByName::pump()

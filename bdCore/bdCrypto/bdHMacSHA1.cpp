@@ -24,7 +24,6 @@ bdHMacSHA1::bdHMacSHA1(const bdUByte8* const key, const bdUInt keySize) : bdHMac
 
 bdHMacSHA1::~bdHMacSHA1()
 {
-    delete this;
 }
 
 void* bdHMacSHA1::operator new(bdUWord nbytes)

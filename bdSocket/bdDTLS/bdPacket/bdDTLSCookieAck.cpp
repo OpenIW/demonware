@@ -20,7 +20,6 @@ bdDTLSCookieAck::bdDTLSCookieAck(bdUInt16 vtag, const bdUByte8* key, const bdSec
 
 bdDTLSCookieAck::~bdDTLSCookieAck()
 {
-    delete this;
 }
 
 bdBool bdDTLSCookieAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)

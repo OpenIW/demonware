@@ -155,7 +155,7 @@ bdBool bdSocketRouter::quit()
         conn = m_dtls.getValue(it);
         if (conn)
         {
-            delete conn;
+            conn->~bdDTLSAssociation();
         }
     }
     m_dtls.clear();

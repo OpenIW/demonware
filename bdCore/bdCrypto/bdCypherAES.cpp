@@ -11,7 +11,6 @@ bdCypherAES::bdCypherAES() : bdCypher(16)
 
 bdCypherAES::~bdCypherAES()
 {
-    delete this;
 }
 
 void* bdCypherAES::operator new(bdUWord nbytes)

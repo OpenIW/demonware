@@ -19,6 +19,8 @@ public:
     unsigned int m_stackSize;
     unsigned int m_priority;
 
+    void operator delete(void* p);
+    void* operator new(bdUWord nbytes);
     bdThread(class bdRunnable* runnable, int priority, unsigned int stackSize);
     ~bdThread();
     void join();

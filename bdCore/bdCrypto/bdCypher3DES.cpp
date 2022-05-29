@@ -13,7 +13,6 @@ bdCypher3Des::bdCypher3Des() : bdCypher(8u)
 
 bdCypher3Des::~bdCypher3Des()
 {
-    delete this;
 }
 
 void* bdCypher3Des::operator new(bdUWord nbytes)

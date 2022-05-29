@@ -11,7 +11,6 @@ bdHashMD5::bdHashMD5() : bdHash(BD_HASH_MD5, 16u)
 
 bdHashMD5::~bdHashMD5()
 {
-    delete this;
 }
 
 void* bdHashMD5::operator new(bdUWord nbytes)

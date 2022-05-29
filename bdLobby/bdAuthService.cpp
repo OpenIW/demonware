@@ -80,11 +80,11 @@ bdBool bdAuthService::getUsernamesForLicense(const bdNChar8* licenseKey)
     return true;
 }
 
-bdUByte8* bdAuthService::getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt& steamCookieKeySize)
+bdUByte8* bdAuthService::getSteamRequestData(const bdNChar8* steamCookieKey, bdUInt& steamCookieKeySize)
 {
     createSteamCookie(m_steamCookieKey);
     bdMemset(&m_steamCookieKey[24], 0, 64);
-    bdStrlcpy(reinterpret_cast<bdNChar8*>(&m_steamCookieKey[24]), reinterpret_cast<const bdNChar8*>(steamCookieKey), 64);
+    bdStrlcpy(reinterpret_cast<bdNChar8*>(&m_steamCookieKey[24]), steamCookieKey, 64);
     steamCookieKeySize = 88;
     return m_steamCookieKey;
 }

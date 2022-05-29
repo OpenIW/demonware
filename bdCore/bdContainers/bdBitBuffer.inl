@@ -50,7 +50,6 @@ inline bdBitBuffer::bdBitBuffer(const bdUByte8* bits, const bdUInt numBits, cons
 
 inline bdBitBuffer::~bdBitBuffer()
 {
-    delete this;
 }
 
 inline void* bdBitBuffer::operator new(bdUWord nbytes)

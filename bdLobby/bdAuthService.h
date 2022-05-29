@@ -21,8 +21,8 @@ public:
         BD_CONNECTING = 1,
         BD_PENDING_REPLY = 2
     };
-protected:
     bdFastArray<bdNChar8[64]> m_usernamesForLicenseResult;
+protected:
     bdReference<bdLobbyConnection> m_connection;
     bdUInt m_titleID;
     bdReference<bdCommonAddr> m_authServiceAddr;
@@ -50,13 +50,12 @@ public:
     bdBool deleteAccount(char*, char*);
     bdBool migrateAccount(char*, const unsigned int, char*);
     bdBool authorizeAccount(const bdNChar8* accountName, const bdNChar8* userKey);
-    bdBool authorizeAccount(char*, char*);
     bdBool authorizeAnonymous();
     bdBool authorizeDedicatedHost(const bdNChar8* licenseKey);
     bdBool authorizeDedicatedServer();
     bdBool authorizeDedicatedServerRSA();
     bdBool getUsernamesForLicense(const bdNChar8* licenseCode);
-    bdUByte8* getSteamRequestData(const bdUByte8* steamCookieKey, bdUInt& steamCookieKeySize);
+    bdUByte8* getSteamRequestData(const bdNChar8* steamCookieKey, bdUInt& steamCookieKeySize);
     bdBool authorizeSteamTicket(bdNChar8* ticket, const bdUInt ticketSize);
     static void createSteamCookie(bdUByte8* cookie);
     void setSteamCookie(char*);

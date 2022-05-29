@@ -239,7 +239,7 @@ void bdQoSProbe::pump()
 
     if (m_status != BD_QOS_PROBE_INITIALIZED)
     {
-        bdLogWarn("bdSocket/qos", "Cannot pump class before it has bee ninitialzied.");
+        bdLogWarn("bdSocket/qos", "Cannot pump class before it has been initialzied.");
         return;
     }
     if (m_probingTimer.getElapsedTimeInSeconds() > 0.2f)

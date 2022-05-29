@@ -26,5 +26,4 @@ bdHash::bdHash(bdHashAlgorithms type, bdUInt digestSize)
 
 bdHash::~bdHash()
 {
-    delete this;
 }

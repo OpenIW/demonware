@@ -7,7 +7,6 @@ bdHMac::bdHMac()
 
 bdHMac::~bdHMac()
 {
-    delete this;
 }
 
 void bdHMac::operator delete(void* p)

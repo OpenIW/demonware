@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdCore/bdCore.h"
+
+void bdThread::operator delete(void* p)
+{
+    bdMemory::deallocate(p);
+}
+
+void* bdThread::operator new(bdUWord nbytes)
+{
+    return bdMemory::allocate(nbytes);
+}
 
 bdThread::bdThread(bdRunnable* runnable, int priority, unsigned int stackSize)
 {

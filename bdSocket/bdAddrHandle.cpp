@@ -9,7 +9,6 @@ bdAddrHandle::bdAddrHandle(bdCommonAddrRef ca, const bdSecurityID& secID)
 
 bdAddrHandle::~bdAddrHandle()
 {
-    delete this;
 }
 
 void bdAddrHandle::operator delete(void* p)

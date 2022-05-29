@@ -476,7 +476,6 @@ void bdNetImpl::stop()
         if (m_ipDiscClient)
         {
             m_ipDiscClient->~bdIPDiscoveryClient();
-            delete m_ipDiscClient;
         }
         m_ipDiscClient = NULL;
     }
@@ -486,7 +485,6 @@ void bdNetImpl::stop()
         if (m_natTypeDiscClient)
         {
             m_natTypeDiscClient->~bdNATTypeDiscoveryClient();
-            delete m_natTypeDiscClient;
         }
     }
     if (m_getHostByName)

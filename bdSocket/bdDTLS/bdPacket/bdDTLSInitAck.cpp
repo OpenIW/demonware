@@ -44,7 +44,6 @@ bdDTLSInitAck* bdDTLSInitAck::operator=(bdDTLSInitAck& other)
 
 bdDTLSInitAck::~bdDTLSInitAck()
 {
-    delete this;
 }
 
 bdBool bdDTLSInitAck::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)

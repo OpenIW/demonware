@@ -11,7 +11,6 @@ bdHashTiger192::bdHashTiger192() : bdHash(BD_HASH_TIGER192, 24u)
 
 bdHashTiger192::~bdHashTiger192()
 {
-    delete this;
 }
 
 void* bdHashTiger192::operator new(bdUWord nbytes)

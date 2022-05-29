@@ -33,7 +33,6 @@ bdDTLSCookieEcho::bdDTLSCookieEcho(bdUInt16 vtag, bdDTLSInitAck& cookie, bdCommo
 
 bdDTLSCookieEcho::~bdDTLSCookieEcho()
 {
-    delete this;
 }
 
 bdBool bdDTLSCookieEcho::serialize(void* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset)

@@ -2,7 +2,6 @@
 
 inline bdReferencable::~bdReferencable()
 {
-    delete this;
 }
 
 inline bdReferencable& bdReferencable::operator=(bdReferencable& a)

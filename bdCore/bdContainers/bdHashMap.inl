@@ -26,7 +26,6 @@ inline bdHashMap<keyType, dataType, hashClass>::Node::Node(keyType const& key, d
 template<typename keyType, typename dataType, typename hashClass>
 inline bdHashMap<keyType, dataType, hashClass>::Node::~Node()
 {
-    delete this;
 }
 
 template<typename keyType, typename dataType, typename hashClass>
@@ -37,8 +36,8 @@ inline bdHashMap<keyType, dataType, hashClass>::bdHashMap()
 
 template<typename keyType, typename dataType, typename hashClass>
 inline bdHashMap<keyType, dataType, hashClass>::bdHashMap(const bdUInt initialCapacity, const bdFloat32 loadFactor)
+    : m_numIterators(0)
 {
-    m_numIterators = 0;
     createMap(initialCapacity, loadFactor);
 }
 
@@ -300,6 +299,12 @@ inline void bdHashMap<keyType, dataType, hashClass>::createMap(const bdUInt init
     {
         bdLogWarn("hashmap", "Illegal loadFactor. Using default value.");
     }
+    m_size = 0;
+    m_capacity = getNextCapacity(initialCapacity);
+    m_loadFactor = loadFactor;
+    m_threshold = (m_capacity * m_loadFactor);
+    m_map = bdAllocate<Node*>(m_capacity);
+    bdMemset(m_map, 0, sizeof(m_map) * m_capacity);
 }
 
 template<typename keyType, typename dataType, typename hashClass>
