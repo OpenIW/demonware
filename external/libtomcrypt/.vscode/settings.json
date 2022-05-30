@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "*.unit": "xml",
-        "*.effect": "xml",
-        "*.sval": "xml",
-        "TOMCRYPT_MATH.H": "cpp"
-    }
-}
