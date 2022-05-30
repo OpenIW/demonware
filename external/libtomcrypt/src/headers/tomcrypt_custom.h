@@ -287,7 +287,7 @@
 #ifndef LTC_NO_MATH
 
 /* LibTomMath */
-#define LTM_LTC_DESC
+// #define LTM_DESC
 
 /* TomsFastMath */
 /* #define TFM_LTC_DESC */

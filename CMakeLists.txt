@@ -25,9 +25,8 @@ endfunction()
 
 include_directories(. 
     external/libtomcrypt/src/headers 
+	external/libtommath
 )
-
-add_definitions(-DLTM_DESC)
 
 add_compile_options(
     /MP                      # Build with Multiple Processes
@@ -53,4 +52,7 @@ target_link_libraries(demonware ws2_32.lib libtomcrypt libtommath)
 add_virtual_path(demonware)
 
 add_subdirectory(external/libtommath)
+
+add_compile_definitions(LTM_DESC LTC_SOURCE LTC_NO_TEST LTC_NO_PROTOTYPES)
+
 add_subdirectory(external/libtomcrypt)
