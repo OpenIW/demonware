@@ -82,7 +82,11 @@ bdBool bdNetImpl::findFreePort(bdAddr& addr)
         bindResult = sock.bind(tryAddr);
         if (bindResult == BD_NET_SUCCESS)
         {
-            bdLogInfo("bdNet/net", "Using port %u", port);
+            if (!sock.close())
+            {
+                bdLogWarn("bdNet/net", "Socket failed to close with an error");
+            }
+            addr = tryAddr;
             return true;
         }
         else if (bindResult == BD_NET_ADDRESS_IN_USE && sock.close())
@@ -106,19 +110,43 @@ bdBool bdNetImpl::start(const bdNetStartParams& params)
         return false;
     }
     m_params = params;
-    bdAddr addr;
-    if (!getBindAddr(addr))
+    bdAddr tryAddr;
+    if (!getBindAddr(tryAddr))
     {
         bdLogWarn("bdNet/net", "Failed to configure bind address");
         m_status = BD_NET_PARAMS_CONFIG_ERROR;
         return false;
     }
-    if (!findFreePort(addr))
+    if (!findFreePort(tryAddr))
     {
         bdLogWarn("bdNet/net", "Failed to find a free port");
         m_status = BD_NET_BIND_FAILED;
         return false;
     }
+
+    bdBool success = true;
+    if (!m_params.m_socket)
+    {
+        m_params.m_socket = new bdSocket();
+        success = m_params.m_socket->create(false, true);
+    }
+    bdSocketStatusCode bindResult = m_params.m_socket->bind(tryAddr.getPort());
+    if (bindResult != BD_NET_SUCCESS)
+    {
+        bdLogWarn("bdNet/net", "Failed to bind");
+        m_status = BD_NET_BIND_FAILED;
+        return false;
+    }
+    m_params.m_gamePort = tryAddr.getPort();
+    bdLogInfo("bdNet/net", "Requested port %u, using port %u", params.m_gamePort, m_params.m_gamePort);
+
+    if (!success)
+    {
+        bdLogWarn("bdNet/net", "Failed to create game socket");
+        m_status = BD_NET_BIND_FAILED;
+        return false;
+    }
+
     m_socketRouter = new bdSocketRouter();
     if (!m_params.m_onlineGame)
     {

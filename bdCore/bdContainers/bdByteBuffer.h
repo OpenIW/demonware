@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdByteBuffer : bdReferencable
+class bdByteBuffer : public bdReferencable
 {
 protected:
     bdUInt m_size;

@@ -4,7 +4,7 @@
 class bdLobbyConnection;
 typedef bdReference<bdLobbyConnection> bdLobbyConnectionRef;
 
-class bdLobbyConnectionListener : bdReferencable
+class bdLobbyConnectionListener : public bdReferencable
 {
 public:
     virtual ~bdLobbyConnectionListener();

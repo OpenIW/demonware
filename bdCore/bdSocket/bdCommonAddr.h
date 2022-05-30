@@ -15,7 +15,7 @@ enum bdNATType : __int32
 class bdCommonAddr;
 typedef bdReference<bdCommonAddr> bdCommonAddrRef;
 
-class bdCommonAddr : bdReferencable
+class bdCommonAddr : public bdReferencable
 {
 protected:
     bdArray<bdAddr> m_localAddrs;

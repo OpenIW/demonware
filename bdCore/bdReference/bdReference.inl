@@ -6,7 +6,7 @@ inline bdReference<T>::bdReference()
     m_ptr = NULL;
     if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+        m_ptr->addRef();
     }
 }
 
@@ -16,7 +16,7 @@ inline bdReference<T>::bdReference(const bdReference<T>* other)
     m_ptr = other->m_ptr;
     if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+        m_ptr->addRef();
     }
 }
 
@@ -26,7 +26,7 @@ inline bdReference<T>::bdReference(bdReference<T>* other)
     m_ptr = other->m_ptr;
     if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+        m_ptr->addRef();
     }
 }
 
@@ -35,11 +35,11 @@ inline bdReference<T>::~bdReference()
 {
     if (m_ptr)
     {
-        if (!reinterpret_cast<bdReferencable*>(m_ptr)->releaseRef())
+        if (!m_ptr->releaseRef())
         {
             if (m_ptr)
             {
-                reinterpret_cast<bdReferencable*>(m_ptr)->~bdReferencable();
+               m_ptr->~T();
             }
             m_ptr = NULL;
         }
@@ -52,7 +52,7 @@ inline bdReference<T>::bdReference(T* p)
     m_ptr = p;
     if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+        m_ptr->addRef();
     }
 }
 
@@ -77,42 +77,42 @@ inline T* bdReference<T>::operator->() const
 template<typename T>
 inline void bdReference<T>::operator=(T* p)
 {
-    if (this->m_ptr)
+    if (m_ptr)
     {
-        if (!reinterpret_cast<bdReferencable*>(this->m_ptr)->releaseRef())
+        if (!m_ptr->releaseRef())
         {
-            if (this->m_ptr)
+            if (m_ptr)
             {
-                reinterpret_cast<bdReferencable*>(this->m_ptr)->~bdReferencable();
+               m_ptr->~T();
             }
         }
     }
-    this->m_ptr = p;
-    if (this->m_ptr)
+    m_ptr = p;
+    if (m_ptr)
     {
-        reinterpret_cast<bdReferencable*>(this->m_ptr)->addRef();
+        m_ptr->addRef();
     }
 }
 
 template<typename T>
 inline bdReference<T>& bdReference<T>::operator=(const bdReference<T>& other)
 {
-    if (other.m_ptr != this->m_ptr)
+    if (other.m_ptr != m_ptr)
     {
         if (m_ptr)
         {
-            if (!reinterpret_cast<bdReferencable*>(m_ptr)->releaseRef())
+            if (!m_ptr->releaseRef())
             {
                 if (m_ptr)
                 {
-                    reinterpret_cast<bdReferencable*>(m_ptr)->~bdReferencable();
+                    m_ptr->~T();
                 }
             }
         }
         m_ptr = other.m_ptr;
         if (m_ptr)
         {
-            reinterpret_cast<bdReferencable*>(m_ptr)->addRef();
+            m_ptr->addRef();
         }
     }
     return *this;

@@ -2,8 +2,10 @@
 #include "bdCore/bdCore.h"
 
 bdECCKey::bdECCKey()
+    : m_status(BD_ECC_KEY_UNINITIALIZED)
 {
     m_status = BD_ECC_KEY_UNINITIALIZED;
+    bdMemcpy(&ltc_mp, &ltm_desc, sizeof(ltc_math_descriptor));
 }
 
 bdECCKey::~bdECCKey()

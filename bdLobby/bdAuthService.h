@@ -23,11 +23,11 @@ public:
     };
     bdFastArray<bdNChar8[64]> m_usernamesForLicenseResult;
 protected:
-    bdReference<bdLobbyConnection> m_connection;
+    bdLobbyConnectionRef m_connection;
     bdUInt m_titleID;
-    bdReference<bdCommonAddr> m_authServiceAddr;
+    bdCommonAddrRef m_authServiceAddr;
     bdAuthService::bdStatus m_status;
-    bdReference<bdBitBuffer> m_request;
+    bdBitBufferRef m_request;
     bdAuthInfo m_authInfo;
     bdAuthTicket m_authTicket;
     bdUByte8 m_steamCookieKey[88];

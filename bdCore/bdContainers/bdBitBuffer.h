@@ -3,7 +3,7 @@
 
 #define BD_BB_NUM_HEADER_BITS 1
 
-class bdBitBuffer : bdReferencable
+class bdBitBuffer : public bdReferencable
 {
 public:
     bdFastArray<unsigned char> m_data;

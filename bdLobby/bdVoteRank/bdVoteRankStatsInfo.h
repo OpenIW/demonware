@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-#pragma pack(8)
-class __declspec(align(8)) bdVoteRankStatsInfo : bdStatsInfo
+class bdVoteRankStatsInfo : bdStatsInfo
 {
 public:
     bdUInt64 m_fileOwnerID;

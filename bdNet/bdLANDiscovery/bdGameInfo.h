@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdGameInfo : bdReferencable
+class bdGameInfo : public bdReferencable
 {
 protected:
     bdUInt m_titleId;

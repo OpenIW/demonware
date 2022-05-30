@@ -4,7 +4,7 @@
 #define BD_MAX_MESSAGE_SIZE 1236
 typedef bdUByte8 bdMessageType;
 
-class bdMessage : bdReferencable
+class bdMessage : public bdReferencable
 {
 protected:
     bdMessageType m_type;
