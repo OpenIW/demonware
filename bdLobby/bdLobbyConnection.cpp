@@ -267,16 +267,16 @@ bdBool bdLobbyConnection::connect(bdAuthInfo& authInfo)
     m_status = BD_CONNECTING;
     setSessionKey(authInfo.m_sessionKey);
     bdSocketStatusCode status = m_socket.connect(bdAddr(m_addr->getPublicAddr()));
-    if (status == BD_NET_SUCCESS)
-    {
-        m_status = BD_CONNECTED;
-        callListenersConnect(true);
-        return true;
-    }
-    else if (status == BD_NET_WOULD_BLOCK)
+    if (status == BD_NET_WOULD_BLOCK)
     {
         m_asyncConnectTimer.reset();
         m_asyncConnectTimer.start();
+        return true;
+    }
+    else if (status == BD_NET_SUCCESS)
+    {
+        m_status = BD_CONNECTED;
+        callListenersConnect(true);
         return true;
     }
     else
@@ -336,8 +336,8 @@ bdBool bdLobbyConnection::pump()
     }
     while (m_status == BD_CONNECTED && !m_outgoingBuffers.isEmpty())
     {
-        bdPendingBufferTransfer tx = m_outgoingBuffers.peek();
-        bdInt sentStatus = m_socket.send(tx.getData(), tx.getAvail());
+        bdPendingBufferTransfer* tx = &m_outgoingBuffers.peek();
+        bdInt sentStatus = m_socket.send(tx->getData(), tx->getAvail());
         if (sentStatus <= 0)
         {
             switch (sentStatus)
@@ -377,7 +377,7 @@ bdBool bdLobbyConnection::pump()
             return m_status == BD_CONNECTED;
         }
         m_keepAliveTimer.start();
-        if (!tx.updateTransfer(sentStatus))
+        if (!tx->updateTransfer(sentStatus))
         {
             m_outgoingBuffers.dequeue();
         }
@@ -412,12 +412,12 @@ void bdLobbyConnection::callListenersConnect(const bdBool success)
         m_lastReceivedTimer.start();
         if (m_connectionListener)
         {
-            m_connectionListener->onConnect(bdLobbyConnectionRef(this));
+            m_connectionListener->onConnect(this);
         }
     }
     else if (m_connectionListener)
     {
-        m_connectionListener->onConnectFailed(bdLobbyConnectionRef(this));
+        m_connectionListener->onConnectFailed(this);
     }
 }
 
@@ -425,7 +425,7 @@ void bdLobbyConnection::callListenersDisconnect()
 {
     if (m_connectionListener)
     {
-        m_connectionListener->onDisconnect(bdLobbyConnectionRef(this));
+        m_connectionListener->onDisconnect(this);
     }
 }
 

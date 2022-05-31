@@ -519,6 +519,11 @@ void bdSocketRouter::processError(bdAddr& realAddr, bdInt val, bdUInt& resetCoun
     case -9:
     case -8:
     case -7:
+    case -4:
+    case -3:
+    case -1:
+        bdLogWarn("bdSocket/bdSocketRouter", "Encountered error: %i while receving from the socket router ", val);
+        break;
     case -6:
         bdLogWarn("bdSocket/bdSocketRouter", "Couldn't recieve message. Buffer too small?");
         break;
@@ -540,12 +545,6 @@ void bdSocketRouter::processError(bdAddr& realAddr, bdInt val, bdUInt& resetCoun
         realAddr.toString(addrBuffer, sizeof(addrBuffer));
         bdLogWarn("bdSocket/bdSocketRouter", "Exiting receiveAll loop after receiving %u connection resets.", resetCount);
         bdLogWarn("bdSocket/bdSocketRouter", "Last reset was received for addr %s ", addrBuffer);
-        break;
-    case -4:
-    case -3:
-    case -2:
-    case -1:
-        bdLogWarn("bdSocket/bdSocketRouter", "Encountered error: %i while receving from the socket router ", val);
         break;
     case 0:
     case 1:

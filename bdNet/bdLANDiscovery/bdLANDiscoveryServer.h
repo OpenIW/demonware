@@ -4,13 +4,11 @@
 class bdLANDiscoveryServer
 {
 public:
-    enum bdStatus : bdInt
+    enum bdStatus
     {
-        BD_IDLE = 0x0,
-        BD_UPLOAD = 0x1,
-        BD_DOWNLOAD = 0x2,
-        BD_DELETE = 0x3,
-        BD_COPY = 0x4,
+        BD_IDLE = 0,
+        BD_PENDING = 1,
+        BD_ERROR = 2
     };
 protected:
     bdReference<bdGameInfo> m_gameInfo;
@@ -27,4 +25,5 @@ public:
     void stop();
     void unregisterListener(bdLANDiscoveryListener* listener);
     void update();
+    bdStatus getStatus() const;
 };

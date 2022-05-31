@@ -71,7 +71,7 @@ const bdAddrHandleRef& bdConnection::getAddressHandle() const
 
 bdCommonAddrRef bdConnection::getAddress() const
 {
-    return bdCommonAddrRef(&m_addr);
+    return bdCommonAddrRef(m_addr);
 }
 
 bdConnection::Status bdConnection::getStatus() const

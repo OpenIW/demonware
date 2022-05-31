@@ -20,13 +20,13 @@ bdInt bdPlatformStreamSocket::create(bdBool blocking)
 
 bdSocketStatusCode bdPlatformStreamSocket::connect(bdInt handle, bdInAddr addr, bdUInt16 port)
 {
-    sockaddr remoteAddr;
+    sockaddr_in remoteAddr;
 
     memset(&remoteAddr, 0, sizeof(remoteAddr));
-    remoteAddr.sa_family = AF_INET;
-    *(bdInAddr*)&remoteAddr.sa_data[2] = addr;
-    *remoteAddr.sa_data = htons(port);
-    if (::connect(handle, &remoteAddr, sizeof(remoteAddr)))
+    remoteAddr.sin_family = 2;
+    remoteAddr.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
+    remoteAddr.sin_port = htons(port);
+    if (::connect(handle, (sockaddr*)&remoteAddr, sizeof(remoteAddr)))
     {
         return BD_NET_SUCCESS;
     }

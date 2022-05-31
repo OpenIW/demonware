@@ -30,15 +30,15 @@ bdBool bdLANDiscoveryServer::start(const bdReference<bdGameInfo> gameInfo, const
 {
     if (!m_socket.create(false, true))
     {
-        m_status = BD_DOWNLOAD;
+        m_status = BD_ERROR;
         return false;
     }
     if (m_socket.bind(bdAddr(localAddr, discoveryPort)) != BD_NET_SUCCESS)
     {
-        m_status = BD_DOWNLOAD;
+        m_status = BD_ERROR;
         return false;
     }
-    m_status = BD_UPLOAD;
+    m_status = BD_PENDING;
     m_gameInfo = gameInfo;
     return true;
 }
@@ -64,7 +64,7 @@ void bdLANDiscoveryServer::update()
     bdNChar8 addrStr[24];
     bdUInt tempTitleID;
 
-    if (!m_status != BD_UPLOAD)
+    if (!m_status != BD_PENDING)
     {
         bdLogWarn("bdNet/discovery server", "Not initialized.");
         return;
@@ -111,4 +111,9 @@ void bdLANDiscoveryServer::update()
     {
         m_listeners[i]->onRequest();
     }
+}
+
+bdLANDiscoveryServer::bdStatus bdLANDiscoveryServer::getStatus() const
+{
+    return m_status;
 }
