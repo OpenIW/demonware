@@ -12,6 +12,10 @@ void* bdTitleUtilities::operator new(bdUWord nbytes)
     return bdMemory::allocate(nbytes);
 }
 
+bdTitleUtilities::~bdTitleUtilities()
+{
+}
+
 bdTitleUtilities::bdTitleUtilities(bdRemoteTaskManager* remoteTaskManager)
     : m_remoteTaskManager(remoteTaskManager)
 {

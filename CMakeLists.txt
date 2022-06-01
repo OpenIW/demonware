@@ -25,7 +25,7 @@ endfunction()
 
 include_directories(. 
     external/libtomcrypt/src/headers 
-	external/libtommath
+    external/libtommath
 )
 
 add_compile_options(
@@ -37,6 +37,8 @@ file(GLOB_RECURSE SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.h *.inl)
 list(FILTER SRC EXCLUDE REGEX "external")
 list(FILTER SRC EXCLUDE REGEX "build")
 
+add_compile_definitions(LTM_DESC LTC_SOURCE USE_LTM)
+
 add_library(demonware STATIC
     ${SRC}
 )
@@ -47,12 +49,8 @@ target_compile_definitions(demonware PUBLIC
     "_CRT_SECURE_NO_WARNINGS"
 )
 
-target_link_libraries(demonware ws2_32.lib libtomcrypt libtommath)
+target_link_libraries(demonware ws2_32.lib libtomcrypt)
 
 add_virtual_path(demonware)
-
-add_subdirectory(external/libtommath)
-
-add_compile_definitions(LTM_DESC LTC_SOURCE LTC_NO_TEST LTC_NO_PROTOTYPES)
-
 add_subdirectory(external/libtomcrypt)
+add_subdirectory(external/libtommath)

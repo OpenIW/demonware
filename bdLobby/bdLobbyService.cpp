@@ -474,7 +474,7 @@ void bdLobbyService::cleanup()
     }
     if (m_titleUtilitiesManager)
     {
-        delete m_titleUtilitiesManager;
+        m_titleUtilitiesManager->~bdTitleUtilities();
     }
     if (m_keyArchive)
     {

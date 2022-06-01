@@ -13,8 +13,6 @@
    LTC_SHA384 hash included in sha512.c, Tom St Denis
 */
 
-#include "tomcrypt.h"
-
 const struct ltc_hash_descriptor sha384_desc =
 {
     "sha384",

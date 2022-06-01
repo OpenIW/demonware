@@ -5,9 +5,6 @@
 /* $ID$ */
 /* @(#)TuringMultab.h   1.3 (QUALCOMM) 02/09/03 */
 /* Multiplication table for Turing using 0xD02B4367 */
-
-#include "tomcrypt.h"
-
 static const ulong32 Multab[256] = {
     0x00000000, 0xD02B4367, 0xED5686CE, 0x3D7DC5A9,
     0x97AC41D1, 0x478702B6, 0x7AFAC71F, 0xAAD18478,

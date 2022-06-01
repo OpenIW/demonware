@@ -8,6 +8,7 @@ protected:
 public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
+    ~bdTitleUtilities();
     bdTitleUtilities(bdRemoteTaskManager* remoteTaskManager);
     bdRemoteTaskRef verifyString(const bdNChar8* const str, const bdUInt length, bdVerifyString* verified);
     bdRemoteTaskRef recordEvent(const bdNChar8* const eventStr, const bdUInt length, bdUInt category);

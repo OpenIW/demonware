@@ -23,8 +23,6 @@ Td3[x] = Si[x].[09, 0d, 0b, 0e];
 Td4[x] = Si[x].[01, 01, 01, 01];
 */
 
-#include "tomcrypt.h"
-
 /**
   @file aes_tab.c
   AES tables

@@ -13,7 +13,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 include_directories(
-	.
+    .
 )
 
 add_library(libtommath STATIC
@@ -139,8 +139,3 @@ add_library(libtommath STATIC
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC .)
-
-target_compile_definitions(libtommath PUBLIC
-    "_DEBUG"
-    "_WINDOWS;"
-    "_CRT_SECURE_NO_WARNINGS;")

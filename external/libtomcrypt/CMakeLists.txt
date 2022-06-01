@@ -24,10 +24,10 @@ endfunction()
 
 include_directories(
     src/headers
-	../libtommath
+    ../libtommath
 )
 
-add_compile_definitions(LTM_DESC LTC_SOURCE LTC_NO_TEST LTC_NO_PROTOTYPES)
+add_compile_definitions(LTM_DESC LTC_SOURCE USE_LTM)
 
 add_library(libtomcrypt STATIC 
     src/ciphers/des.c

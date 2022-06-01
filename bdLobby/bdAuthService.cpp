@@ -158,11 +158,10 @@ void bdAuthService::startTask()
 
 void bdAuthService::onConnect(bdLobbyConnectionRef lobbyConnection)
 {
-    bdUByte8 buffer[4];
     if (*lobbyConnection && *m_request)
     {
-        *buffer = 0;
-        m_connection->sendRaw(buffer, sizeof(buffer));
+        bdUInt ping = 0;
+        m_connection->sendRaw(reinterpret_cast<bdUByte8*>(&ping), sizeof(ping));
         m_connection->send(m_request->getData(), m_request->getDataSize(), false);
         m_status = BD_PENDING_REPLY;
     }

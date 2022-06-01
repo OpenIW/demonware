@@ -264,7 +264,7 @@
 #define LTC_SPRNG
 
 /* The LTC_RC4 stream cipher */
-//#define LTC_RC4
+#define LTC_RC4
 
 /* Fortuna PRNG */
 #define LTC_FORTUNA
@@ -274,7 +274,7 @@
 #define LTC_FORTUNA_POOLS 32
 
 /* Greg's LTC_SOBER128 PRNG ;-0 */
-//#define LTC_SOBER128
+#define LTC_SOBER128
 
 /* the *nix style /dev/random device */
 #define LTC_DEVRANDOM
@@ -287,7 +287,7 @@
 #ifndef LTC_NO_MATH
 
 /* LibTomMath */
-// #define LTM_DESC
+/* #define LTM_LTC_DESC */
 
 /* TomsFastMath */
 /* #define TFM_LTC_DESC */
