@@ -4,7 +4,7 @@
 class bdECCKey
 {
 public:
-    enum bdECCKeyStatus : __int32
+    enum bdECCKeyStatus : bdInt
     {
         BD_ECC_KEY_UNINITIALIZED = 0x0,
         BD_ECC_KEY_INITIALIZED = 0x1,

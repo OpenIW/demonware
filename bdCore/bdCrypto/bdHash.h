@@ -3,7 +3,7 @@
 
 #define BD_HASH_DIGEST_SIZE_MAX 32
 
-enum bdHashAlgorithms : __int32
+enum bdHashAlgorithms : bdInt
 {
     BD_HASH_SHA256 = 0x0,
     BD_HASH_TIGER192 = 0x1,

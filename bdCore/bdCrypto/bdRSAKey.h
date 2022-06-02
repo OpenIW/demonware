@@ -4,7 +4,7 @@
 class bdRSAKey
 {
 public:
-    enum bdRSAKeyStatus : __int32
+    enum bdRSAKeyStatus : bdInt
     {
         BD_RSA_KEY_UNINITIALIZED = 0x0,
         BD_RSA_KEY_INITIALIZED = 0x1,

@@ -4,7 +4,7 @@
 #define BD_COMMON_ADDR_SERIALIZED_SIZE 25
 #define BD_MAX_LOCAL_ADDRS 3
 
-enum bdNATType : __int32
+enum bdNATType : bdInt
 {
     BD_NAT_UNKNOWN = 0x0,
     BD_NAT_OPEN = 0x1,

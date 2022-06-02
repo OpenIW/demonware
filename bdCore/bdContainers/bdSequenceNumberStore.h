@@ -4,7 +4,7 @@
 class bdSequenceNumberStore
 {
 public:
-    enum bdSequenceStatus : __int32
+    enum bdSequenceStatus : bdInt
     {
         BD_SN_INVALID_SMALLER = -2,
         BD_SN_VALID_SMALLER = -1,

@@ -51,9 +51,7 @@ public:
     }
     bdString(const bdString& s)
     {
-        bdStringData *StringData;
-
-        this->m_string = s.m_string;
+        m_string = s.m_string;
         addReference(getStringData());
     }
     bdString(const char *s)

@@ -73,15 +73,17 @@ inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
     bdUInt bitsToWrite = numBits;
     while (bitsToWrite)
     {
-        bdUInt bitPos = m_writePosition & 7;
-        bdUInt remainingBits = 8 - bitPos;
-        bdUInt thisWrite = (bitsToWrite < remainingBits) ? bitsToWrite : remainingBits;
-        bdUByte8 mask = (0xFF >> remainingBits) | (0xFF << (bitPos + thisWrite));
-        bdUInt nextDestByteIndex = m_writePosition >> 3;
-        bdUByte8 maskedDest = mask & m_data[nextDestByteIndex];
-        bdUInt currentSrcByteIndex = (numBits - bitsToWrite) >> 3;
-        bdUByte8 nextSrcByte = (((numBits - 1) >> 3) > currentSrcByteIndex) ? reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex + 1] : 0;
-        bdUByte8 currentSrcByte = reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex];
+        bdUInt bitPos = m_writePosition & 7; // bitPos
+        bdUInt remainingBits = 8 - bitPos; // remBit
+        bdUInt thisWrite = (bitsToWrite < remainingBits) ? bitsToWrite : remainingBits; // thisWrite
+        bdUByte8 mask = (0xFF >> remainingBits) | (0xFF << (bitPos + thisWrite)); // mask
+        bdUInt nextDestByteIndex = m_writePosition >> 3; // bytePos
+        bdUByte8 maskedDest = mask & m_data[nextDestByteIndex]; // tempByte
+        bdUByte8 thisBit = ((numBits - bitsToWrite) & 7); // thisbit
+        bdUInt currentSrcByteIndex = (numBits - bitsToWrite) >> 3; // thisByte
+        bdUByte8 currentSrcByte = reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex]; // thisData
+        bdUByte8 nextSrcByte = (((numBits - 1) >> 3) > currentSrcByteIndex) ? reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex + 1] : 0; // nextByte
+        currentSrcByte = ((nextSrcByte << (8 - thisBit)) | (currentSrcByte >> thisBit));
 
         m_data[nextDestByteIndex] = ~mask & (currentSrcByte << bitPos) | maskedDest;
         m_writePosition += thisWrite;
@@ -98,15 +100,15 @@ inline bdBool bdBitBuffer::writeBool(const bdBool b)
     writeDataType(BD_BB_BOOL_TYPE);
     if (b)
     {
-        bdUByte8 byte = -1;
+        bdUByte8 byte = 0xFF;
         writeBits(&byte, 1u);
     }
     else
     {
-        bdUByte8 byte = 0;
+        bdUByte8 byte = 0x0;
         writeBits(&byte, 1u);
     }
-    return getData();
+    return b;
 }
 
 inline void bdBitBuffer::writeUInt32(const bdUInt32 u)
@@ -477,7 +479,7 @@ inline bdBool bdBitBuffer::readDataType(const bdBitBufferDataType expectedDataTy
     ok = readRangedUInt32(dataType32, 0, 31u, false);
     if (ok)
     {
-        ok = dataType32 == expectedDataType;
+        ok = dataType32 == static_cast<bdUInt32>(expectedDataType);
         bdBitBuffer::typeToString(expectedDataType, string1, sizeof(string1));
         bdBitBuffer::typeToString((const bdBitBufferDataType)dataType32, string2, sizeof(string2));
     }

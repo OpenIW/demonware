@@ -4,7 +4,7 @@
 class bdNATTravClient : public bdPacketInterceptor
 {
 public:
-    enum bdNATTravClientStatus : __int32
+    enum bdNATTravClientStatus : bdInt
     {
         BD_NAT_TRAV_UNINITIALIZED = 0x0,
         BD_NAT_TRAV_INITIALIZED = 0x1,
