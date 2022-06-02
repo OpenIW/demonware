@@ -64,52 +64,32 @@ inline void bdBitBuffer::operator delete(void* p)
 
 inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
 {
-    bdUByte8 nextSrcByte;
-    bdUByte8 currentSrcByte;
-    bdUInt currentSrcByteIndex;
-    bdUByte8 maskedDest;
-    bdUInt nextDestByteIndex;
-    bdUByte8 mask;
-    bdInt upShift;
-    bdUInt bitsToWrite;
-    bdUInt lastByteIndex;
-
-    lastByteIndex = (numBits + m_writePosition - 1) / 8;
+    bdUInt lastByteIndex = (numBits + m_writePosition - 1) >> 3;
     if (!m_data.rangeCheck(lastByteIndex))
     {
         bdUByte8 value = 0;
         m_data.setGrow(lastByteIndex, value);
     }
-    bitsToWrite = numBits;
+    bdUInt bitsToWrite = numBits;
     while (bitsToWrite)
     {
-        upShift = m_writePosition & 7;
-        if (bitsToWrite >= 8 - upShift)
+        bdUInt bitPos = m_writePosition & 7;
+        bdUInt remainingBits = 8 - bitPos;
+        bdUInt thisWrite = (bitsToWrite < remainingBits) ? bitsToWrite : remainingBits;
+        bdUByte8 mask = (0xFF >> remainingBits) | (0xFF << (bitPos + thisWrite));
+        bdUInt nextDestByteIndex = m_writePosition >> 3;
+        bdUByte8 maskedDest = mask & m_data[nextDestByteIndex];
+        bdUInt currentSrcByteIndex = (numBits - bitsToWrite) >> 3;
+        bdUByte8 nextSrcByte = (((numBits - 1) >> 3) > currentSrcByteIndex) ? reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex + 1] : 0;
+        bdUByte8 currentSrcByte = reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex];
+
+        m_data[nextDestByteIndex] = ~mask & (currentSrcByte << bitPos) | maskedDest;
+        m_writePosition += thisWrite;
+        bitsToWrite -= thisWrite;
+        if (m_maxWritePosition < m_writePosition)
         {
-            bitsToWrite = 8 - upShift;
+            m_maxWritePosition = m_writePosition;
         }
-        mask = (255 >> (8 - upShift)) | (255 << (upShift + bitsToWrite));
-        nextDestByteIndex = m_writePosition / 8;
-        maskedDest = mask & m_data[nextDestByteIndex];
-        currentSrcByteIndex = (numBits - bitsToWrite) / 8;
-        nextSrcByte = 0;
-        if ((numBits - 1) / 8 > currentSrcByteIndex)
-        {
-            nextSrcByte = ((bdUByte8*)bits)[currentSrcByteIndex + 1];
-        }
-        currentSrcByte = ((bdUByte8*)bits)[((numBits - bitsToWrite) / 8)];
-        m_data[nextDestByteIndex] = ~mask & ((bdUByte8)((nextSrcByte << (8 - ((numBits - bitsToWrite) & 7))) | ((bdInt)currentSrcByte >> ((numBits - bitsToWrite) & 7))) << upShift) | maskedDest;
-        m_writePosition += bitsToWrite;
-        bitsToWrite -= bitsToWrite;
-        if (m_maxWritePosition <= m_writePosition)
-        {
-            m_writePosition = m_writePosition;
-        }
-        else
-        {
-            m_writePosition = m_maxWritePosition;
-        }
-        m_maxWritePosition = m_writePosition;
     }
 }
 

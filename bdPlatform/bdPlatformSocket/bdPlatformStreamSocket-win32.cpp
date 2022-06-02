@@ -27,7 +27,10 @@ bdSocketStatusCode bdPlatformStreamSocket::connect(bdInt handle, bdInAddr addr, 
     remoteAddr.sin_family = 2;
     remoteAddr.sin_addr.S_un.S_addr = addr.inUn.m_iaddr;
     remoteAddr.sin_port = htons(port);
-    if (::connect(handle, (sockaddr*)&remoteAddr, sizeof(remoteAddr)))
+
+    bdInt status = ::connect(handle, (sockaddr*)&remoteAddr, sizeof(remoteAddr));
+    bdPlatformTiming::sleep(100);
+    if (status != SOCKET_ERROR)
     {
         return BD_NET_SUCCESS;
     }
@@ -84,42 +87,47 @@ bool bdPlatformStreamSocket::checkSocketException(bdInt handle)
 
 bdBool bdPlatformStreamSocket::isWritable(bdInt handle, bdSocketStatusCode& error)
 {
-    timeval zero;
-    fd_set fdwrite;
-    fd_set fderr;
     bool success;
-    int i;
+    timeval zero;
+    fd_set fderr;
+    fd_set fdwrite;
 
+    fdwrite.fd_count = 1;
+    fderr.fd_count = 1;
+    error = BD_NET_SUCCESS;
     zero.tv_sec = 0;
     zero.tv_usec = 0;
-    fderr.fd_count = 0;
-    for (i = 0; i < fderr.fd_count && fderr.fd_array[i] != handle; ++i);
+    fdwrite.fd_array[0] = handle;
+    fderr.fd_array[0] = handle;
 
-    if (i == fderr.fd_count && fderr.fd_count < 64)
-    {
-        fderr.fd_array[i] = handle;
-        ++fderr.fd_count;
-    }
-
-    error = BD_NET_SUCCESS;
     success = __WSAFDIsSet(handle, &fdwrite) && select(0, 0, &fdwrite, &fderr, &zero) != -1;
-    if (__WSAFDIsSet(handle, &fderr))
+    if (!__WSAFDIsSet(handle, &fderr))
     {
-        switch (WSAGetLastError())
-        {
-        case WSAEINTR:
-            error = BD_NET_BLOCKING_CALL_CANCELED;
-        case WSAEINVAL:
-            error = BD_NET_NOT_BOUND;
-        case WSAEWOULDBLOCK:
-            error = BD_NET_WOULD_BLOCK;
-        case WSAEMSGSIZE:
-            error = BD_NET_MSG_SIZE;
-        case WSAEHOSTUNREACH:
-            error = BD_NET_CONNECTION_RESET;
-        default:
-            error = BD_NET_ERROR;
-        }
+        return success;
+    }
+    switch (WSAGetLastError())
+    {
+    case WSAEINTR:
+        error = BD_NET_BLOCKING_CALL_CANCELED;
+        break;
+    case WSAEINVAL:
+        error = BD_NET_NOT_BOUND;
+        break;
+    case WSAEWOULDBLOCK:
+        error = BD_NET_WOULD_BLOCK;
+        break;
+    case WSAEMSGSIZE:
+        error = BD_NET_MSG_SIZE;
+        break;
+    case WSAEHOSTUNREACH:
+        error = BD_NET_CONNECTION_RESET;
+        break;
+    case WSAENOTCONN:
+        error = BD_NET_NOT_CONNECTED;
+        break;
+    default:
+        error = BD_NET_ERROR;
+        break;
     }
     return success;
 }

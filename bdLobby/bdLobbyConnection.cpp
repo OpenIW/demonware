@@ -112,7 +112,7 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
         ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 5u, offset, offset, isEncrypted);
         if (ok)
         {
-            bdPendingBufferTransfer tx(bdTaskByteBufferRef(message), messageSize + 5);
+            bdPendingBufferTransfer tx(message, messageSize + 5);
             m_outgoingBuffers.enqueue(tx);
         }
         pump();

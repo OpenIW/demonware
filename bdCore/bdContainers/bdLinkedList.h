@@ -15,9 +15,6 @@ public:
         Node* m_next;
         Node* m_prev;
 
-        Node(const T& data) : m_data(T(data))
-        {
-        }
         void operator delete(void* p)
         {
             bdMemory::deallocate(p);
@@ -25,6 +22,13 @@ public:
         void* operator new(bdUWord nBytes)
         {
             return bdMemory::allocate(nBytes);
+        }
+        Node(const T& data) : m_data(T(data))
+        {
+        }
+        ~Node()
+        {
+
         }
     };
     Node* m_head;

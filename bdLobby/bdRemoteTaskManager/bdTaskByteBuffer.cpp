@@ -28,6 +28,18 @@ bdTaskByteBuffer::bdTaskByteBuffer(const bdUByte8* bytes, const bdUInt size, bdB
     }
 }
 
+bdTaskByteBuffer::~bdTaskByteBuffer()
+{
+    if (m_taskData)
+    {
+        bdDeallocate<bdUByte8>(m_taskData);
+    }
+    m_taskData = NULL;
+    m_data = NULL;
+    m_readPtr = NULL;
+    m_writePtr = NULL;
+}
+
 void bdTaskByteBuffer::setupTaskData(bdUInt size)
 {
     if (size)
@@ -35,8 +47,8 @@ void bdTaskByteBuffer::setupTaskData(bdUInt size)
         m_paddingSize = (size + 11) & 0xFFFFFFF8;
         m_paddingSize -= size;
         m_taskDataSize = size + m_paddingSize + 14;
-        m_taskData = reinterpret_cast<bdUByte8*>(bdMemory::allocate(m_taskDataSize));
-        m_data = this->m_taskData + 14;
+        m_taskData = bdAllocate<bdUByte8>(m_taskDataSize);
+        m_data = m_taskData + 14;
         m_validHeaderSize = 14;
         m_size = size;
     }

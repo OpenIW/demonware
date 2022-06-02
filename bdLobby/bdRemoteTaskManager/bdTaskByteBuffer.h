@@ -13,6 +13,7 @@ public:
     void* operator new(bdUWord nbytes);
     bdTaskByteBuffer(const bdUInt size, bdBool isTypeChecked);
     bdTaskByteBuffer(const bdUByte8* bytes, const bdUInt size, bdBool isTypeChecked);
+    virtual ~bdTaskByteBuffer();
     void setupTaskData(bdUInt size);
     void allocateBuffer();
     bdUInt getHeaderSize() const;

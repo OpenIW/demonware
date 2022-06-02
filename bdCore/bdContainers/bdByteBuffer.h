@@ -23,7 +23,7 @@ public:
     bdByteBuffer();
     bdByteBuffer(void* bytes, const bdUInt size, bdBool isTypeChecked);
     bdByteBuffer(const bdUInt size, bdBool isTypeChecked);
-    ~bdByteBuffer();
+    virtual ~bdByteBuffer();
 
     const bdUInt getDataSize() const;
     const bdUInt getReadSize() const;

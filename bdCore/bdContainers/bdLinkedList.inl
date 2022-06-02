@@ -128,31 +128,32 @@ inline void bdLinkedList<T>::removeAt(Position& position)
     Node* node;
 
     node = reinterpret_cast<Node*>(position);
-    if (node)
+    if (position)
     {
         forward(position);
-        if (node == this->m_head)
+        if (node == m_head)
         {
-            this->m_head = this->m_head->m_next;
+            m_head = m_head->m_next;
         }
         else
         {
             node->m_prev->m_next = node->m_next;
         }
 
-        if (node == this->m_tail)
+        if (node == m_tail)
         {
-            this->m_tail = node->m_prev;
+            m_tail = node->m_prev;
         }
         else
         {
-            node->m_next->m_prev = node->m_prev;
+            node->m_next = node->m_prev;
         }
+
         if (node)
         {
-            delete node;
+            node->~Node();
         }
-        --this->m_size;
+        --m_size;
     }
 }
 
