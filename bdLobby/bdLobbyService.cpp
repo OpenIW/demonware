@@ -577,7 +577,7 @@ void bdLobbyService::handlePushMessage(bdByteBufferRef message)
             ok = invite.deserialize(bdByteBufferRef(message));
             if (ok)
             {
-                m_eventHandler->onSessionInvite(&invite);
+                m_eventHandler->onSessionInvite(invite);
             }
             else
             {

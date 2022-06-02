@@ -29,8 +29,7 @@ bdSocketStatusCode bdPlatformStreamSocket::connect(bdInt handle, bdInAddr addr, 
     remoteAddr.sin_port = htons(port);
 
     bdInt status = ::connect(handle, (sockaddr*)&remoteAddr, sizeof(remoteAddr));
-    bdPlatformTiming::sleep(100);
-    if (status != SOCKET_ERROR)
+    if (status >= 0)
     {
         return BD_NET_SUCCESS;
     }
@@ -154,6 +153,7 @@ bdInt bdPlatformStreamSocket::send(bdInt handle, const void* const data, bdUInt 
 
     bdLogInfo("socket", "Sending thorugh socket: %i", handle);
     bdInt sent = ::send(handle, reinterpret_cast<const char*>(data), length, 0);
+    bdLogInfo("socket", "Sent %i bytes", sent);
     if (sent >= 0)
     {
         m_totalBytesSent += sent;

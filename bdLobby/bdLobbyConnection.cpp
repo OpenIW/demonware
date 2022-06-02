@@ -330,9 +330,12 @@ bdBool bdLobbyConnection::pump()
             close();
             return false;
         }
-        bdLogWarn("bdLobby/bdLobbyConnection", "Failed to establish connection due to socket error %d", sockError);
-        close();
-        return false;
+        else
+        {
+            bdLogWarn("bdLobby/bdLobbyConnection", "Failed to establish connection due to socket error %d", sockError);
+            close();
+            return false;
+        }
     }
     while (m_status == BD_CONNECTED && !m_outgoingBuffers.isEmpty())
     {

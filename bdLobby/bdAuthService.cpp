@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "bdLobby/bdLobby.h"
 
 const bdUInt32 BD_MAGIC_NUMBER = 4022185438;
@@ -158,7 +159,7 @@ void bdAuthService::startTask()
 
 void bdAuthService::onConnect(bdLobbyConnectionRef lobbyConnection)
 {
-    if (*lobbyConnection && *m_request)
+    if (*lobbyConnection && m_request.notNull())
     {
         bdUInt ping = 0;
         m_connection->sendRaw(reinterpret_cast<bdUByte8*>(&ping), sizeof(ping));
