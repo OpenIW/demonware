@@ -12,7 +12,7 @@ void bdLoopbackConnection::operator delete(void* p)
     bdMemory::deallocate(p);
 }
 
-bdLoopbackConnection::bdLoopbackConnection(bdCommonAddrRef addr) : bdConnection(&bdCommonAddrRef(addr)), m_messages()
+bdLoopbackConnection::bdLoopbackConnection(bdCommonAddrRef addr) : bdConnection(addr), m_messages()
 {
 }
 
@@ -47,7 +47,7 @@ bdBool bdLoopbackConnection::send(bdMessageRef message)
     {
         message->getPayload()->resetReadPosition();
     }
-    m_messages.enqueue(&message);
+    m_messages.enqueue(message);
     return true;
 }
 
@@ -59,7 +59,7 @@ void bdLoopbackConnection::updateStatus()
     {
         for (bdUInt i = 0; i < m_listeners.getSize(); ++i)
         {
-            m_listeners[i]->onConnect(bdConnectionRef(this));
+            m_listeners[i]->onConnect((this));
         }
         m_status = BD_CONNECTED;
         break;

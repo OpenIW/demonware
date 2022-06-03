@@ -135,8 +135,8 @@ bdDataChunkRef bdReliableReceiveWindow::getNextToRead()
     bdSequenceNumber frameSeqNumber(m_lastDispatched, m_frame[index]->getSequenceNumber(), 16);
     if (toDispatch == frameSeqNumber)
     {
-        dataChunk = &m_frame[index];
-        m_frame[index] = reinterpret_cast<bdDataChunkRef*>(NULL);
+        dataChunk = m_frame[index];
+        m_frame[index] = *reinterpret_cast<bdDataChunkRef*>(NULL);
         m_lastDispatched = frameSeqNumber;
         m_recvWindowUsedCredit -= dataChunk->getSerializedSize();
         if (*m_sack)

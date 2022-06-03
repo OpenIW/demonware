@@ -114,16 +114,16 @@ bdRemoteTaskRef bdContentStreaming::download(const bdUInt64 fileID, void* fileDa
 {
     if (!initDownload(fileData, fileSize, NULL, fileMetaData, startByte, endByte))
     {
-        return &bdRemoteTaskRef();
+        return bdRemoteTaskRef();
     }
-    m_remoteTask = &_preDownloadByFileID(fileID, fileSize, m_downloadMetaData);
+    m_remoteTask = _preDownloadByFileID(fileID, fileSize, m_downloadMetaData);
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startDownload();
     }
     else
     {
-        return bdRemoteTaskRef(&m_remoteTask);
+        return bdRemoteTaskRef(m_remoteTask);
     }
 }
 

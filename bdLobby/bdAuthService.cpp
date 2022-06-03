@@ -247,7 +247,7 @@ bdBitBufferRef bdAuthService::makeCreateAccount(const bdUInt titleID, const bdNC
     // Write our license and encrypted credentials to the buffer
     buffer->writeBits(licenseBuffer, 64);
     buffer->writeBits(encCredentials, sizeof(encCredentials) * CHAR_BIT);
-    return buffer;
+    return bdBitBufferRef(buffer);
 }
 
 bdBitBufferRef bdAuthService::makeGetUsernamesForLicense(const bdUInt titleID, const bdNChar8* licenseKey)
@@ -270,7 +270,7 @@ bdBitBufferRef bdAuthService::makeGetUsernamesForLicense(const bdUInt titleID, c
     license.m_licenseID = bdAuthUtility::getLicenseID(licenseKey);
     license.serialize(licenseBuffer, sizeof(licenseBuffer));
     buffer->writeBits(licenseBuffer, sizeof(licenseBuffer) * CHAR_BIT);
-    return buffer;
+    return bdBitBufferRef(buffer);
 }
 
 bdBitBufferRef bdAuthService::makeAuthAccountForService(const bdUInt titleID, const bdNChar8* accountName)
@@ -293,7 +293,7 @@ bdBitBufferRef bdAuthService::makeAuthAccountForService(const bdUInt titleID, co
     license.m_licenseID = bdAuthUtility::getLicenseID(accountName);
     license.serialize(licenseBuffer, sizeof(licenseBuffer));
     buffer->writeBits(licenseBuffer, sizeof(licenseBuffer) * CHAR_BIT);
-    return buffer;
+    return bdBitBufferRef(buffer);
 }
 
 bdBitBufferRef bdAuthService::makeAuthHostForService(const bdUInt titleID, const bdNChar8* licenseKey)
@@ -317,7 +317,7 @@ bdBitBufferRef bdAuthService::makeAuthHostForService(const bdUInt titleID, const
     license.m_licenseID = bdAuthUtility::getLicenseID(licenseKey);
     license.serialize(licenseBuffer, sizeof(licenseBuffer));
     buffer->writeBits(licenseBuffer, sizeof(licenseBuffer) * CHAR_BIT);
-    return buffer;
+    return bdBitBufferRef(buffer);
 }
 
 bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef reply)
@@ -537,7 +537,7 @@ bdLobbyErrorCode bdAuthService::handleReply(bdUByte8 replyType, bdBitBufferRef r
     }
     
     case 29:
-        if (!handleSteamReply(&reply))
+        if (!handleSteamReply(reply))
         {
             return BD_AUTH_UNKNOWN_ERROR;
         }
@@ -596,7 +596,7 @@ bdBitBufferRef bdAuthService::makeAuthForSteam(const bdUInt titleID, const bdNCh
     buffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
     buffer->writeBits(&ticketSize, 32);
     buffer->writeBits(ticket, CHAR_BIT * ticketSize);
-    return buffer;
+    return bdBitBufferRef(buffer);
 }
 
 bdBool bdAuthService::handleSteamReply(bdBitBufferRef buffer)

@@ -290,7 +290,7 @@ bdContentStreaming* bdLobbyService::getContentStreaming()
         }
         return m_contentStreamingManager;
     }
-    bdLogWarn("lobby service", "Not connected.");
+    //bdLogWarn("lobby service", "Not connected.");
     return NULL;
 }
 
@@ -313,7 +313,7 @@ bdPooledStorage* bdLobbyService::getPooledStorage()
         }
         return m_pooledStorageManager;
     }
-    bdLogWarn("lobby service", "Not connected.");
+    //bdLogWarn("lobby service", "Not connected.");
     return NULL;
 }
 
@@ -409,7 +409,7 @@ void bdLobbyService::onConnect(bdLobbyConnectionRef connection)
     bdByteBufferRef byteBuffer(new bdByteBuffer(8, false));
     byteBuffer->writeUInt32(200);
     byteBuffer->writeUInt32(connection->getReceiveBufferSize());
-    connection->sendRaw(&byteBuffer, 8);
+    connection->sendRaw(byteBuffer, 8);
     bdBitBufferRef bitBuffer(new bdBitBuffer(8, true));
     bitBuffer->setTypeCheck(false);
     bitBuffer->writeBool(true);

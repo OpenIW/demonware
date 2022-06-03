@@ -64,7 +64,7 @@ bdRemoteTaskRef bdStorage::uploadFile(const bdNChar8* const fileName, const void
     {
         bdLogWarn("storage", "Failed to write param into buffer");
     }
-    return &task;
+    return task;
 }
 
 bdRemoteTaskRef bdStorage::removeFile(const bdNChar8* const fileName, const bdUInt64 ownerID)

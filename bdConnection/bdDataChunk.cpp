@@ -181,7 +181,7 @@ const bdSeqNumber bdDataChunk::getSequenceNumber() const
 
 bdMessageRef bdDataChunk::getMessage() const
 {
-    return bdMessageRef(&m_message);
+    return bdMessageRef(m_message);
 }
 
 const bdUByte8 bdDataChunk::getFlags() const

@@ -45,7 +45,7 @@ bdSocketStatusCode bdPlatformSocket::bind(bdInt& handle, bdInAddr addr, bdUInt16
     {
         return BD_NET_SUCCESS;
     }
-    bdLogMessage(BD_LOG_WARNING, "warn/", "platform/socket", __FILE__, __FUNCTION__, __LINE__, "Call to bind() failed, WSAGetLastError: %d", WSAGetLastError());
+    bdLogWarn("platform/socket", "Call to bind() failed, WSAGetLastError: %d", WSAGetLastError());
     closesocket(handle);
     if (WSAGetLastError() == 10013 || 10047 || 10049)
     {

@@ -238,17 +238,17 @@ bdRemoteTaskRef bdMatchMaking::notifyLeave(const bdSessionID& sessionID, const b
 
 bdRemoteTaskRef bdMatchMaking::submitPerformance(const bdUInt gameType, bdPerformanceValue* performanceValues, const bdUInt numValues)
 {
-    return &bdRemoteTaskRef();
+    return bdRemoteTaskRef();
 }
 
 bdRemoteTaskRef bdMatchMaking::getPerformanceValues(const bdUInt64* const entityIDs, const bdUInt numEntityIDs, const bdUInt gameType, bdPerformanceValue* results)
 {
-    return &bdRemoteTaskRef();
+    return bdRemoteTaskRef();
 }
 
 bdRemoteTaskRef bdMatchMaking::getSessionInvites(const bdUInt32 startIndex, const bdUInt32 maxNumResults, bdSessionInvite* results)
 {
-    return &bdRemoteTaskRef();
+    return bdRemoteTaskRef();
 }
 
 bdRemoteTaskRef bdMatchMaking::startNotifyTask(const bdSessionID& sessionID, const bdUInt64* users, const bdUInt numUsers, const bdUByte8 taskType)

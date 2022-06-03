@@ -23,9 +23,9 @@ bdDispatcher::bdDispatcher() : m_interceptors(0u)
 void bdDispatcher::process(bdConnectionRef connection)
 {
     bdMessageRef message;
-    while (connection->getMessageToDispatch(&message))
+    while (connection->getMessageToDispatch(message))
     {
-        bdReceivedMessage rmessage(&bdMessageRef(message), &bdConnectionRef(connection));
+        bdReceivedMessage rmessage(message, connection);
         bdBool accepted = 0;
         for (bdUInt i = 0; !accepted && i < m_interceptors.getSize(); ++i)
         {

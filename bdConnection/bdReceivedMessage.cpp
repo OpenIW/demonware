@@ -8,10 +8,10 @@ bdReceivedMessage::bdReceivedMessage(const bdMessageRef message, const bdConnect
 
 bdMessageRef bdReceivedMessage::getMessage() const
 {
-    return bdMessageRef(&m_message);
+    return bdMessageRef(m_message);
 }
 
 bdConnectionRef bdReceivedMessage::getConnection() const
 {
-    return bdConnectionRef(&m_connection);
+    return bdConnectionRef(m_connection);
 }

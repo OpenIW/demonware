@@ -120,14 +120,14 @@ void bdReliableSendWindow::getDataToSend(bdPacket& packet)
             continue;
         }
 
-        bdDataChunkRef chunk(&frameSlot->m_chunk);
+        bdDataChunkRef chunk(frameSlot->m_chunk);
         if (frameSlot->m_sendCount)
         {
             if (frameSlot->m_missingCount < m_retransmitCountThreshold)
             {
                 if (frameSlot->m_timer.getElapsedTimeInSeconds() > m_timeoutPeriod && m_flightSize < m_congestionWindow)
                 {
-                    if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
+                    if (packet.addChunk(*reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                     {
                         bdLogInfo("bdConnection/windows", "sent retransmit (rto timeout) %u", chunk->getSequenceNumber());
                         frameSlot->m_missingCount = 0;
@@ -145,7 +145,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket& packet)
             }
             else
             {
-                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
+                if (packet.addChunk(*reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     bdLogInfo("bdConnection/windows", "sent retransmit (fast retransmit) %u", chunk->getSequenceNumber());
                     frameSlot->m_missingCount = 0;
@@ -166,7 +166,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket& packet)
             serializedSize = chunk->getSerializedSize();
             if (m_remoteReceiveWindowCredit - m_flightSize > chunk->getSerializedSize())
             {
-                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
+                if (packet.addChunk(*reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     ++frameSlot->m_sendCount;
                     frameSlot->m_timer.start();
@@ -182,7 +182,7 @@ void bdReliableSendWindow::getDataToSend(bdPacket& packet)
             }
             if (m_flightSize < m_congestionWindow && serializedSize < 1288)
             {
-                if (packet.addChunk(reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
+                if (packet.addChunk(*reinterpret_cast<bdChunkRef*>(&bdDataChunkRef(chunk))))
                 {
                     bdLogInfo("bdConnection/windows", "sent 1 new packet %u (rule b)", chunk->getSequenceNumber());
                     ++frameSlot->m_sendCount;

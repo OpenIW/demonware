@@ -14,7 +14,7 @@ void* bdPendingBufferTransfer::operator new(bdUWord nbytes)
 }
 
 bdPendingBufferTransfer::bdPendingBufferTransfer(bdTaskByteBufferRef buffer, bdUInt totalSize)
-    : bdReferencable(), m_buffer(*buffer), m_txPtr((*buffer)->getHeaderStart()), m_txAvail(m_txPtr ? totalSize : 0)
+    : bdReferencable(), m_buffer(buffer.m_ptr), m_txPtr(buffer->getHeaderStart()), m_txAvail(m_txPtr ? totalSize : 0)
 {
 }
 
@@ -158,7 +158,7 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
     ++m_messageCount;
     if (ok)
     {
-        bdPendingBufferTransfer tx(bdTaskByteBufferRef(message), sizePrefix + 4);
+        bdPendingBufferTransfer tx(message, sizePrefix + 4);
         m_outgoingBuffers.enqueue(tx);
     }
     pump();
@@ -308,17 +308,15 @@ void bdLobbyConnection::close()
 bdBool bdLobbyConnection::pump()
 {
     bdSocketStatusCode sockError;
+    int ping = 0;
 
     if (m_status == BD_CONNECTING)
     {
         sockError = BD_NET_SUCCESS;
-        if (m_socket.isWritable(sockError))
+        if (m_socket.isWritable(sockError) && sockError == BD_NET_SUCCESS)
         {
-            if (sockError == BD_NET_SUCCESS)
-            {
-                m_status = BD_CONNECTED;
-                callListenersConnect(true);
-            }
+            m_status = BD_CONNECTED;
+            callListenersConnect(true);
         }
         else if (sockError == BD_NET_SUCCESS)
         {

@@ -11,7 +11,7 @@ bdInt bdPlatformStreamSocket::create(bdBool blocking)
 
     SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     nonblocking = !blocking;
-    if (ioctlsocket(s, FIONBIO, &nonblocking))
+    if (ioctlsocket(s, 0x8004667E, &nonblocking))
     {
         return SOCKET_ERROR;
     }
@@ -86,47 +86,54 @@ bool bdPlatformStreamSocket::checkSocketException(bdInt handle)
 
 bdBool bdPlatformStreamSocket::isWritable(bdInt handle, bdSocketStatusCode& error)
 {
+    int i;
     bool success;
-    timeval zero;
-    fd_set fderr;
-    fd_set fdwrite;
+    timeval timeout;
+    fd_set writefds;
+    fd_set exceptfds;
+    fd_set readfds;
 
-    fdwrite.fd_count = 1;
-    fderr.fd_count = 1;
-    error = BD_NET_SUCCESS;
-    zero.tv_sec = 0;
-    zero.tv_usec = 0;
-    fdwrite.fd_array[0] = handle;
-    fderr.fd_array[0] = handle;
+    exceptfds.fd_count = 0;
+    writefds.fd_array[0] = handle;
+    writefds.fd_count = 1;
+    readfds.fd_array[0] = handle;
+    readfds.fd_count = 1;
 
-    success = __WSAFDIsSet(handle, &fdwrite) && select(0, 0, &fdwrite, &fderr, &zero) != -1;
-    if (!__WSAFDIsSet(handle, &fderr))
+    for (i = 0; i < exceptfds.fd_count && exceptfds.fd_array[i] != handle; ++i);
+    if (i == exceptfds.fd_count && exceptfds.fd_count < 64)
     {
-        return success;
+        exceptfds.fd_array[i] = handle;
+        ++exceptfds.fd_count;
     }
-    switch (WSAGetLastError())
+    error = BD_NET_SUCCESS;
+    int selectResult = select(0, NULL, &writefds, &exceptfds, NULL);
+    success = __WSAFDIsSet(handle, &writefds) && selectResult != -1;
+    if (__WSAFDIsSet(handle, &exceptfds))
     {
-    case WSAEINTR:
-        error = BD_NET_BLOCKING_CALL_CANCELED;
-        break;
-    case WSAEINVAL:
-        error = BD_NET_NOT_BOUND;
-        break;
-    case WSAEWOULDBLOCK:
-        error = BD_NET_WOULD_BLOCK;
-        break;
-    case WSAEMSGSIZE:
-        error = BD_NET_MSG_SIZE;
-        break;
-    case WSAEHOSTUNREACH:
-        error = BD_NET_CONNECTION_RESET;
-        break;
-    case WSAENOTCONN:
-        error = BD_NET_NOT_CONNECTED;
-        break;
-    default:
-        error = BD_NET_ERROR;
-        break;
+        switch (WSAGetLastError())
+        {
+        case WSAEINTR:
+            error = BD_NET_BLOCKING_CALL_CANCELED;
+            break;
+        case WSAEINVAL:
+            error = BD_NET_NOT_BOUND;
+            break;
+        case WSAEWOULDBLOCK:
+            error = BD_NET_WOULD_BLOCK;
+            break;
+        case WSAEMSGSIZE:
+            error = BD_NET_MSG_SIZE;
+            break;
+        case WSAEHOSTUNREACH:
+            error = BD_NET_CONNECTION_RESET;
+            break;
+        case WSAENOTCONN:
+            error = BD_NET_NOT_CONNECTED;
+            break;
+        default:
+            error = BD_NET_ERROR;
+            break;
+        }
     }
     return success;
 }

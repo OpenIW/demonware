@@ -3,12 +3,12 @@
 #include "bdConnection/bdConnection.h"
 
 bdUnicastConnection::bdControlChunkStore::bdControlChunkStore(bdChunkRef chunk, bdBool lone)
-    : m_chunk(&chunk), m_lone(lone)
+    : m_chunk(chunk), m_lone(lone)
 {
 }
 
 bdUnicastConnection::bdControlChunkStore::bdControlChunkStore(const bdUnicastConnection::bdControlChunkStore& other)
-    : m_chunk(&other.m_chunk), m_lone(other.m_lone)
+    : m_chunk(other.m_chunk), m_lone(other.m_lone)
 {
 }
 
@@ -308,7 +308,7 @@ bdUInt bdUnicastConnection::getDataToSend(bdUByte8* const buffer, const bdUInt b
             }
             else
             {
-                if (!sendCookieEcho(&bdInitAckChunkRef(&m_initAckChunk)))
+                if (!sendCookieEcho(bdInitAckChunkRef(m_initAckChunk)))
                 {
                     close();
                 }
@@ -452,7 +452,7 @@ bdBool bdUnicastConnection::handleData(bdReference<bdChunk>& chunk)
     bdDataChunkRef dchunk(reference_cast<bdDataChunk, bdChunk>(bdChunkRef(chunk)));
     if ((dchunk->getFlags() & 1) != 0)
     {
-        return m_unreliableReceiveWindow.add(bdDataChunkRef(&dchunk));
+        return m_unreliableReceiveWindow.add(bdDataChunkRef(dchunk));
     }
     else
     {
@@ -686,7 +686,7 @@ bdBool bdUnicastConnection::handleCookieAck(bdChunkRef& chunk, const bdUInt vtag
 bdBool bdUnicastConnection::handleHeartbeat(bdChunkRef& chunk)
 {
     m_receiveTimer.start();
-    return sendHeartbeatAck(reference_cast<bdInitChunk, bdChunk>(&bdChunkRef(chunk)));
+    return sendHeartbeatAck(reference_cast<bdInitChunk, bdChunk>(bdChunkRef(chunk)));
 }
 
 bdBool bdUnicastConnection::handleHeartbeatAck(bdChunkRef&)

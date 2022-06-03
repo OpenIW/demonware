@@ -43,14 +43,14 @@ bdLobbyErrorCode bdRemoteTaskManager::sendTask(bdRemoteTaskRef newTask, bdTaskBy
 {
     bdBool ok = false;
     ok = (*queryParams)->writeNoType();
-    ok = ok == m_lobbyConnection->sendTask(&bdTaskByteBufferRef(queryParams), (*queryParams)->getDataSize(), m_encryptedConnection);
+    ok = ok == m_lobbyConnection->sendTask(bdTaskByteBufferRef(queryParams), (*queryParams)->getDataSize(), m_encryptedConnection);
     if (!ok)
     {
         newTask->setStatus(bdRemoteTask::BD_FAILED);
         newTask->setErrorCode(BD_SEND_FAILED);
         return BD_SEND_FAILED;
     }
-    m_tasks.addTail(&newTask);
+    m_tasks.addTail(newTask);
     newTask->start(0.0f);
     return BD_NO_ERROR;
 }

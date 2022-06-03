@@ -8,8 +8,7 @@ public:
     T* m_ptr;
 
     bdReference();
-    bdReference(const bdReference<T>* other);
-    bdReference(bdReference<T>* other);
+    bdReference(const bdReference<T>& other);
     bdReference(T* p);
     ~bdReference();
     bdBool isNull() const;

@@ -76,7 +76,7 @@ public:
     bdCommonAddrRef getAddress() const;
     virtual bdBool receive(const bdUByte8*, const bdUInt) { return false; };
     virtual bdBool send(const bdMessageRef, const bdBool) { return false; };
-    virtual bdBool getMessageToDispatch(bdMessageRef*) { return false; };
+    virtual bdBool getMessageToDispatch(bdMessageRef&) { return false; };
     virtual bdConnection::Status getStatus() const;
     virtual bdBool connect();
     virtual void disconnect();

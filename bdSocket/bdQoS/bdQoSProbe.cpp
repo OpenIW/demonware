@@ -150,7 +150,7 @@ bdBool bdQoSProbe::probe(bdCommonAddrRef addr, const bdSecurityID& id, const bdS
     if (m_probesResolving.getIterator(addr))
     {
         bdLogInfo("bdSocket/qos", "Got multiple probes for the same address.\n");
-        it = m_probesResolving.getIterator(&addr);
+        it = m_probesResolving.getIterator(addr);
         m_probesResolving.getValue(it).pushBack(&entry, 1);
         m_probesResolving.releaseIterator(it);
     }
@@ -177,7 +177,7 @@ void bdQoSProbe::onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAd
         m_probesProbbing.put(m_lastProbeId, entries[i]);
         ++m_lastProbeId;
     }
-    m_probesResolving.remove(&remote);
+    m_probesResolving.remove(remote);
 }
 
 void bdQoSProbe::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
@@ -278,7 +278,7 @@ void bdQoSProbe::pump()
     {
         bdQoSProbe::bdQoSProbeEntryWrapper entry;
         m_probesProbbing.get(toRemove.peek(), entry);
-        entry.m_listener->onQoSProbeFailed(bdCommonAddrRef(&entry.m_addr));
+        entry.m_listener->onQoSProbeFailed(bdCommonAddrRef(entry.m_addr));
         m_probesProbbing.remove(toRemove.peek());
         toRemove.dequeue();
     }

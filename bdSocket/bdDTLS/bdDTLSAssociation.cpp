@@ -526,7 +526,7 @@ bdInt bdDTLSAssociation::handleData(bdAddr& addr, const bdUByte8* data, const bd
     }
     val = payloadSize;
     bdMemcpy(&addr, &m_addr, sizeof(addr));
-    addrHandle = &m_addrHandle;
+    addrHandle = m_addrHandle;
     m_lastReceived.start();
     return val;
 }
@@ -609,7 +609,7 @@ void bdDTLSAssociation::sendCookieEcho(bdAddr& addr)
         m_state = BD_DTLS_CLOSED;
         return;
     }
-    bdDTLSCookieEcho cookieEcho(m_peerTag, m_initAck, bdCommonAddrRef(&m_localCommonAddr), m_ECCKey);
+    bdDTLSCookieEcho cookieEcho(m_peerTag, m_initAck, bdCommonAddrRef(m_localCommonAddr), m_ECCKey);
     cookieEcho.serialize(buffer, sizeof(buffer), 0, tmpUInt);
     if (m_socket->sendTo(addr, buffer, tmpUInt) < 0)
     {
@@ -696,7 +696,7 @@ const bdInt bdDTLSAssociation::getStatus() const
 
 const bdAddrHandleRef bdDTLSAssociation::getAddrHandle() const
 {
-    return bdAddrHandleRef(&m_addrHandle);
+    return bdAddrHandleRef(m_addrHandle);
 }
 
 const bdSecurityID& bdDTLSAssociation::getLocalSecurityId() const

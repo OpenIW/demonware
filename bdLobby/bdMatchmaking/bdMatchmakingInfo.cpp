@@ -57,7 +57,7 @@ bdCommonAddrRef bdMatchMakingInfo::getHostAddrAsCommonAddr(bdCommonAddrRef local
     if (m_hostAddrSize != BD_COMMON_ADDR_SERIALIZED_SIZE)
     {
         bdLogError("match making info", "m_hostAddrSize != BD_COMMON_ADDR_SERIALIZED_SIZE. ");
-        return &newAddr;
+        return newAddr;
     }
     newAddr = new bdCommonAddr();
     newAddr->deserialize(bdCommonAddrRef(localCommonAddr), m_hostAddr);
@@ -65,7 +65,7 @@ bdCommonAddrRef bdMatchMakingInfo::getHostAddrAsCommonAddr(bdCommonAddrRef local
     {
         bdLogWarn("match making info", "localCommonAddr not set. ");
     }
-    return &newAddr;
+    return newAddr;
 }
 
 void bdMatchMakingInfo::setHostAddr(bdCommonAddrRef localCommonAddr)

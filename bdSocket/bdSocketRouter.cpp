@@ -714,10 +714,10 @@ void bdSocketRouter::onNATAddrDiscoveryFailed(bdCommonAddrRef remote)
 
     bdLogInfo(LogChannel, "Address lookup failed from");
     bdLogInfo(LogChannel, "NAT Discovery Failed - Local addr:");
-    bdCommonAddrInfo::getInfo(&bdCommonAddrRef(&m_localCommonAddr), commonAddrInfo, sizeof(commonAddrInfo));
+    bdCommonAddrInfo::getInfo(bdCommonAddrRef(m_localCommonAddr), commonAddrInfo, sizeof(commonAddrInfo));
     bdLogInfo(LogChannel, commonAddrInfo);
     bdLogInfo(LogChannel, "NAT Discovery Failed - Remote addr:");
-    bdCommonAddrInfo::getInfo(&bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
+    bdCommonAddrInfo::getInfo(bdCommonAddrRef(remote), commonAddrInfo, sizeof(commonAddrInfo));
     bdLogInfo(LogChannel, commonAddrInfo);
 
     bdAddrHandleRef addrHandle;
@@ -810,7 +810,7 @@ bdInt bdSocketRouter::getStatus(const bdAddrHandleRef addrHandle)
         bdLogWarn(LogChannel, "Cannot get status of null addr handle ref");
         return status;
     }
-    bdAddressMap::addrToString(&addrHandle, addrStr, sizeof(addrStr));
+    bdAddressMap::addrToString(addrHandle, addrStr, sizeof(addrStr));
     switch (addrHandle->getStatus())
     {
     case bdAddrHandle::BD_ADDR_NOT_CONSTRUCTED:

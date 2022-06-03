@@ -168,7 +168,7 @@ void bdRemoteTask::start(const bdFloat32 timeout)
     m_timer.start();
     m_timeout = timeout;
     m_status = BD_PENDING;
-    m_byteResults = (bdByteBufferRef*)NULL;
+    m_byteResults = NULL;
 }
 
 void bdRemoteTask::stop(bdByteBufferRef results, const bdUInt64 id)

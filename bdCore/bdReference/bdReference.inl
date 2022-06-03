@@ -11,19 +11,9 @@ inline bdReference<T>::bdReference()
 }
 
 template<typename T>
-inline bdReference<T>::bdReference(const bdReference<T>* other)
+inline bdReference<T>::bdReference(const bdReference<T>& other)
 {
-    m_ptr = other->m_ptr;
-    if (m_ptr)
-    {
-        m_ptr->addRef();
-    }
-}
-
-template<typename T>
-inline bdReference<T>::bdReference(bdReference<T>* other)
-{
-    m_ptr = other->m_ptr;
+    m_ptr = other.m_ptr;
     if (m_ptr)
     {
         m_ptr->addRef();

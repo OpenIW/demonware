@@ -35,7 +35,7 @@ bdRemoteTaskRef bdPooledStorage::upload(bdUploadInterceptor* uploadHandle, bdUIn
     m_remoteTask = _preUpload();
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
-        return &startUpload();
+        return startUpload();
     }
     else
     {
@@ -50,7 +50,7 @@ bdRemoteTaskRef bdPooledStorage::download(bdUInt64 fileID, bdDownloadInterceptor
         return bdRemoteTaskRef();
     }
     m_taskData.m_fileID = fileID;
-    m_remoteTask = &_preDownload();
+    m_remoteTask = _preDownload();
     if (m_remoteTask->getStatus() == bdRemoteTask::BD_PENDING)
     {
         return startDownload();
@@ -65,7 +65,7 @@ bdRemoteTaskRef bdPooledStorage::uploadSummaryMetaData(bdUInt64 fileID, const vo
 {
     if (!initUpload(0, summaryData, NULL, summaryDataSize, NULL, 0, metaData, metaDataSize, numTags, tags, NULL, 0, true))
     {
-        return &bdRemoteTaskRef();
+        return bdRemoteTaskRef();
     }
     m_taskData.m_fileID = fileID;
     m_remoteTask = _preUploadSummary();

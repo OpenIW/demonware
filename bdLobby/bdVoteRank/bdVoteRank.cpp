@@ -22,5 +22,5 @@ bdRemoteTaskRef bdVoteRank::submitRating(bdRatingInfo* ratings, const bdUInt num
         ratings[i].serialize(**buffer);
     }
     m_remoteTaskManager->startTask(task, buffer);
-    return &task;
+    return task;
 }

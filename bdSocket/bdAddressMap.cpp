@@ -64,7 +64,7 @@ bdBool bdAddressMap::findAddrHandle(const bdCommonAddrRef ca, const bdSecurityID
             if (!numFound)
             {
                 result = true;
-                addrHandle = &handle;
+                addrHandle = handle;
             }
             ++numFound;
         }

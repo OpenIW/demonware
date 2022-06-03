@@ -33,7 +33,7 @@ bdUInt bdPacket::serialize(bdUByte8* outBuffer, const bdUInt outSize)
 
     for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(chunkPos))
     {
-        bdChunkRef chunk(reinterpret_cast<bdChunkRef*>(chunkPos));
+        bdChunkRef chunk(*reinterpret_cast<bdChunkRef*>(chunkPos));
         serializedNumBytes = chunk->getSerializedSize();
         if (bytesRemaining < serializedNumBytes)
         {
@@ -47,7 +47,7 @@ bdUInt bdPacket::serialize(bdUByte8* outBuffer, const bdUInt outSize)
     }
     for (Position chunkPos = m_chunks.getHeadPosition(); chunkPos; m_chunks.forward(chunkPos))
     {
-        bdChunkRef chunk(reinterpret_cast<bdChunkRef*>(chunkPos));
+        bdChunkRef chunk(*reinterpret_cast<bdChunkRef*>(chunkPos));
         if (chunk->getType() == 2)
         {
             bdDataChunkRef dataChunk(reference_cast<bdDataChunk,bdChunk>(bdChunkRef(chunk)));
@@ -174,7 +174,7 @@ bdBool bdPacket::deserialize(const bdUByte8* inData, const bdUInt inSize)
             bdLogWarn("bdConnection/packet", "Chunk deserialization failed.");
             continue;
         }
-        m_chunks.addTail(&chunk);
+        m_chunks.addTail(chunk);
     }
     return ok;
 }
@@ -185,7 +185,7 @@ bdBool bdPacket::addChunk(bdChunkRef chunk)
     bdUInt newPacketSize = chunk->getSerializedSize() + m_currentSize;
     if (newPacketSize <= m_bufferSize)
     {
-        m_chunks.addTail(&chunk);
+        m_chunks.addTail(chunk);
         m_currentSize = newPacketSize;
         return true;
     }
