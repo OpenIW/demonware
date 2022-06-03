@@ -11,12 +11,12 @@ inline bdReferencable& bdReferencable::operator=(bdReferencable& a)
 
 inline bdInt bdReferencable::releaseRef()
 {
-    return InterlockedDecrement((volatile LONG*)&m_refCount) - 1;
+    return InterlockedDecrement((volatile LONG*)&m_refCount);
 }
 
 inline bdInt bdReferencable::addRef()
 {
-    return InterlockedIncrement((volatile LONG*)&m_refCount) + 1;
+    return InterlockedIncrement((volatile LONG*)&m_refCount);
 }
 
 inline bdInt bdReferencable::getRefCount()
