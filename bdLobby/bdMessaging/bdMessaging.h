@@ -15,6 +15,7 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdMessaging(bdRemoteTaskManager* remoteTaskManager);
+    ~bdMessaging();
     bdRemoteTaskRef getMailHeaders(class bdMailHeader*, const unsigned int, const unsigned int);
     bdRemoteTaskRef getMails(unsigned long long*, const unsigned int, class bdMailBody*, const bool);
     bdRemoteTaskRef deleteMail(unsigned long long*, const unsigned int);

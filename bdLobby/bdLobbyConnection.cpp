@@ -250,7 +250,7 @@ bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8& type, bdBitBufferRef& p
 
     if (getMessageToDispatch(type, buffer) && buffer.notNull())
     {
-        payload = new bdBitBuffer(buffer->getData(), buffer->getDataSize() * CHAR_BIT, true);
+        payload = new bdBitBuffer(buffer->getData(), buffer->getSize() * CHAR_BIT, true);
         return true;
     }
     return false;
@@ -448,6 +448,7 @@ bdBool bdLobbyConnection::recvMessageData()
         m_recvMessage = (bdTaskByteBuffer*)NULL;
         m_recvTransfer = (bdPendingBufferTransfer*)NULL;
         m_recvState = BD_READ_SIZE;
+        oldState = BD_READ_INIT;
         status = recvMessageSize();
         break;
     case BD_READ_SIZE:
@@ -459,12 +460,9 @@ bdBool bdLobbyConnection::recvMessageData()
     case BD_READ_MESSAGE:
         bdAssert(m_recvTransfer->getAvail() > 0, "BD_READ_MESSAGE state error");
         status = m_socket.recv(m_recvTransfer->getData(), m_recvTransfer->getAvail());
-        if (status > 0)
+        if (status > 0 && !m_recvTransfer->updateTransfer(status))
         {
-            if (!m_recvTransfer->updateTransfer(status))
-            {
-                m_recvState = BD_READ_COMPLETE;
-            }
+            m_recvState = BD_READ_COMPLETE;
         }
         break;
     default:
@@ -555,7 +553,7 @@ bdInt bdLobbyConnection::recvEncryptType()
     bdInt sockStatus = m_socket.recv(&m_recvEncryptType, 1u);
     if (sockStatus <= 0)
     {
-        return sockStatus;
+       return sockStatus;
     }
     bdAssert(*m_recvMessage == BD_NULL && *m_recvTransfer == BD_NULL, "BD_READ_ENCRYPT state error");
     bdUInt headerRemaining = m_recvEncryptType == 1 || m_recvEncryptType == 2 ? 9 : 1;

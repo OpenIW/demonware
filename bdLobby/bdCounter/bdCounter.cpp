@@ -17,6 +17,10 @@ bdCounter::bdCounter(bdRemoteTaskManager* const remoteTaskManager)
 {
 }
 
+bdCounter::~bdCounter()
+{
+}
+
 bdRemoteTaskRef bdCounter::incrementCounters(bdCounterValue* const counterIncrements, const bdUInt numEntries)
 {
     bdRemoteTaskRef task;

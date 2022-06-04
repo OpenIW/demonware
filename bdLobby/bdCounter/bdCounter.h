@@ -9,6 +9,7 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdCounter(bdRemoteTaskManager* const remoteTaskManager);
+    ~bdCounter();
     bdRemoteTaskRef incrementCounters(bdCounterValue* const counterIncrements, const bdUInt numEntries);
     bdRemoteTaskRef getCounterTotals(bdCounterValue* results, const bdUInt numCounterIDs);
 };

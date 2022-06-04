@@ -64,31 +64,98 @@ inline void bdBitBuffer::operator delete(void* p)
 
 inline void bdBitBuffer::writeBits(const void* bits, const bdUInt numBits)
 {
+    /*
+    Pseudocode from Official client
+
+    unsigned int m_writePosition; // [esp+0h] [ebp-6Ch]
+    unsigned int v4; // [esp+4h] [ebp-68h]
+    char v6; // [esp+2Bh] [ebp-41h] BYREF
+    unsigned int v7; // [esp+2Ch] [ebp-40h]
+    unsigned int v8; // [esp+30h] [ebp-3Ch]
+    unsigned int v9; // [esp+34h] [ebp-38h]
+    unsigned int v10; // [esp+38h] [ebp-34h]
+    unsigned int v11; // [esp+3Ch] [ebp-30h]
+    char v12; // [esp+42h] [ebp-2Ah]
+    char v13; // [esp+43h] [ebp-29h]
+    unsigned int v14; // [esp+44h] [ebp-28h]
+    char v15; // [esp+4Ah] [ebp-22h]
+    unsigned __int8 v16; // [esp+4Bh] [ebp-21h]
+    int v17; // [esp+4Ch] [ebp-20h]
+    char v18; // [esp+53h] [ebp-19h]
+    int v19; // [esp+54h] [ebp-18h]
+    unsigned __int8 v20; // [esp+5Bh] [ebp-11h]
+    unsigned int v21; // [esp+5Ch] [ebp-10h]
+    int v22; // [esp+60h] [ebp-Ch]
+    unsigned int lastByteIndex; // [esp+64h] [ebp-8h]
+    unsigned int v24; // [esp+68h] [ebp-4h]
+
+    lastByteIndex = (this->m_writePosition + numBits - 1) >> 3;
+    if (lastByteIndex >= this->m_data.m_size)
+    {
+        v6 = 0;
+        m_data.setGrow(lastByteIndex, v6);
+    }
+    v24 = numBits;
+    v22 = (int)bits;
+    while (v24)
+    {
+        v7 = this->m_writePosition & 7;
+        v10 = 8 - v7;
+        if (v24 >= 8 - v7)
+            v4 = v10;
+        else
+            v4 = v24;
+        v8 = v4;
+        v13 = (255 >> v10) | (255 << (v7 + v4));
+        v14 = this->m_writePosition >> 3;
+        v15 = v13 & this->m_data.m_data[v14];
+        v21 = numBits - v24;
+        v19 = ((BYTE)numBits - (BYTE)v24) & 7;
+        v17 = 8 - v19;
+        v9 = (numBits - v24) >> 3;
+        v20 = *(BYTE*)(v9 + v22);
+        v16 = 0;
+        v11 = (numBits - 1) >> 3;
+        if (v11 > v9)
+            v16 = *(BYTE*)(v9 + v22 + 1);
+        v20 = (v16 << v17) | ((int)v20 >> v19);
+        v12 = ~v13;
+        v18 = ~v13 & (v20 << v7);
+        this->m_data.m_data[v14] = v18 | v15;
+        this->m_writePosition += v8;
+        v24 -= v8;
+        if (this->m_maxWritePosition <= this->m_writePosition)
+            m_writePosition = this->m_writePosition;
+        else
+            m_writePosition = this->m_maxWritePosition;
+        this->m_maxWritePosition = m_writePosition;
+    }
+    */
+
     bdUInt lastByteIndex = (numBits + m_writePosition - 1) >> 3;
     if (!m_data.rangeCheck(lastByteIndex))
     {
-        bdUByte8 value = 0;
-        m_data.setGrow(lastByteIndex, value);
+        m_data.setGrow(lastByteIndex, 0);
     }
     bdUInt bitsToWrite = numBits;
     while (bitsToWrite)
     {
-        bdUInt bitPos = m_writePosition & 7; // bitPos
-        bdUInt remainingBits = 8 - bitPos; // remBit
-        bdUInt thisWrite = (bitsToWrite < remainingBits) ? bitsToWrite : remainingBits; // thisWrite
-        bdUByte8 mask = (0xFF >> remainingBits) | (0xFF << (bitPos + thisWrite)); // mask
-        bdUInt nextDestByteIndex = m_writePosition >> 3; // bytePos
-        bdUByte8 maskedDest = mask & m_data[nextDestByteIndex]; // tempByte
-        bdUByte8 thisBit = ((numBits - bitsToWrite) & 7); // thisbit
-        bdUInt currentSrcByteIndex = (numBits - bitsToWrite) >> 3; // thisByte
-        bdUByte8 currentSrcByte = reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex]; // thisData
-        bdUByte8 nextSrcByte = (((numBits - 1) >> 3) > currentSrcByteIndex) ? reinterpret_cast<const bdUByte8*>(bits)[currentSrcByteIndex + 1] : 0; // nextByte
-        currentSrcByte = ((nextSrcByte << (8 - thisBit)) | (currentSrcByte >> thisBit));
-
-        m_data[nextDestByteIndex] = ~mask & (currentSrcByte << bitPos) | maskedDest;
+        bdUInt upShift = m_writePosition & 7;
+        bdUInt thisWrite = (bitsToWrite < 8 - upShift) ? bitsToWrite : 8 - upShift;
+        bdUByte8 mask = (0xFF >> (8 - upShift)) | (0xFF << (upShift + thisWrite));
+        bdUInt nextDestByteIndex = m_writePosition >> 3;
+        bdUByte8 maskedDest = mask & m_data[nextDestByteIndex];
+        bdUInt currentSrcByteIndex = (numBits - bitsToWrite) >> 3;
+        bdUByte8 nextSrcByte = 0;
+        if ((numBits - 1) >> 3 > currentSrcByteIndex)
+        {
+            nextSrcByte = *(reinterpret_cast<const bdUByte8*>(bits) + currentSrcByteIndex + 1);
+        }
+        bdUByte8 currentSrcByte = *(reinterpret_cast<const bdUByte8*>(bits) + ((numBits - bitsToWrite) >> 3));
+        m_data[nextDestByteIndex] = ~mask & (((nextSrcByte << (8 - ((numBits - bitsToWrite) & 7))) | (currentSrcByte >> ((numBits - bitsToWrite) & 7))) << upShift) | maskedDest;
         m_writePosition += thisWrite;
         bitsToWrite -= thisWrite;
-        if (m_maxWritePosition < m_writePosition)
+        if (m_maxWritePosition <= m_writePosition)
         {
             m_maxWritePosition = m_writePosition;
         }
@@ -100,12 +167,12 @@ inline bdBool bdBitBuffer::writeBool(const bdBool b)
     writeDataType(BD_BB_BOOL_TYPE);
     if (b)
     {
-        bdUByte8 byte = 0xFF;
+        bdUByte8 byte = -1;
         writeBits(&byte, 1u);
     }
     else
     {
-        bdUByte8 byte = 0x0;
+        bdUByte8 byte = 0;
         writeBits(&byte, 1u);
     }
     return b;
@@ -297,34 +364,34 @@ inline bdBool bdBitBuffer::readBits(void* bits, bdUInt numBits)
     bdUByte8* dest;
     bdUByte8 value;
 
+    bdUInt bitsToRead = numBits;
     if (!numBits)
     {
         return 1;
     }
-    if (numBits + this->m_readPosition > this->m_maxWritePosition)
+    if (numBits + m_readPosition > m_maxWritePosition)
     {
-        this->m_failedRead = 1;
+        m_failedRead = 1;
         return false;
     }
-    nextByteIndex = this->m_readPosition >> 3;
-    while (numBits)
+
+    nextByteIndex = m_readPosition >> 3;
+    while (bitsToRead)
     {
         if (!m_data.rangeCheck(nextByteIndex))
         {
-            this->m_failedRead = 1;
+            m_failedRead = 1;
             return false;
         }
-        if (numBits >= 8)
-        {
-            numBits = 8;
-        }
-        byte0 = m_data[++nextByteIndex];
+        bdUInt minBit = (bitsToRead < 8) ? bitsToRead : 8;
+        byte0 = m_data[nextByteIndex];
+        nextByteIndex++;
         downShift = m_readPosition & 7;
-        if (numBits + downShift <= 8)
+        if (minBit + downShift <= 8)
         {
             dest = reinterpret_cast<bdUByte8*>(bits);
             bits = (char*)bits + 1;
-            *dest = (255 >> (8 - numBits)) & (byte0 >> downShift);
+            *dest = (255 >> (8 - minBit)) & (byte0 >> downShift);
         }
         else
         {
@@ -333,13 +400,13 @@ inline bdBool bdBitBuffer::readBits(void* bits, bdUInt numBits)
                 m_failedRead = 1;
                 return false;
             }
-            value = (255 >> (8 - numBits)) & ((m_data[nextByteIndex] << (8 - downShift)) | (byte0 >> downShift));
+            value = (0xFF >> (8 - minBit)) & ((m_data[nextByteIndex] << (8 - downShift)) | (byte0 >> downShift));
             dest = reinterpret_cast<bdUByte8*>(bits);
             bits = (char*)bits + 1;
             *dest = value;
         }
-        m_readPosition += numBits;
-        numBits -= numBits;
+        m_readPosition += minBit;
+        bitsToRead -= minBit;
     }
     return true;
 }
@@ -466,22 +533,21 @@ inline bdBool bdBitBuffer::readRangedUInt32(bdUInt& u, const bdUInt begin, const
 
 inline bdBool bdBitBuffer::readDataType(const bdBitBufferDataType expectedDataType)
 {
-    bdBool ok = true;
-    bdUInt32 dataType32;
     bdNChar8 string2[40];
     bdNChar8 string1[40];
 
-    if (!this->m_typeChecked)
+    if (!m_typeChecked)
     {
-        return ok;
+        return true;
     }
-    dataType32 = 0;
-    ok = readRangedUInt32(dataType32, 0, 31u, false);
+    bdUInt32 dataType32 = 0;
+    bdBool ok = readRangedUInt32(dataType32, 0, 31u, false);
     if (ok)
     {
         ok = dataType32 == static_cast<bdUInt32>(expectedDataType);
         bdBitBuffer::typeToString(expectedDataType, string1, sizeof(string1));
-        bdBitBuffer::typeToString((const bdBitBufferDataType)dataType32, string2, sizeof(string2));
+        bdBitBuffer::typeToString(static_cast<bdBitBufferDataType>(dataType32), string2, sizeof(string2));
+        bdLogError("bdCore/bitBuffer", "Expected: %s, read: %s", string1, string2);
     }
     return ok;
 }
@@ -496,7 +562,7 @@ inline bdBool bdBitBuffer::readRangedInt32(bdInt& i, const bdInt begin, const bd
     bdInt ni;
     bdBool ok;
 
-    //bdAssertMsg(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
+    bdAssert(end >= begin, "bdBitBuffer::writeRangedUInt, end of range is less than the begining");
     ok = true;
     ok = readDataType(BD_BB_RANGED_UNSIGNED_INTEGER32_TYPE);
     if (this->m_typeChecked)

@@ -17,6 +17,10 @@ bdGroup::bdGroup(bdRemoteTaskManager* remoteTaskManager)
 {
 }
 
+bdGroup::~bdGroup()
+{
+}
+
 bdRemoteTaskRef bdGroup::setGroups(const bdUInt32* const groupIDs, const bdUInt numEntries)
 {
     bdUInt taskSize = 4 * numEntries + 75;

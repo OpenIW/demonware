@@ -425,7 +425,8 @@ void bdLobbyService::onConnect(bdLobbyConnectionRef connection)
     }
     bitBuffer->writeBits(m_authInfo.m_data, sizeof(m_authInfo.m_data) * CHAR_BIT);
     connection->send(bitBuffer->getData(), bitBuffer->getDataSize(), false);
-    m_taskManager = new bdRemoteTaskManager(bdLobbyConnectionRef(connection), m_encryptedConnection);
+    connection->setSessionKey(m_authInfo.m_sessionKey);
+    m_taskManager = new bdRemoteTaskManager(connection, m_encryptedConnection);
     bdLogInfo("lobby service", "Connected to MatchMaking Service.");
 }
 
@@ -438,97 +439,110 @@ void bdLobbyService::cleanup()
 {
     if (m_taskManager)
     {
-        delete m_taskManager;
+        m_taskManager->~bdRemoteTaskManager();
+        m_taskManager = BD_NULL;
     }
     if (m_profiles)
     {
-        delete m_profiles;
+        m_profiles->~bdProfiles();
+        m_profiles = BD_NULL;
     }
     if (m_messaging)
     {
-        delete m_messaging;
+        m_messaging->~bdMessaging();
+        m_messaging = BD_NULL;
     }
     if (m_matchMaking)
     {
-        delete m_matchMaking;
+        m_matchMaking->~bdMatchMaking();
+        m_matchMaking = BD_NULL;
     }
     if (m_statsManager)
     {
-        delete m_statsManager;
+        m_statsManager->~bdStats();
+        m_statsManager = BD_NULL;
     }
     if (m_friendsManager)
     {
-        delete m_friendsManager;
+        m_friendsManager = BD_NULL;
     }
     if (m_teamsManager)
     {
-        delete m_teamsManager;
+        m_teamsManager = BD_NULL;
     }
     if (m_storageManager)
     {
-        delete m_storageManager;
+        m_storageManager->~bdStorage();
+        m_storageManager = BD_NULL;
     }
     if (m_contentUnlockManager)
     {
-        delete m_contentUnlockManager;
+        m_contentUnlockManager = BD_NULL;
     }
     if (m_titleUtilitiesManager)
     {
         m_titleUtilitiesManager->~bdTitleUtilities();
+        m_titleUtilitiesManager = BD_NULL;
     }
     if (m_keyArchive)
     {
-        delete m_keyArchive;
+        m_keyArchive = BD_NULL;
     }
     if (m_counter)
     {
-        delete m_counter;
+        m_counter->~bdCounter();
+        m_counter = BD_NULL;
     }
     if (m_group)
     {
-        delete m_group;
+        m_group->~bdGroup();
+        m_group = BD_NULL;
     }
     if (m_contentStreamingManager)
     {
-        delete m_contentStreamingManager;
+        m_contentStreamingManager->~bdContentStreaming();
+        m_contentStreamingManager = BD_NULL;
     }
     if (m_pooledStorageManager)
     {
-        delete m_pooledStorageManager;
+        m_pooledStorageManager->~bdPooledStorage();
+        m_pooledStorageManager = BD_NULL;
     }
     if (m_tags)
     {
-        delete m_tags;
+        m_tags->~bdTags();
+        m_tags = BD_NULL;
     }
     if (m_voteRankManager)
     {
-        delete m_voteRankManager;
+        m_voteRankManager->~bdVoteRank();
+        m_voteRankManager = BD_NULL;
     }
     if (m_twitter)
     {
-        delete m_twitter;
+        m_twitter = BD_NULL;
     }
     if (m_facebook)
     {
-        delete m_facebook;
+        m_facebook = BD_NULL;
     }
     if (m_linkCode)
     {
-        delete m_linkCode;
+        m_linkCode = BD_NULL;
     }
     if (m_antiCheat)
     {
-        delete m_antiCheat;
+        m_antiCheat = BD_NULL;
     }
     if (m_DML)
     {
-        delete m_DML;
+        m_DML = BD_NULL;
     }
     if (m_activityTracker)
     {
-        delete m_activityTracker;
+        m_activityTracker = BD_NULL;
     }
-    m_lobbyConnection = (bdLobbyConnection*)NULL;
+    m_lobbyConnection = BD_NULL;
 }
 
 void bdLobbyService::handlePushMessage(bdByteBufferRef message)

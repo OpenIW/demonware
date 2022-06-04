@@ -6,4 +6,6 @@ class bdFriends
 {
 protected:
     bdRemoteTaskManager* m_remoteTaskManager;
+public:
+    ~bdFriends();
 };

@@ -17,6 +17,10 @@ bdStats::bdStats(bdRemoteTaskManager* remoteTaskManager)
 {
 }
 
+bdStats::~bdStats()
+{
+}
+
 bdRemoteTaskRef bdStats::writeStats(bdStatsInfo** stats, const bdUInt numStats)
 {
     bdRemoteTaskRef task;

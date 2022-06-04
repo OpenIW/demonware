@@ -21,6 +21,7 @@ public:
     void operator delete(void* p);
     void* operator new(bdUWord nbytes);
     bdStats(bdRemoteTaskManager* remoteTaskManager);
+    ~bdStats();
     bdRemoteTaskRef writeStats(class bdStatsInfo** stats, const bdUInt numStats);
     bdRemoteTaskRef readStatsByRank(const unsigned int, const unsigned long long, class bdStatsInfo**, const unsigned int);
     bdRemoteTaskRef readStatsByRank(const bdUInt leaderBoardID, const bdUInt64 firstRank, bdStatsInfo* stats, const bdUInt maxResults);

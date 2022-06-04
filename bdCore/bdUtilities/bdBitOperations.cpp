@@ -16,28 +16,25 @@ bdUInt bdBitOperations::nextPowerOf2(const bdUInt v)
 
 bdUInt bdBitOperations::highBitNumber(bdUInt v)
 {
-    bdInt i;
+    int v2; // [esp+0h] [ebp-4h]
+    unsigned int v3; // [esp+Ch] [ebp+8h]
 
-    i = 16;
-    if ((v & 0xFFFF0000) == 0)
+    v2 = (v & 0xFFFF0000) != 0 ? 0x10 : 0;
+    v3 = v >> ((v & 0xFFFF0000) != 0 ? 0x10 : 0);
+    if ((v3 & 0xFF00) != 0)
     {
-        i = 0;
+        v2 |= 8u;
+        v3 >>= 8;
     }
-    v >>= i;
-    if ((v & 0xFF00) != 0)
+    if ((v3 & 0xF0) != 0)
     {
-        i |= 8u;
-        v >>= 8;
+        v2 |= 4u;
+        v3 >>= 4;
     }
-    if ((v & 0xF0) != 0)
+    if ((v3 & 0xC) != 0)
     {
-        i |= 4u;
-        v >>= 4;
+        v2 |= 2u;
+        v3 >>= 2;
     }
-    if ((v & 0xC) != 0)
-    {
-        i |= 2u;
-        v >>= 2;
-    }
-    return (v >> 1) | i;
+    return v2 | (v3 >> 1);
 }

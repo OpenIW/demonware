@@ -205,8 +205,15 @@ bdInt bdPlatformStreamSocket::receive(bdInt handle, void* const data, bdUInt len
         return BD_NET_BLOCKING_CALL_CANCELED;
     case WSAEINVAL:
         return BD_NET_NOT_BOUND;
+    case WSAEWOULDBLOCK:
+        return BD_NET_WOULD_BLOCK;
     case WSAEMSGSIZE:
         return BD_NET_MSG_SIZE;
+    case WSAENETDOWN:
+    case WSAENETUNREACH:
+    case WSAECONNABORTED:
+    case WSAECONNRESET:
+    case WSAETIMEDOUT:
     case WSAEHOSTUNREACH:
         return BD_NET_HOST_UNREACH;
     case WSAENOTCONN:

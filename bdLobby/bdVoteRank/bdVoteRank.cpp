@@ -7,6 +7,10 @@ bdVoteRank::bdVoteRank(bdRemoteTaskManager* remoteTaskManager)
 {
 }
 
+bdVoteRank::~bdVoteRank()
+{
+}
+
 bdRemoteTaskRef bdVoteRank::submitRating(bdRatingInfo* ratings, const bdUInt numRatings)
 {
     bdRemoteTaskRef task;

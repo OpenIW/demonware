@@ -13,7 +13,7 @@ void* bdRemoteTaskManager::operator new(bdUWord nbytes)
 }
 
 bdRemoteTaskManager::bdRemoteTaskManager(bdLobbyConnectionRef lobbyConnection, const bdBool useEncryption)
-    : m_tasks(), m_asyncTasks(4u, 0.75f), m_asyncResults(4u, 0.75f), m_lobbyConnection(*m_lobbyConnection), m_encryptedConnection(useEncryption), m_connectionID(0)
+    : m_tasks(), m_asyncTasks(4u, 0.75f), m_asyncResults(4u, 0.75f), m_lobbyConnection(lobbyConnection), m_encryptedConnection(useEncryption), m_connectionID(0)
 {
 }
 
@@ -42,8 +42,8 @@ bdLobbyErrorCode bdRemoteTaskManager::startLSGTask(bdRemoteTaskRef& newTask, con
 bdLobbyErrorCode bdRemoteTaskManager::sendTask(bdRemoteTaskRef newTask, bdTaskByteBufferRef& queryParams)
 {
     bdBool ok = false;
-    ok = (*queryParams)->writeNoType();
-    ok = ok == m_lobbyConnection->sendTask(bdTaskByteBufferRef(queryParams), (*queryParams)->getDataSize(), m_encryptedConnection);
+    ok = queryParams->writeNoType();
+    ok = ok == m_lobbyConnection->sendTask(bdTaskByteBufferRef(queryParams), queryParams->getDataSize(), m_encryptedConnection);
     if (!ok)
     {
         newTask->setStatus(bdRemoteTask::BD_FAILED);

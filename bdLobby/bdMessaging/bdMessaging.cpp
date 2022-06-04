@@ -17,6 +17,10 @@ bdMessaging::bdMessaging(bdRemoteTaskManager* remoteTaskManager)
 {
 }
 
+bdMessaging::~bdMessaging()
+{
+}
+
 bdRemoteTaskRef bdMessaging::getMailHeaders(bdMailHeader*, const unsigned int, const unsigned int)
 {
     return bdRemoteTaskRef();

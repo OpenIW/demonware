@@ -7,5 +7,6 @@ protected:
     bdRemoteTaskManager* m_remoteTaskManager;
 public:
     bdVoteRank(bdRemoteTaskManager* remoteTaskManager);
+    ~bdVoteRank();
     bdRemoteTaskRef submitRating(bdRatingInfo* ratings, const bdUInt numRatings);
 };
