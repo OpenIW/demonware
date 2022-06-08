@@ -32,7 +32,7 @@ public:
     bdRemoteTaskRef readStatsByRating(const unsigned int, const long long, class bdStatsInfo**, const unsigned int);
     bdRemoteTaskRef readStatsByRating(const unsigned int, const long long, class bdStatsInfo*, const unsigned int);
     bdRemoteTaskRef readStatsByEntityID(const unsigned int, unsigned long long*, const unsigned int, class bdStatsInfo**);
-    bdRemoteTaskRef readStatsByEntityID(const bdUInt leaderBoardID, bdUInt64* entityIDs, const bdUInt numEntityIDs, class bdStatsInfo* stats);
+    bdRemoteTaskRef readStatsByEntityID(const bdUInt leaderBoardID, const bdUInt64* entityIDs, const bdUInt numEntityIDs, class bdStatsInfo* stats);
     bdRemoteTaskRef startArbitratedSession(const class bdSessionID, const class bdSessionNonce*);
     bdRemoteTaskRef writeArbitratedStats(const unsigned int, const class bdSessionID, const class bdSessionNonce*, class bdArbitratedStatsInfo**, const unsigned int);
     bdRemoteTaskRef deleteStats(const unsigned int);

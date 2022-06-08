@@ -29,14 +29,38 @@ void bdRemoteTaskManager::initTaskBuffer(bdTaskByteBufferRef& buffer, const bdUB
 
 bdLobbyErrorCode bdRemoteTaskManager::startTask(bdRemoteTaskRef& newTask, bdTaskByteBufferRef& queryParams)
 {
+
     newTask = new bdRemoteTask();
     return sendTask(bdRemoteTaskRef(newTask), queryParams);
 }
 
 bdLobbyErrorCode bdRemoteTaskManager::startLSGTask(bdRemoteTaskRef& newTask, const bdUByte8 serviceID, const bdUByte8 taskID, const void* const queryParams, const bdUInt queryParamsSize)
 {
-    // TODO for bandwidth test
-    return bdLobbyErrorCode();
+    bdLobbyErrorCode error = BD_SEND_FAILED;
+    newTask = new bdRemoteTask();
+    if (newTask.notNull())
+    {
+        bdTaskByteBufferRef messageBuffer = new bdTaskByteBuffer(queryParamsSize + 2, false);
+        bdBool ok = messageBuffer->writeUByte8(serviceID);
+        ok = ok == messageBuffer->writeUByte8(taskID);
+        ok = ok == messageBuffer->write(queryParams, queryParamsSize);
+        if (ok && m_lobbyConnection.notNull())
+        {
+            ok = m_lobbyConnection->sendTask(bdTaskByteBufferRef(messageBuffer), messageBuffer->getDataSize(), m_encryptedConnection);
+            if (ok)
+            {
+                error = BD_NO_ERROR;
+                m_tasks.addTail(newTask);
+                newTask->start(0.0f);
+            }
+        }
+    }
+
+    if (newTask.notNull() && error)
+    {
+        newTask = BD_NULL;
+    }
+    return error;
 }
 
 bdLobbyErrorCode bdRemoteTaskManager::sendTask(bdRemoteTaskRef newTask, bdTaskByteBufferRef& queryParams)

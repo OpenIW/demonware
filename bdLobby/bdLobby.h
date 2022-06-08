@@ -114,3 +114,7 @@
 #include "bdLobbyEventHandler.h"
 
 #include "bdLobbyService.h"
+
+// LSGServices
+#include "bdLSGServices/bdBandwidthTestResults.h"
+#include "bdLSGServices/bdBandwidthTest.h"

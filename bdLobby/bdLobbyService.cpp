@@ -290,7 +290,7 @@ bdContentStreaming* bdLobbyService::getContentStreaming()
         }
         return m_contentStreamingManager;
     }
-    //bdLogWarn("lobby service", "Not connected.");
+    bdLogWarn("lobby service", "Not connected.");
     return NULL;
 }
 
@@ -313,7 +313,7 @@ bdPooledStorage* bdLobbyService::getPooledStorage()
         }
         return m_pooledStorageManager;
     }
-    //bdLogWarn("lobby service", "Not connected.");
+    bdLogWarn("lobby service", "Not connected.");
     return NULL;
 }
 

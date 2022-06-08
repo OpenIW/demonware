@@ -170,7 +170,7 @@ bdBool bdByteBuffer::expand(bdUInt32 increaseSize)
 
     if (oldReadPtr < oldData || oldWritePtr < oldData)
     {
-        //bdAssert(false, "bdByteBuffer underflow; beginning of data is after read/write pointer positions.");
+        bdAssert(false, "bdByteBuffer underflow; beginning of data is after read/write pointer positions.");
         return false;
     }
 

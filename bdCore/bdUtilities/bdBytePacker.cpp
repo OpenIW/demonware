@@ -8,39 +8,35 @@ bdBool bdBytePacker::appendBuffer(bdUByte8* dest, bdUInt destSize, bdUInt offset
 
     if (dest && src)
     {
+        bdAssert(offset <= destSize, "Offset is past the end of the destination buffer.");
         if (newOffset > destSize)
         {
-            bdLogMessage(BD_LOG_WARNING, "warn/", "byte packer", __FILE__, "bdBytePacker::appendBuffer", __LINE__, "Not enough room left to write %u bytes.", writeSize);
+            bdLogWarn("byte packer", "Not enough room left to write %u bytes.", writeSize);
         }
 
         if (offset <= destSize && newOffset <= destSize)
         {
-            memmove(&dest[offset], src, writeSize);
+            bdMemmove(&dest[offset], src, writeSize);
             return true;
         }
+        return false;
     }
-    return false;
+    return true;
 }
 
 bdBool bdBytePacker::appendEncodedUInt16(bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt16 value)
 {
-    char src;
-
-    if (value <= 127)
+    if (value <= 0x7F)
     {
-        return appendBuffer(buffer, bufferSize, offset, newOffset, (char*)&value, 1);
+        return bdBytePacker::appendBasicType<bdUByte8>(buffer, bufferSize, offset, newOffset, value);
     }
     else
     {
-        src = value | 0x8000;
-        if (appendBuffer(buffer, bufferSize, offset, newOffset, (char*)&src + 3, 1))
-        {
-            if (appendBuffer(buffer, bufferSize, newOffset, newOffset, (char*)&src, 1u))
-            {
-                return true;
-            }
-        }
-        return false;
+        bdAssert(value < 0x8000u, "Integer is too big.");
+        bdUByte8 src = value | 0x8000;
+        bool appended = bdBytePacker::appendBasicType<bdUByte8>(buffer, bufferSize, offset, newOffset, src + 1);
+        appended = appended == bdBytePacker::appendBasicType<bdUByte8>(buffer, bufferSize, newOffset, newOffset, src);
+        return appended;
     }
 }
 
@@ -50,6 +46,7 @@ bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt of
 
     if (dest && src)
     {
+        bdAssert(offset <= srcSize, "Offset is past the end of the source buffer.");
         if (newOffset > srcSize)
         {
             bdLogWarn("byte packer", "Not enough data left to read %u bytes.", readSize);
@@ -57,40 +54,31 @@ bdBool bdBytePacker::removeBuffer(const bdUByte8* src, bdUInt srcSize, bdUInt of
 
         if ((newOffset <= srcSize) && offset <= srcSize)
         {
-            memmove(dest, &src[offset], readSize);
+            bdMemmove(dest, &src[offset], readSize);
             return true;
         }
+        return false;
     }
-    return false;
+    return true;
 }
 
 bdBool bdBytePacker::removeEncodedUInt16(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt16& value)
 {
-    unsigned char firstByte = 0;
+    bdUByte8 firstByte = 0;
 
-    if (!removeBuffer(buffer, bufferSize, offset, newOffset, &firstByte, 1))
-    {
-        value = 0;
-        return false;
-    }
+    bdBool ok = removeBasicType<bdUByte8>(buffer, bufferSize, offset, newOffset, firstByte);
 
     if (firstByte < 0x80)
     {
         value = firstByte;
-        return true;
+        return ok;
     }
 
     firstByte &= ~0x80;
-    if (removeBuffer(buffer, bufferSize, newOffset, newOffset, &firstByte, 1))
-    {
-        value = firstByte + (firstByte << 8);
-        return true;
-    }
-    else
-    {
-        value = (firstByte << 8);
-        return false;
-    }
+    bdUByte8 secondByte = 0;
+    ok = ok == bdBytePacker::removeBasicType<bdUByte8>(buffer, bufferSize, newOffset, newOffset, secondByte);
+    value = secondByte + (firstByte << 8);
+    return ok;
 }
 
 bdBool bdBytePacker::skipBytes(const bdUByte8* buffer, bdUInt bufferSize, bdUInt offset, bdUInt& newOffset, bdUInt bytes)

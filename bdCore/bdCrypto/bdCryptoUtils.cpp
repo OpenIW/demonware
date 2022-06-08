@@ -12,7 +12,7 @@ void bdCryptoUtils::calculateInitialVector(const bdUInt32 seed, bdUByte8* iv)
 
     IVSize = 24;
     tmp = 0;
-    appended = bdBytePacker::appendBasicType<bdUInt32>(reinterpret_cast<void*>(seedBuffer), 4u, 0, tmp, seed);
+    appended = bdBytePacker::appendBasicType<bdUInt32>(seedBuffer, 4u, 0, tmp, seed);
     bdAssert(appended, "Failed to serialize ivseed");
     success = tigerHash.hash(seedBuffer, 4u, iv, IVSize);
     bdAssert(success, "Hash function failed.");

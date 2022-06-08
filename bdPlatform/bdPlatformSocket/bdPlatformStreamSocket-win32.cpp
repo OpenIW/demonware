@@ -215,6 +215,7 @@ bdInt bdPlatformStreamSocket::receive(bdInt handle, void* const data, bdUInt len
     case WSAECONNRESET:
     case WSAETIMEDOUT:
     case WSAEHOSTUNREACH:
+        bdLogError("socket", "WSAError: %i", WSAGetLastError());
         return BD_NET_HOST_UNREACH;
     case WSAENOTCONN:
         return checkSocketException(handle) ? BD_NET_CONNECTION_RESET : BD_NET_NOT_CONNECTED;

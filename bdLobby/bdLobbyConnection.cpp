@@ -121,7 +121,7 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
     bdHMacSHA1 hmac(m_sessionKey, sizeof(m_sessionKey));
     bdUInt signatureSize = 4;
     bdByte8 blockSize = 8;
-    bdUInt cypherSize = ~(blockSize - 1) & (blockSize - 1 + messageSize + 4);
+    bdUInt cypherSize = (messageSize + 11) & -8u; //~(blockSize - 1) & (blockSize - 1 + messageSize + 4);
     bdAssert((signatureSize + message->getSize() + message->getPaddingSize()) >= cypherSize, "bdTaskBuffer allocation too small");
     bdUInt32 sizePrefix = cypherSize + 5;
     message->setHeaderSize(13u);
@@ -258,7 +258,7 @@ bdBool bdLobbyConnection::getMessageToDispatch(bdUByte8& type, bdBitBufferRef& p
 
 void bdLobbyConnection::setSessionKey(const bdUByte8* const sesssionKey)
 {
-    bdMemcpy(m_sessionKey, m_sessionKey, sizeof(m_sessionKey));
+    bdMemcpy(m_sessionKey, sesssionKey, sizeof(m_sessionKey));
     m_cypher.init(m_sessionKey, sizeof(m_sessionKey));
 }
 

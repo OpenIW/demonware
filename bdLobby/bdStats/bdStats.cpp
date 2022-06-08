@@ -100,7 +100,7 @@ bdRemoteTaskRef bdStats::readStatsByPivot(const bdUInt leaderBoardID, const bdUI
     return task;
 }
 
-bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, bdUInt64* entityIDs, const bdUInt numEntityIDs, bdStatsInfo* stats)
+bdRemoteTaskRef bdStats::readStatsByEntityID(const bdUInt leaderBoardID, const bdUInt64* entityIDs, const bdUInt numEntityIDs, bdStatsInfo* stats)
 {
     bdRemoteTaskRef task;
     bdUInt taskSize = 9 * numEntityIDs + 69;
