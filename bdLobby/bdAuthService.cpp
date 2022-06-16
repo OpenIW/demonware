@@ -212,8 +212,8 @@ bdBitBufferRef bdAuthService::makeCreateAccount(const bdUInt titleID, const bdNC
     bdNChar8 licenseKey[24];
     bdUByte8 iv[24];
 
-    bdUByte8 src = 0;
-    bdBitBufferRef buffer(new bdBitBuffer(&src, 8, true));
+    bdUByte8 type = 0;
+    bdBitBufferRef buffer(new bdBitBuffer(&type, 8, true));
     buffer->setTypeCheck(false);
     buffer->writeBool(true);
     buffer->setTypeCheck(true);
@@ -256,8 +256,8 @@ bdBitBufferRef bdAuthService::makeGetUsernamesForLicense(const bdUInt titleID, c
     bdUByte8 iv[24];
     bdUByte8 licenseBuffer[8];
 
-    bdUByte8 src = 20;
-    bdBitBufferRef buffer(new bdBitBuffer(&src, 8, true));
+    bdUByte8 type = 20;
+    bdBitBufferRef buffer(new bdBitBuffer(&type, 8, true));
     buffer->setTypeCheck(false);
     buffer->writeBool(true);
     buffer->setTypeCheck(true);
@@ -280,8 +280,8 @@ bdBitBufferRef bdAuthService::makeAuthAccountForService(const bdUInt titleID, co
     bdUByte8 iv[24];
     bdUByte8 licenseBuffer[8];
 
-    bdUByte8 src = 10;
-    bdBitBufferRef buffer(new bdBitBuffer(&src, 8, true));
+    bdUByte8 type = 10;
+    bdBitBufferRef buffer(new bdBitBuffer(&type, 8, true));
     buffer->setTypeCheck(false);
     buffer->writeBool(true);
     buffer->setTypeCheck(true);
@@ -304,8 +304,8 @@ bdBitBufferRef bdAuthService::makeAuthHostForService(const bdUInt titleID, const
     bdUByte8 iv[24];
     bdUByte8 licenseBuffer[8];
 
-    bdUByte8 src = 12;
-    bdBitBufferRef buffer(new bdBitBuffer(&src, 8, true));
+    bdUByte8 type = 12;
+    bdBitBufferRef buffer(new bdBitBuffer(&type, 8, true));
     buffer->setTypeCheck(false);
     buffer->writeBool(true);
     buffer->setTypeCheck(true);
@@ -588,9 +588,19 @@ bdBitBufferRef bdAuthService::makeAuthForSteam(const bdUInt titleID, const bdNCh
     buffer->writeBool(true);
     buffer->setTypeCheck(true);
 
-    buffer->writeUInt32(bdCryptoUtils::getNewIVSeed());
-    buffer->writeUInt32(titleID);
-    buffer->writeUInt32(ticketSize);
+    bdUInt newSeed = bdCryptoUtils::getNewIVSeed();
+    buffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+    buffer->writeBits(&newSeed, 32);
+    //buffer->writeUInt32(bdCryptoUtils::getNewIVSeed());
+
+    buffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+    buffer->writeBits(&titleID, 32);
+    //buffer->writeUInt32(titleID);
+
+    buffer->writeDataType(BD_BB_UNSIGNED_INTEGER32_TYPE);
+    buffer->writeBits(&ticketSize, 32);
+    //buffer->writeUInt32(ticketSize);
+
     buffer->writeBits(ticket, CHAR_BIT * ticketSize);
     return buffer;
 }
@@ -603,19 +613,18 @@ bdBool bdAuthService::handleSteamReply(bdBitBufferRef buffer)
     bdUInt ivseed;
     bdBool ok = buffer->readUInt32(ivseed);
     bdCryptoUtils::calculateInitialVector(ivseed, iv);
-    ok = ok == buffer->readBits(recvdAuthTicket, sizeof(recvdAuthTicket) * CHAR_BIT);
+    ok = ok == buffer->readBits(recvdAuthTicket, 0x400);
     bdCryptoUtils::decrypt(m_steamCookieKey, iv, recvdAuthTicket, recvdAuthTicket, sizeof(recvdAuthTicket));
 
-    bdAuthTicket authTicket;
     if (ok)
     {
-        authTicket.deserialize(recvdAuthTicket);
+        m_authTicket.deserialize(recvdAuthTicket);
     }
-    ok = ok == buffer->readBits(m_authInfo.m_data, sizeof(m_authInfo.m_data) * CHAR_BIT);
-    if (ok && authTicket.m_magicNumber == BD_MAGIC_NUMBER)
+    ok = ok == buffer->readBits(m_authInfo.m_data, 0x400);
+    if (ok && m_authTicket.m_magicNumber == BD_MAGIC_NUMBER)
     {
-        bdMemcpy(m_authInfo.m_sessionKey, authTicket.m_sessionKey, sizeof(m_authInfo.m_sessionKey));
-        m_authInfo.m_titleID = authTicket.m_titleID;
+        bdMemcpy(m_authInfo.m_sessionKey, m_authTicket.m_sessionKey, sizeof(m_authInfo.m_sessionKey));
+        m_authInfo.m_titleID = m_authTicket.m_titleID;
         m_authInfo.m_IVSeed = ivseed;
     }
     return ok;

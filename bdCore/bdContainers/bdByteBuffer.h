@@ -34,7 +34,7 @@ public:
     const bdUInt getMaxReadSize() const;
 
     void setTypeCheck(const bdBool flag);
-    void allocateBuffer();
+    virtual void allocateBuffer();
     bdBitBufferDataType inspectDataType();
     void resizeToFit(bdUInt32 newDataSize);
     bdBool expand(bdUInt32 increaseSize);

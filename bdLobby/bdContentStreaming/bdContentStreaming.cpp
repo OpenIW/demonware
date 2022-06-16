@@ -22,7 +22,7 @@ bdContentStreaming::~bdContentStreaming()
 }
 
 bdRemoteTaskRef bdContentStreaming::upload(const bdUInt16 fileSlot, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category,
-    void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID)
+    const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID)
 {
     if (!initUpload(fileSlot, NULL, uploadHandler, fileSize, fileName, category, thumbData, thumbDataSize, numTags, tags, fileID, 0, false))
     {
@@ -40,7 +40,7 @@ bdRemoteTaskRef bdContentStreaming::upload(const bdUInt16 fileSlot, bdUploadInte
 }
 
 bdRemoteTaskRef bdContentStreaming::upload(const bdUInt16 fileSlot, void* fileData, const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category,
-    void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID)
+    const void* thumbData, const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID)
 {
     if (!initUpload(fileSlot, fileData, NULL, fileSize, fileName, category, thumbData, thumbDataSize, numTags, tags, fileID, 0, false))
     {
@@ -189,7 +189,8 @@ bdRemoteTaskRef bdContentStreaming::getFileMetaDataByID(const bdUInt numFileIDs,
     return task;
 }
 
-bdRemoteTaskRef bdContentStreaming::uploadUserSummaryMetaData(bdUInt64 fileID, void* summaryData, bdUInt summaryDataSize, void* metaData, bdUInt metaDataSize, bdUInt numTags, bdTag* tags)
+bdRemoteTaskRef bdContentStreaming::uploadUserSummaryMetaData(bdUInt64 fileID, const void* summaryData, bdUInt summaryDataSize, const void* metaData, bdUInt metaDataSize,
+    bdUInt numTags, bdTag* tags)
 {
     if (!initUpload(0, summaryData, NULL, summaryDataSize, NULL, 0, metaData, metaDataSize, numTags, tags, NULL, 0, false))
     {

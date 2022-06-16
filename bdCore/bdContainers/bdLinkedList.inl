@@ -112,6 +112,7 @@ inline void bdLinkedList<T>::insertAfter(const Position position, const T& value
         {
             m_head = node;
         }
+        m_tail = node;
     }
     ++m_size;
 }
@@ -146,7 +147,7 @@ inline void bdLinkedList<T>::removeAt(Position& position)
         }
         else
         {
-            node->m_next = node->m_prev;
+            node->m_next->m_prev = node->m_prev;
         }
 
         if (node)

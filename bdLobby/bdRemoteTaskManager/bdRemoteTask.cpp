@@ -12,14 +12,14 @@ void* bdRemoteTask::operator new(bdUWord nbytes)
 }
 
 bdRemoteTask::bdRemoteTask()
-    : bdReferencable(), m_timer(), m_timeout(0.0f), m_status(BD_EMPTY), m_byteResults((bdByteBuffer*)NULL), m_taskResult(NULL), m_taskResultList(NULL), m_numResults(0),
+    : bdReferencable(), m_timer(), m_timeout(0.0f), m_status(BD_EMPTY), m_byteResults(NULL), m_taskResult(NULL), m_taskResultList(NULL), m_numResults(0),
     m_maxNumResults(0), m_totalNumResults(0), m_transactionID(0), m_errorCode(BD_NO_ERROR), m_taskResultProcessor(NULL)
 {
     m_timer.reset();
 }
 
 bdRemoteTask::bdRemoteTask(bdRemoteTask::bdStatus status)
-    : bdReferencable(), m_timer(), m_timeout(0.0f), m_status(status), m_byteResults((bdByteBuffer*)NULL), m_taskResult(NULL), m_taskResultList(NULL), m_numResults(0),
+    : bdReferencable(), m_timer(), m_timeout(0.0f), m_status(status), m_byteResults(NULL), m_taskResult(NULL), m_taskResultList(NULL), m_numResults(0),
     m_maxNumResults(0), m_totalNumResults(0), m_transactionID(0), m_errorCode(BD_NO_ERROR), m_taskResultProcessor(NULL)
 {
 }
@@ -111,12 +111,7 @@ void bdRemoteTask::handleAsyncTaskReply(bdByteBufferRef buffer)
 bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
 {
     bdBool ok = true;
-    bdUByte8 taskResponseType = 0;
 
-    if (buffer->inspectDataType() == BD_BB_UNSIGNED_CHAR8_TYPE)
-    {
-        ok = buffer->readUByte8(taskResponseType);
-    }
     ok = ok == buffer->readUInt32(m_numResults);
     if (ok)
     {

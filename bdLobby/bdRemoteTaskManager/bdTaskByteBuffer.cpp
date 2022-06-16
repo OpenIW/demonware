@@ -73,7 +73,7 @@ bdUInt bdTaskByteBuffer::getHeaderSize() const
 
 void bdTaskByteBuffer::setHeaderSize(bdUInt size)
 {
-    m_validHeaderSize = size;
+    m_validHeaderSize = size >= 14 ? 14 : size;
 }
 
 bdUByte8* bdTaskByteBuffer::getHeaderStart() const

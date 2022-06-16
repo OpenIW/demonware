@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-class bdVoteRankStatsInfo : bdStatsInfo
+class bdVoteRankStatsInfo : public bdStatsInfo
 {
 public:
     bdUInt64 m_fileOwnerID;

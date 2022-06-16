@@ -32,7 +32,7 @@ bdBool bdLobbyService::connect(bdAddr lobbyServiceAddr, const bdAuthInfo* authIn
         bdLogError("lobby service", "No authentication info specified");
         return false;
     }
-    if (*m_lobbyConnection)
+    if (m_lobbyConnection.notNull())
     {
         m_lobbyConnection->disconnect();
         cleanup();
@@ -407,14 +407,19 @@ bdUInt bdLobbyService::getTitleID()
 void bdLobbyService::onConnect(bdLobbyConnectionRef connection)
 {
     bdByteBufferRef byteBuffer(new bdByteBuffer(8, false));
+
     byteBuffer->writeUInt32(200);
     byteBuffer->writeUInt32(connection->getReceiveBufferSize());
     connection->sendRaw(byteBuffer, 8);
-    bdBitBufferRef bitBuffer(new bdBitBuffer(8, true));
+
+    bdUByte8 type = 7;
+    bdBitBufferRef bitBuffer(new bdBitBuffer(&type, 8, true));
     bitBuffer->setTypeCheck(false);
     bitBuffer->writeBool(true);
     bitBuffer->setTypeCheck(true);
+
     bitBuffer->writeUInt32(m_authInfo.m_titleID);
+
     if (m_encryptedConnection)
     {
         bitBuffer->writeUInt32(m_authInfo.m_IVSeed);
@@ -423,7 +428,7 @@ void bdLobbyService::onConnect(bdLobbyConnectionRef connection)
     {
         bitBuffer->writeUInt32(0);
     }
-    bitBuffer->writeBits(m_authInfo.m_data, sizeof(m_authInfo.m_data) * CHAR_BIT);
+    bitBuffer->writeBits(m_authInfo.m_data, 1024);
     connection->send(bitBuffer->getData(), bitBuffer->getDataSize(), false);
     connection->setSessionKey(m_authInfo.m_sessionKey);
     m_taskManager = new bdRemoteTaskManager(connection, m_encryptedConnection);

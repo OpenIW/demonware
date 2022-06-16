@@ -7,9 +7,9 @@ public:
     void* operator new(bdUWord nbytes);
     bdContentStreaming(bdRemoteTaskManager* const remoteTaskManager);
     ~bdContentStreaming();
-    bdRemoteTaskRef upload(const bdUInt16 fileSlot, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category, void* thumbData,
+    bdRemoteTaskRef upload(const bdUInt16 fileSlot, bdUploadInterceptor* uploadHandler, const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category, const void* thumbData,
         const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID);
-    bdRemoteTaskRef upload(const bdUInt16 fileSlot, void* fileData , const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category, void* thumbData,
+    bdRemoteTaskRef upload(const bdUInt16 fileSlot, void* fileData , const bdUInt fileSize, const bdNChar8* fileName, const bdUInt16 category, const void* thumbData,
         const bdUInt thumbDataSize, const bdUInt numTags, bdTag* tags, bdFileID* fileID);
     bdRemoteTaskRef copyFromPooledStorage(bdUInt64 pooledFileID, const bdUInt16 fileSlot, bdNChar8* fileName, const bdUInt16 category, void* metaData, bdUInt metaDataSize,
         bdUInt numTags, bdTag* tags, bdFileID* fileID);
@@ -25,7 +25,7 @@ public:
     bdRemoteTaskRef downloadApplePurchasedFile(const bdUInt64, void*, const bdUInt, void*, const bdUInt, bdFileMetaData*, bdUInt, bdUInt);
     bdRemoteTaskRef removeFile(const bdUInt16 fileSlot);
     bdRemoteTaskRef getFileMetaDataByID(const bdUInt numFileIDs, bdUInt64* fileIDs, bdFileMetaData* fileDescriptor);
-    bdRemoteTaskRef uploadUserSummaryMetaData(bdUInt64 fileID, void* summaryData, bdUInt summaryDataSize, void* metaData, bdUInt metaDataSize, bdUInt numTags, bdTag* tags);
+    bdRemoteTaskRef uploadUserSummaryMetaData(bdUInt64 fileID, const void* summaryData, bdUInt summaryDataSize, const void* metaData, bdUInt metaDataSize, bdUInt numTags, bdTag* tags);
     bdRemoteTaskRef downloadUserSummary(bdUInt64 fileID, void* summaryData, bdUInt summaryDataSize, bdUInt startByte, bdUInt endByte);
     bdRemoteTaskRef listAllPublisherFiles(const bdUInt, const bdUInt16, bdFileMetaData*, const bdUInt16, const bdUInt16, bdNChar8*);
     bdRemoteTaskRef listFilesByOwner(const bdUInt64 ownerID, const bdUInt startDate, const bdUInt16 category, bdFileMetaData* fileDescriptors,

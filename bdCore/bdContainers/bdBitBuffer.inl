@@ -742,7 +742,7 @@ inline bdUByte8* bdBitBuffer::getData()
 inline void bdBitBuffer::typeToString(const bdBitBufferDataType type, bdNChar8* const strBuffer, const bdUWord strLength)
 {
     bdBitBufferDataType newType;
-    const char* dataTypeDescs[] = { "NoType", "Bool", "Char8", "UChar8", "WChar16", "Int16", "UInt16", 
+    char* dataTypeDescs[28] = { "NoType", "Bool", "Char8", "UChar8", "WChar16", "Int16", "UInt16", 
         "Int32", "UInt32", "RangedInt32", "RangeUInt32", "Float32", "Float64", "RangeFloat32", "String", "String",
         "MultiByteString", "Blob", "NaN", "FullType", "Unknown Type"};
 

@@ -18,7 +18,6 @@ public:
     void initTaskBuffer(bdTaskByteBufferRef& buffer, const bdUByte8 serviceID, const bdUByte8 taskID);
     bdLobbyErrorCode startTask(bdRemoteTaskRef& newTask, bdTaskByteBufferRef& queryParams);
     bdLobbyErrorCode startLSGTask(bdRemoteTaskRef& newTask, const bdUByte8 serviceID, const bdUByte8 taskID, const void* const queryParams, const bdUInt queryParamsSize);
-    bdLobbyErrorCode sendTask(bdRemoteTaskRef newTask, bdTaskByteBufferRef& queryParams);
     bdUInt64 getConnectionID() const;
     void setConnectionID(bdUInt64 connectionID);
     void handleTaskReply(const bdByteBufferRef buffer);

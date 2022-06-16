@@ -53,12 +53,12 @@ bdByteBuffer::~bdByteBuffer()
 
 const bdUInt bdByteBuffer::getDataSize() const
 {
-    return (bdInt32)m_writePtr - (bdInt32)m_data;
+    return m_writePtr - m_data;
 }
 
 const bdUInt bdByteBuffer::getReadSize() const
 {
-    return (bdInt32)m_readPtr - (bdInt32)m_data;
+    return m_readPtr - m_data;
 }
 
 bdBool bdByteBuffer::getStringLength(bdUInt& length)
@@ -595,7 +595,7 @@ bdBool bdByteBuffer::writeDataType(const bdBitBufferDataType dataType)
 
     if (m_typeChecked)
     {
-        ok = write(&dataType8, sizeof(dataType8));
+        ok = write(&dataType8, 1);
     }
     return ok;
 }
@@ -798,5 +798,6 @@ bdBool bdByteBuffer::writeNoType()
     {
         return writeDataType(BD_BB_NO_TYPE);
     }
+    bdLogError("core/bytebuffer", "No type cannot be written to not type checked byte buffers");
     return ok;
 }

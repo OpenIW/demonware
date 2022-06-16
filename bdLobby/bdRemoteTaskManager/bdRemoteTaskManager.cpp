@@ -29,9 +29,26 @@ void bdRemoteTaskManager::initTaskBuffer(bdTaskByteBufferRef& buffer, const bdUB
 
 bdLobbyErrorCode bdRemoteTaskManager::startTask(bdRemoteTaskRef& newTask, bdTaskByteBufferRef& queryParams)
 {
-
+    bdLobbyErrorCode error = BD_SEND_FAILED;
     newTask = new bdRemoteTask();
-    return sendTask(bdRemoteTaskRef(newTask), queryParams);
+    bdBool ok = queryParams->writeNoType();
+    if (ok)
+    {
+        ok = m_lobbyConnection->sendTask(bdTaskByteBufferRef(queryParams), queryParams->getDataSize(), m_encryptedConnection);
+        if (ok)
+        {
+            error = BD_NO_ERROR;
+            m_tasks.addTail(newTask);
+            newTask->start(0.0f);
+        }
+    }
+
+    if (error)
+    {
+        newTask->setStatus(bdRemoteTask::BD_FAILED);
+        newTask->setErrorCode(BD_SEND_FAILED);
+    }
+    return error;
 }
 
 bdLobbyErrorCode bdRemoteTaskManager::startLSGTask(bdRemoteTaskRef& newTask, const bdUByte8 serviceID, const bdUByte8 taskID, const void* const queryParams, const bdUInt queryParamsSize)
@@ -63,22 +80,6 @@ bdLobbyErrorCode bdRemoteTaskManager::startLSGTask(bdRemoteTaskRef& newTask, con
     return error;
 }
 
-bdLobbyErrorCode bdRemoteTaskManager::sendTask(bdRemoteTaskRef newTask, bdTaskByteBufferRef& queryParams)
-{
-    bdBool ok = false;
-    ok = queryParams->writeNoType();
-    ok = ok == m_lobbyConnection->sendTask(bdTaskByteBufferRef(queryParams), queryParams->getDataSize(), m_encryptedConnection);
-    if (!ok)
-    {
-        newTask->setStatus(bdRemoteTask::BD_FAILED);
-        newTask->setErrorCode(BD_SEND_FAILED);
-        return BD_SEND_FAILED;
-    }
-    m_tasks.addTail(newTask);
-    newTask->start(0.0f);
-    return BD_NO_ERROR;
-}
-
 bdUInt64 bdRemoteTaskManager::getConnectionID() const
 {
     return m_connectionID;
@@ -95,7 +96,7 @@ void bdRemoteTaskManager::handleTaskReply(bdByteBufferRef buffer)
     if (task.notNull() && task->getStatus() == bdRemoteTask::BD_PENDING)
     {
         bdUInt64 transactionID = 0;
-        if ( buffer->readUInt64(transactionID) )
+        if ( buffer->read<bdUInt64>(transactionID) )
         {
             task->stop(bdByteBufferRef(buffer), transactionID);
             bdLogInfo("lobby/remotetaskmanager", "Received reply on\nconnection ID : %llu\ntransaction ID: %llu", m_connectionID, transactionID);
@@ -110,8 +111,8 @@ void bdRemoteTaskManager::handleTaskReply(bdByteBufferRef buffer)
 
 void bdRemoteTaskManager::handleLSGTaskReply(const bdByteBufferRef buffer)
 {
-    bdRemoteTaskRef task(!m_tasks.isEmpty() ? m_tasks.getHead() : (bdRemoteTask*)NULL);
-    bdRemoteTaskRef test(m_tasks.getHead());
+    bdRemoteTaskRef task(m_tasks.isEmpty() ? NULL : m_tasks.getHead());
+
     if (task.notNull() && task->getStatus() == bdRemoteTask::BD_PENDING)
     {
         task->handleTaskReply(bdByteBufferRef(buffer));

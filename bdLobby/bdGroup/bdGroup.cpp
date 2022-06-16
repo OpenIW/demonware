@@ -61,7 +61,7 @@ bdRemoteTaskRef bdGroup::getEntityGroups(const bdUInt64 entityID, bdGroupID* res
 
 bdRemoteTaskRef bdGroup::getGroupCounts(const bdUInt32* const groupIDs, const bdUInt numGroupIDs, bdGroupCount* results, const bdUInt numEntries)
 {
-    bdUInt taskSize = 4 * numGroupIDs;
+    bdUInt taskSize = (sizeof(bdUInt) * numGroupIDs) + 75;
     bdTaskByteBufferRef buffer(new bdTaskByteBuffer(taskSize, true));
     bdRemoteTaskRef task;
 

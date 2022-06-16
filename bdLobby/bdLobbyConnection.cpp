@@ -87,6 +87,7 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
 {
     bdUByte8 initialVector[24];
     bdUByte8 signature[4];
+    unsigned __int8 v37[2]; // tmp for debugging
     bdUByte8* writePtr;
 
     if (messageSize > m_maxSendMessageSize)
@@ -120,37 +121,49 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
     }
     bdHMacSHA1 hmac(m_sessionKey, sizeof(m_sessionKey));
     bdUInt signatureSize = 4;
-    bdByte8 blockSize = 8;
-    bdUInt cypherSize = (messageSize + 11) & -8u; //~(blockSize - 1) & (blockSize - 1 + messageSize + 4);
+    bdUInt cypherSize = (messageSize + 11) & -8;
     bdAssert((signatureSize + message->getSize() + message->getPaddingSize()) >= cypherSize, "bdTaskBuffer allocation too small");
     bdUInt32 sizePrefix = cypherSize + 5;
-    message->setHeaderSize(13u);
+
+    message->setHeaderSize(13);
     if (message->getHeaderSize() != 13)
     {
         bdAssert(false, "Memory size for encrypted header invalid");
         return false;
     }
+
+    // Set our IV to 0, then calculate our IV with the seed of messageCount
     bdMemset(initialVector, 0, sizeof(initialVector));
     bdCryptoUtils::calculateInitialVector(m_messageCount, initialVector);
+
+    // Start writing our header by getting the start of it.
     writePtr = message->getHeaderStart();
     bdUInt offset = 0;
 
+    // Write sizePrefix, isEncrypted and messageCount to  the header
     bdBool ok = bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, 0, offset, sizePrefix);
     ok = ok == bdBytePacker::appendBasicType<bdBool>(writePtr, 13, offset, offset, isEncrypted);
     ok = ok == bdBytePacker::appendBasicType<bdUInt>(writePtr, 13, offset, offset, m_messageCount);
     bdAssert(message->getData() == (writePtr + offset + signatureSize), "Remote task serialization error");
+
+    // Move our write pointer to the end of the header and reset the offset to zero
     writePtr += offset;
     offset = 0;
+
+    // Write our empty signature at the beginning of the body
     ok = ok == bdBytePacker::appendBuffer(writePtr, cypherSize, offset, offset, signature, signatureSize);
     bdUInt payloadOffset = offset + 1;
     offset += messageSize;
     bdUInt padding = cypherSize - (messageSize + signatureSize);
+
     for (bdUInt i = 0; i < padding; ++i)
     {
-        bdByte8 cnt = m_messageCount;
-        bdBytePacker::appendBasicType<bdByte8>(writePtr, cypherSize, offset, offset, cnt);
+        //bdByte8 cnt = m_messageCount;
+        //bdBytePacker::appendBasicType<bdByte8>(writePtr, cypherSize, offset, offset, cnt);
+        v37[0] = m_messageCount;
+        v37[1] = bdBytePacker::appendBuffer(writePtr, cypherSize, offset, offset, v37, 1u);
     }
-    hmac.process(&writePtr[payloadOffset], padding + messageSize - 1);
+    hmac.process(&writePtr[payloadOffset], messageSize + padding - 1);
     hmac.getData(signature, signatureSize);
     bdBytePacker::appendBuffer(writePtr, cypherSize, 0, offset, signature, signatureSize);
     ok = ok == m_cypher.encrypt(initialVector, writePtr, writePtr, cypherSize);
@@ -158,7 +171,7 @@ bdBool bdLobbyConnection::sendTask(bdTaskByteBufferRef message, bdUInt messageSi
     ++m_messageCount;
     if (ok)
     {
-        bdPendingBufferTransfer tx(message, sizePrefix + 4);
+        bdPendingBufferTransfer tx(bdTaskByteBufferRef(message), sizePrefix + 4);
         m_outgoingBuffers.enqueue(tx);
     }
     pump();
@@ -445,8 +458,8 @@ bdBool bdLobbyConnection::recvMessageData()
         m_recvCount = 0;
         m_recvEncryptType = 0;
         m_messageSize = 0;
-        m_recvMessage = (bdTaskByteBuffer*)NULL;
-        m_recvTransfer = (bdPendingBufferTransfer*)NULL;
+        m_recvMessage = NULL;
+        m_recvTransfer = NULL;
         m_recvState = BD_READ_SIZE;
         oldState = BD_READ_INIT;
         status = recvMessageSize();

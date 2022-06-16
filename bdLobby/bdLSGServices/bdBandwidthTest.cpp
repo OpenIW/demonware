@@ -130,7 +130,7 @@ bdBandwidthTestStatus bdBandwidthTestClient::getStatus()
 
 void bdBandwidthTestClient::pump()
 {
-    if (m_initStatus != BD_BANDWIDTH_TEST_UNINITIALIZED)
+    if (m_initStatus != BD_BANDWIDTH_TEST_INITIALIZED)
     {
         bdLogWarn("bdBandwidthTestClient", "Pumping uninitialized bdBandwidthTestClient");
     }
@@ -221,7 +221,7 @@ void bdBandwidthTestClient::handleRequestReply(const bdByteBufferRef replyBuffer
     m_error = BD_HANDLE_TASK_FAILED;
     if (replyBuffer.notNull())
     {
-        bdUByte8 testRejected = 1;
+        bdUByte8 testRejected = 0;
         bdBool ok = replyBuffer->read<bdUByte8>(testRejected);
         if (ok && testRejected == 1)
         {

@@ -15,7 +15,6 @@ bdInt bdPlatformStreamSocket::create(bdBool blocking)
     {
         return SOCKET_ERROR;
     }
-    bdLogInfo("socket", "Stream socket created! Socket: %i", s);
     return s;
 }
 
@@ -56,7 +55,6 @@ bool bdPlatformStreamSocket::close(bdInt handle)
     {
         return true;
     }
-    bdLogInfo("socket", "Closing stream socket: %i", handle);
     switch (closesocket(handle))
     {
     case 0:
@@ -158,9 +156,7 @@ bdInt bdPlatformStreamSocket::send(bdInt handle, const void* const data, bdUInt 
         return BD_NET_INVALID_HANDLE;
     }
 
-    bdLogInfo("socket", "Sending thorugh socket: %i", handle);
     bdInt sent = ::send(handle, reinterpret_cast<const char*>(data), length, 0);
-    bdLogInfo("socket", "Sent %i bytes", sent);
     if (sent >= 0)
     {
         m_totalBytesSent += sent;

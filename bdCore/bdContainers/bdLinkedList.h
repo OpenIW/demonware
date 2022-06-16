@@ -23,7 +23,7 @@ public:
         {
             return bdMemory::allocate(nBytes);
         }
-        Node(const T& data) : m_data(T(data))
+        Node(const T& data) : m_data(data)
         {
         }
         ~Node()

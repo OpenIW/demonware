@@ -15,7 +15,7 @@ public:
     bdTaskByteBuffer(const bdUByte8* bytes, const bdUInt size, bdBool isTypeChecked);
     virtual ~bdTaskByteBuffer();
     void setupTaskData(bdUInt size);
-    void allocateBuffer();
+    virtual void allocateBuffer();
     bdUInt getHeaderSize() const;
     void setHeaderSize(bdUInt size);
     bdUByte8* getHeaderStart() const;
