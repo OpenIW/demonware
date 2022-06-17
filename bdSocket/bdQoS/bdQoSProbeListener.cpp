@@ -6,11 +6,11 @@ bdQoSProbeListener::~bdQoSProbeListener()
 {
 }
 
-void bdQoSProbeListener::onQoSProbeSuccess(const bdQoSProbeInfo&)
+void bdQoSProbeListener::onQoSProbeSuccess(bdQoSProbeInfo& info)
 {
 }
 
-void bdQoSProbeListener::onQoSProbeFailed(bdCommonAddrRef)
+void bdQoSProbeListener::onQoSProbeFailed(bdCommonAddrRef addr)
 {
 }
 
