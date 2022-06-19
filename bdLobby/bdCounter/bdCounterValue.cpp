@@ -2,6 +2,11 @@
 
 #include "bdLobby/bdLobby.h"
 
+bdCounterValue::bdCounterValue()
+    : bdTaskResult(), m_counterID(0), m_counterValue(0)
+{
+}
+
 bdUInt bdCounterValue::sizeOf()
 {
     return sizeof(bdCounterValue);

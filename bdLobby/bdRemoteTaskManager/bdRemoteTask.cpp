@@ -123,10 +123,12 @@ bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
                 if (m_taskResult)
                 {
                     bdUInt taskResultSize = m_taskResult->sizeOf();
-                    bdUInt numResultsToRead = 0;
-                    for (bdUInt i = 0; i < (m_numResults >= m_maxNumResults ? m_maxNumResults : m_numResults); ++i)
+                    bdUInt numResultsToRead = m_numResults >= m_maxNumResults ? m_maxNumResults : m_numResults;
+                    bdTaskResult* taskResult = m_taskResult;
+                    for (bdUInt i = 0; i < numResultsToRead; ++i)
                     {
-                        m_taskResult[i].deserialize(bdByteBufferRef(buffer));
+                        taskResult->deserialize(bdByteBufferRef(buffer));
+                        taskResult = (bdTaskResult*)((char*)taskResult + taskResultSize); // Temp bug fix?
                     }
                     if (m_taskResultProcessor)
                     {
@@ -196,13 +198,13 @@ void bdRemoteTask::setTimeout(const bdFloat32 timeout)
 void bdRemoteTask::setTaskResult(bdTaskResult* result, const bdUInt numResults)
 {
     m_taskResult = result;
-    m_numResults = numResults;
+    m_maxNumResults = numResults;
 }
 
 void bdRemoteTask::setTaskResultList(bdTaskResult** result, const bdUInt numResults)
 {
     m_taskResultList = result;
-    m_numResults = numResults;
+    m_maxNumResults = numResults;
 }
 
 void bdRemoteTask::setTaskResultProcessor(bdTaskResultProcessor* processor)
