@@ -115,6 +115,7 @@ PUBLIC
 
 target_compile_definitions(libtomcrypt
 PRIVATE
+  LTM_DESC LTC_SOURCE USE_LTM
   "_CRT_SECURE_NO_WARNINGS"
 )
 
@@ -124,7 +125,6 @@ PUBLIC
 )
 
 # add_compile_definitions(LTM_DESC LTC_SOURCE USE_LTM)
-
 
 
 # target_include_directories(${PROJECT_NAME} PUBLIC src/headers)

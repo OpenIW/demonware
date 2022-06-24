@@ -12,8 +12,6 @@ PUBLIC
 )
 
 target_compile_definitions(demonware
-PUBLIC
-  LTM_DESC LTC_SOURCE USE_LTM
 PRIVATE
   "_CRT_SECURE_NO_WARNINGS"
 )
