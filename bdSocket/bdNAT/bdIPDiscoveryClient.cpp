@@ -58,14 +58,10 @@ void bdIPDiscoveryClient::pump(bdAddr fromAddr, bdUByte8* data, bdUInt dataSize)
     bdNChar8 protectedAddrBuffer[100];
     bdNChar8 publicAddrBuffer[100];
 
-    if (m_status != BD_IP_DISC_RUNNING)
-    {
-        return;
-    }
-    if (dataSize > 0)
+    if (m_status == BD_IP_DISC_RUNNING && dataSize > 0)
     {
         bdIPDiscoveryPacketReply packet;
-        if (&fromAddr == &m_serverAddr && packet.deserialize(data, dataSize, 0, tmpUInt))
+        if (fromAddr == m_serverAddr && packet.deserialize(data, dataSize, 0, tmpUInt))
         {
             bdMemcpy(&m_publicAddr, &packet.getAddr(), sizeof(m_publicAddr));
             m_status = BD_IP_DISC_SUCCESS;

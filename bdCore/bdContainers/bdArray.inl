@@ -20,8 +20,8 @@ inline bdArray<T>::bdArray(const bdUInt capacity)
 template<typename T>
 inline bdArray<T>::bdArray(const bdArray<T>& a)
 {
-    m_capacity = a.m_capacity;
-    m_size = a.m_size;
+    m_capacity = a.getCapacity();
+    m_size = a.getSize();
     m_data = uninitializedCopy(a);
 }
 
@@ -62,13 +62,13 @@ inline bdBool bdArray<T>::get(const bdUInt i, T& value)
 }
 
 template<typename T>
-inline bdBool bdArray<T>::findFirst(const T* value, bdUInt* i) const
+inline bdBool bdArray<T>::findFirst(const T& value, bdUInt& i) const
 {
     for (bdUInt j = 0; j < m_size; ++j)
     {
-        if (value == &m_data[j])
+        if (value == m_data[j])
         {
-            *i = j;
+            i = j;
             return true;
         }
     }
@@ -278,7 +278,7 @@ void bdArray<T>::operator=(const bdArray<T>& a)
     {
         for (bdUInt i = 0; i < newSize; ++i)
         {
-            m_data[i] = a[i];
+            bdMemcpy(&m_data[i], &a[i], sizeof(T));
         }
         destruct(&m_data[newSize], m_size - newSize);
         m_size = newSize;
@@ -288,7 +288,7 @@ void bdArray<T>::operator=(const bdArray<T>& a)
     {
         for (bdUInt i = 0; i < m_size; ++i)
         {
-            m_data[i] = a[i];
+            bdMemcpy(&m_data[i], &a[i], sizeof(T));
         }
         copyConstructArrayArray(&m_data[m_size], &a.m_data[m_size], newSize - m_size);
         m_size = newSize;

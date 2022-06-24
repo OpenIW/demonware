@@ -9,13 +9,14 @@ protected:
 public:
     static bdUInt serializedSize;
 
+    void* operator new(bdUWord nbytes, void* p);
     void* operator new(bdUWord nbytes);
     void operator delete(void* p);
-    void* operator new(bdUWord nbytes, void* p);
     bdAddr();
     bdAddr(const bdAddr& other);
     bdAddr(const bdInetAddr& address, const bdPort port);
     bdAddr(const bdNChar8* socketAddress);
+    ~bdAddr();
     bdBool operator==(const bdAddr& other) const;
     bdBool operator!=(const bdAddr& other) const;
 

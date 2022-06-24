@@ -58,7 +58,7 @@ public:
     bdBool probe(bdCommonAddrRef addr, const bdSecurityID& id, const bdSecurityKey& key, bdQoSProbeListener* listener);
     void onNATAddrDiscovery(bdCommonAddrRef remote, const bdAddr& realAddr);
     void onNATAddrDiscoveryFailed(bdCommonAddrRef remote);
-    bdBool acceptPacket(bdSocket* __formal, bdAddr addr, void* data, const bdUInt size, bdUByte8 type);
+    virtual bdBool acceptPacket(bdSocket* __formal, bdAddr addr, void* data, const bdUInt size, bdUByte8 type);
     void pump();
     bdBool handleRequest(bdQoSRequestPacket& packet, bdAddr& addr, bdInt32 packetSize);
     bdBool handleReply(bdQoSReplyPacket& packet, bdAddr& addr, bdInt32 packetSize);

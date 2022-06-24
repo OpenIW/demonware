@@ -4,6 +4,11 @@
 
 bdUInt bdAddr::serializedSize = 0;
 
+void* bdAddr::operator new(bdUWord nbytes, void* p)
+{
+    return p;
+}
+
 void* bdAddr::operator new(bdUWord nbytes)
 {
     return bdMemory::allocate(nbytes);
@@ -12,11 +17,6 @@ void* bdAddr::operator new(bdUWord nbytes)
 void bdAddr::operator delete(void* p)
 {
     bdMemory::deallocate(p);
-}
-
-void* bdAddr::operator new(bdUWord nbytes, void* p)
-{
-    return p;
 }
 
 bdAddr::bdAddr()
@@ -38,6 +38,11 @@ bdAddr::bdAddr(const bdNChar8* socketAddress)
     : m_address()
 {
     set(socketAddress);
+}
+
+bdAddr::~bdAddr()
+{
+    m_address.~bdInetAddr();
 }
 
 bdBool bdAddr::operator==(const bdAddr& other) const
@@ -147,7 +152,7 @@ const bdUWord bdAddr::toString(bdNChar8* const str, const bdUWord size) const
     bdUWord strLength;
 
     strLength = m_address.toString(str, size);
-    return bdSnprintf(&str[strLength], (strLength <= size ? size - strLength : 0), ":%u") + strLength;
+    return bdSnprintf(&str[strLength], (strLength <= size ? size - strLength : 0), ":%u", m_port) + strLength;
 }
 
 bdBool bdAddr::serialize(bdUByte8* data, const bdUInt size, const bdUInt offset, bdUInt& newOffset) const

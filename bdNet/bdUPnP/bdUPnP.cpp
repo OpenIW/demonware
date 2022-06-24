@@ -283,6 +283,7 @@ bdBool bdUPnP::checkForDiscoveredDevices(bdUPnPDevice* discoveredDevice)
         {
             return true;
         }
+        return false;
     }
     m_bytesReceived = received;
     m_readBuffer[m_bytesReceived] = 0;

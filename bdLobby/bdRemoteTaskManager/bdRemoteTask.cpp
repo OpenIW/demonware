@@ -128,11 +128,11 @@ bdBool bdRemoteTask::deserializeTaskReply(bdByteBufferRef buffer)
                     for (bdUInt i = 0; i < numResultsToRead; ++i)
                     {
                         taskResult->deserialize(bdByteBufferRef(buffer));
-                        taskResult = (bdTaskResult*)((char*)taskResult + taskResultSize); // Temp bug fix?
+                        taskResult = (bdTaskResult*)((char*)taskResult + taskResultSize);
                     }
                     if (m_taskResultProcessor)
                     {
-                        ok = ok == m_taskResultProcessor->processResult(m_taskResult, m_numResults >= m_maxNumResults ? m_maxNumResults : m_numResults);
+                        ok = ok == m_taskResultProcessor->processResult(m_taskResult, numResultsToRead);
                     }
                 }
                 else if (m_taskResultList)

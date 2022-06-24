@@ -192,7 +192,7 @@ void bdNetImpl::pump()
     bdNChar8 addrBuffer[22];
     bdUByte8 data[1288];
 
-    if (m_params.m_onlineGame || m_status == BD_NET_PENDING)
+    if (!m_params.m_onlineGame || m_status != BD_NET_PENDING)
     {
         return;
     }
@@ -210,7 +210,7 @@ void bdNetImpl::pump()
     {
         if (m_UPnP.getState() == bdUPnP::BD_UPNP_FINISHED && m_UPnP.getPortStatus() == bdUPnPDevice::BD_UPNP_PORT_COLLISION_FOUND)
         {
-            if (m_upnpCollisionRetryCount <= 20)
+            if (++m_upnpCollisionRetryCount <= 20)
             {
                 bdNetStartParams params(m_params);
                 params.m_socket = NULL;
@@ -248,13 +248,13 @@ void bdNetImpl::pump()
                 bdAddr addr(inAddr, m_params.m_natTravPort);
                 bdUInt index = 0;
                 addr.toString(addrBuffer, sizeof(addrBuffer));
-                if (m_natTravAddrs.findFirst(&addr, &index))
+                if (m_natTravAddrs.findFirst(addr, index))
                 {
                     bdLogInfo("bdNet/net", "Duplicate IP %s for Host: %s ignored", addrBuffer, m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer());
                 }
                 else
                 {
-                    bdLogInfo("bdNet/net", "Adding IP %s for Host: %s", addrBuffer);
+                    bdLogInfo("bdNet/net", "Adding IP %s for Host: %s", addrBuffer, m_params.m_natTravHosts[m_currentNatTravHostIndex].getBuffer());
                     m_natTravAddrs.pushBack(addr);
                 }
             }
@@ -312,6 +312,7 @@ void bdNetImpl::pump()
             {
                 bdLogWarn("bdNet/net", "Failed to lookup address %s", m_params.m_natTravHosts[i].getBuffer());
             }
+            m_status = BD_NET_ONLINE_FAILED;
         }
     }
     bdAddr fromAddr;
@@ -362,7 +363,6 @@ void bdNetImpl::pump()
                 if (m_ipDiscClient)
                 {
                     m_ipDiscClient->~bdIPDiscoveryClient();
-                    delete m_ipDiscClient;
                 }
                 m_ipDiscClient = NULL;
             }
@@ -372,7 +372,6 @@ void bdNetImpl::pump()
                 if (m_natTypeDiscClient)
                 {
                     m_natTypeDiscClient->~bdNATTypeDiscoveryClient();
-                    delete m_natTypeDiscClient;
                 }
                 m_natTypeDiscClient = NULL;
             }

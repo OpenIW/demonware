@@ -159,7 +159,16 @@ void bdLobbyService::registerEventHandler(bdLobbyEventHandler* eventHandler)
 
 bdMessaging* bdLobbyService::getMessaging()
 {
-    return m_messaging;
+    if (*m_lobbyConnection && m_lobbyConnection->getStatus() == bdLobbyConnection::BD_CONNECTED)
+    {
+        if (!m_messaging)
+        {
+            m_messaging = new bdMessaging(m_taskManager);
+        }
+        return m_messaging;
+    }
+    bdLogWarn("lobby service", "Not connected.");
+    return NULL;
 }
 
 bdMatchMaking* bdLobbyService::getMatchMaking()

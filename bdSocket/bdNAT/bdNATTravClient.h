@@ -28,7 +28,7 @@ public:
     void receiveFrom(const bdAddr& addr, bdNATTraversalPacket& packet);
     void pump();
     bdBool quit();
-    bdBool acceptPacket(bdSocket* __formal, bdAddr addr, void* data, const bdUInt size, const bdUByte8 type);
+    virtual bdBool acceptPacket(bdSocket* __formal, bdAddr addr, void* data, const bdUInt size, const bdUByte8 type);
     bdBool sendKeepAlive();
     bdBool sendStage1(bdNATTravClientData& data);
     bdBool sendStage2(bdNATTravClientData& data);

@@ -76,7 +76,7 @@ inline void bdFastArray<T>::copyArrayObject(T* dest, const T& src, const bdUInt 
 template<typename T>
 inline void bdFastArray<T>::copyObjectObject(T* dest, const T& src)
 {
-    bdMemcpy(dest, src, sizeof(T));
+    bdMemcpy(dest, &src, sizeof(T));
 }
 
 template<typename T>
